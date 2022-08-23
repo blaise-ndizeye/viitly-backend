@@ -3,7 +3,10 @@ const jwt = require("jsonwebtoken")
 const { ApolloError } = require("apollo-server-errors")
 
 const User = require("../../models/User")
-const { registerUserValidation } = require("../../validators/userValidator")
+const {
+  registerUserValidation,
+  loginUserValidation,
+} = require("../../validators/userValidator")
 const { userData } = require("../../helpers/userHelpers")
 
 const userMutations = {
@@ -42,9 +45,12 @@ const userMutations = {
         password: hashedPassword,
       }).save()
 
+      /* Send verification code to whatsapp and Generate the 
+      notification to the user to verify his/her account */
+
       const accessToken = await jwt.sign(
         {
-          userId: newUser._id,
+          userId: newUser._id.toString(),
         },
         process.env.ACCESS_SECRET,
         {
@@ -58,6 +64,48 @@ const userMutations = {
         message: "User registered successfully",
         accessToken,
         user: userData(newUser),
+      }
+    } catch (err) {
+      console.error(err)
+      throw new ApolloError(err.message, 500)
+    }
+  },
+  async LoginUser(_, args, __, ___) {
+    try {
+      const { credential, password } = args
+
+      const { error } = loginUserValidation({ credential, password })
+      if (error) return new ApolloError(error, 400)
+
+      const userExists = await User.findOne({
+        $or: [
+          { user_name: credential },
+          { phone: credential },
+          { email: credential },
+          { whatsapp: credential },
+        ],
+      })
+      if (!userExists) return new ApolloError("User doesn't exist")
+
+      const passwordMatch = await bcrypt.compare(password, userExists.password)
+      if (!passwordMatch) return new ApolloError("Incorrect password", 400)
+
+      const accessToken = await jwt.sign(
+        {
+          user_id: userExists._id.toString(),
+        },
+        process.env.ACCESS_SECRET,
+        {
+          expiresIn: "7d",
+        }
+      )
+
+      return {
+        code: 200,
+        success: true,
+        message: "User logged in successfully",
+        accessToken,
+        user: userData(userExists),
       }
     } catch (err) {
       console.error(err)

@@ -28,4 +28,13 @@ module.exports = {
       return { error: "" }
     }
   },
+  loginUserValidation(data) {
+    if (!data.credential) {
+      return { error: "Email, Phone, Whatsapp or Username is required" }
+    } else if (!data.password) {
+      return { error: "Password is required" }
+    } else {
+      return { error: "" }
+    }
+  },
 }

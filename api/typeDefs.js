@@ -50,6 +50,7 @@ const typeDefs = gql`
   }
   type Mutation {
     RegisterUser(inputs: UserInput): LogUserResponse!
+    LoginUser(credential: String!, password: String!): LogUserResponse!
   }
 `
 
