@@ -43,6 +43,11 @@ const UserSchema = new Schema({
     required: true,
     default: 0,
   },
+  nReviews: {
+    type: Number,
+    required: true,
+    default: 0,
+  },
   role: {
     type: String,
     default: "PERSONAL",

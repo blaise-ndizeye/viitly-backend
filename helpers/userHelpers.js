@@ -10,6 +10,7 @@ module.exports = {
       nFollowers: data.nFollowers,
       nPosts: data.nPosts,
       nProducts: data.nProducts,
+      nReviews: data.nReviews,
       role: data.role,
       verified: data.verified,
       createdAt: data.createdAt.toISOString(),
