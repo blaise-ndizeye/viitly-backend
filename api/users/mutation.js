@@ -4,6 +4,7 @@ const { ApolloError } = require("apollo-server-errors")
 
 const User = require("../../models/User")
 const { registerUserValidation } = require("../../validators/userValidator")
+const { userData } = require("../../helpers/userHelpers")
 
 const userMutations = {
   async RegisterUser(_, args, __, ___) {
@@ -36,18 +37,28 @@ const userMutations = {
       const salt = await bcrypt.genSalt(10)
       const hashedPassword = await bcrypt.hash(data.password, salt)
 
-      const user = await new User({ ...data, password: hashedPassword }).save()
+      const newUser = await new User({
+        ...data,
+        password: hashedPassword,
+      }).save()
 
       const accessToken = await jwt.sign(
         {
-          userId: user._id,
+          userId: newUser._id,
         },
         process.env.ACCESS_SECRET,
         {
           expiresIn: "7d",
         }
       )
-      console.log(user, accessToken)
+
+      return {
+        code: 201,
+        success: true,
+        message: "User registered successfully",
+        accessToken,
+        user: userData(newUser),
+      }
     } catch (err) {
       console.error(err)
       throw new ApolloError(err.message, 500)

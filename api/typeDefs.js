@@ -49,7 +49,7 @@ const typeDefs = gql`
     hello: String!
   }
   type Mutation {
-    RegisterUser(inputs: UserInput): LogUserResponse
+    RegisterUser(inputs: UserInput): LogUserResponse!
   }
 `
 
