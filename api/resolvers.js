@@ -1,9 +1,11 @@
+const userMutations = require("./users/mutation")
+
 const resolvers = {
   Query: {
     hello: () => "hello there",
   },
   Mutation: {
-    mutate: () => "Am mutation",
+    ...userMutations,
   },
 }
 
