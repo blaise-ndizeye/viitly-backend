@@ -13,7 +13,7 @@ const reviewMutations = {
       isAuthenticated(ctx)
       isValidUser(ctx.user, from)
 
-      const { error } = addReviewValidation(inputs)
+      const { error } = await addReviewValidation(inputs)
       if (error) throw new ApolloError(error, 400)
 
       const receiverExists = await User.findById(to)
