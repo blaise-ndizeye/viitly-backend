@@ -59,7 +59,7 @@ const typeDefs = gql`
     whatsapp: String!
     email: String!
     password: String!
-    confirmPassword: String!
+    confirm_password: String!
   }
 
   input ReviewInput {

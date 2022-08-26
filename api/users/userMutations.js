@@ -6,7 +6,7 @@ const User = require("../../models/User")
 const {
   registerUserValidation,
   loginUserValidation,
-} = require("../../validators/userValidator")
+} = require("../../validators")
 const { userData } = require("../../helpers/userHelpers")
 
 const userMutations = {
@@ -14,8 +14,11 @@ const userMutations = {
     try {
       const data = args.inputs
 
-      const { error } = registerUserValidation(data)
-      if (error) return new ApolloError(error, 400)
+      const { error } = await registerUserValidation(data)
+      if (error) throw new ApolloError(error, 400)
+
+      if (data.password !== data.confirm_password)
+        throw new ApolloError("Passwords must match", 400)
 
       const userNameExists = User.findOne({ user_name: data.user_name })
       const phoneExists = User.findOne({ phone: data.phone })
@@ -29,11 +32,11 @@ const userMutations = {
         emailExists,
       ])
 
-      if (pr1) return new ApolloError("Username is not available", 400)
-      if (pr2) return new ApolloError("Phone number is already registered", 400)
+      if (pr1) throw new ApolloError("Username is not available", 400)
+      if (pr2) throw new ApolloError("Phone number is already registered", 400)
       if (pr3)
-        return new ApolloError("Whatsapp number is already registered", 400)
-      if (pr4) return new ApolloError("Email is already registered", 400)
+        throw new ApolloError("Whatsapp number is already registered", 400)
+      if (pr4) throw new ApolloError("Email is already registered", 400)
 
       /* Upload functionality will be added here */
 
@@ -66,29 +69,28 @@ const userMutations = {
         user: userData(newUser),
       }
     } catch (err) {
-      console.error(err)
-      throw new ApolloError(err.message, 500)
+      throw new ApolloError(err.message, err.extensions.code)
     }
   },
   async LoginUser(_, args, __, ___) {
     try {
       const { credential, password } = args
 
-      const { error } = loginUserValidation({ credential, password })
-      if (error) return new ApolloError(error, 400)
+      const { error } = await loginUserValidation({ credential, password })
+      if (error) throw new ApolloError(error, 400)
 
       const userExists = await User.findOne({
         $or: [
           { user_name: credential },
-          { phone: credential },
+          { phone: credential.substring(1) },
           { email: credential },
-          { whatsapp: credential },
+          { whatsapp: credential.substring(1) },
         ],
       })
-      if (!userExists) return new ApolloError("User doesn't exist", 400)
+      if (!userExists) throw new ApolloError("User doesn't exist", 400)
 
       const passwordMatch = await bcrypt.compare(password, userExists.password)
-      if (!passwordMatch) return new ApolloError("Incorrect password", 400)
+      if (!passwordMatch) throw new ApolloError("Incorrect password", 400)
 
       const accessToken = await jwt.sign(
         {
@@ -108,8 +110,7 @@ const userMutations = {
         user: userData(userExists),
       }
     } catch (err) {
-      console.error(err)
-      throw new ApolloError(err.message, 500)
+      throw new ApolloError(err.message, err.extensions.code)
     }
   },
 }

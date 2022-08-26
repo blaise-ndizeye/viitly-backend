@@ -2,7 +2,7 @@ const { ApolloError } = require("apollo-server-errors")
 
 const Reviews = require("../../models/Reviews")
 const User = require("../../models/User")
-const { addReviewValidation } = require("../../validators/reviewValidator")
+const { addReviewValidation } = require("../../validators")
 const { reviewData } = require("../../helpers/reviewHelpers")
 const { isValidUser, isAuthenticated } = require("../shield")
 
