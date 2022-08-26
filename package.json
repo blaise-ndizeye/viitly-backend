@@ -10,6 +10,7 @@
   "author": "Blaise NDIZEYE",
   "license": "ISC",
   "dependencies": {
+    "@graphql-tools/schema": "^9.0.1",
     "apollo-server-core": "^3.10.1",
     "apollo-server-errors": "^3.3.1",
     "apollo-server-express": "^3.10.1",
@@ -21,9 +22,11 @@
     "flutterwave-node-v3": "^1.0.10",
     "graphql": "^16.5.0",
     "graphql-upload": "^16.0.1",
+    "joi": "^17.6.0",
     "jsonwebtoken": "^8.5.1",
     "mongoosastic": "^5.0.0",
     "mongoose": "^6.5.2",
-    "wbm": "^1.1.16"
+    "wbm": "^1.1.16",
+    "yup": "^0.32.11"
   }
 }

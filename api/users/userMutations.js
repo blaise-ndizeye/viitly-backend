@@ -50,7 +50,7 @@ const userMutations = {
 
       const accessToken = await jwt.sign(
         {
-          userId: newUser._id.toString(),
+          user_id: newUser._id.toString(),
         },
         process.env.ACCESS_SECRET,
         {

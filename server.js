@@ -10,6 +10,7 @@ require("dotenv").config()
 const typeDefs = require("./api/typeDefs")
 const resolvers = require("./api/resolvers")
 const connectDB = require("./utils/db")
+const contextHandler = require("./api/context")
 
 async function startApolloServer() {
   const app = express()
@@ -19,6 +20,7 @@ async function startApolloServer() {
   const server = new ApolloServer({
     typeDefs,
     resolvers,
+    context: ({ req }) => contextHandler({ req }),
     csrfPrevention: true,
     plugins: [
       ApolloServerPluginDrainHttpServer({ httpServer }),
