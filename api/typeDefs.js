@@ -74,6 +74,13 @@ const typeDefs = gql`
     rating: Int!
   }
 
+  input UpdateReviewInput {
+    user_id: ID!
+    review_id: ID!
+    description: String!
+    rating: Int!
+  }
+
   type Query {
     hello: String!
   }
@@ -82,6 +89,7 @@ const typeDefs = gql`
     RegisterUser(inputs: UserInput!, avatar: Upload): LogUserResponse!
     LoginUser(credential: String!, password: String!): LogUserResponse!
     SendReview(inputs: ReviewInput!): ReviewResponse!
+    UpdateReview(inputs: UpdateReviewInput!): ReviewResponse!
   }
 `
 

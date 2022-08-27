@@ -10,7 +10,7 @@ const customResolvers = {
       return userData(user)
     },
     async to(parent) {
-      const user = await User.findById(parent.from)
+      const user = await User.findById(parent.to)
       return userData(user)
     },
   },

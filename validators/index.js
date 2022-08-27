@@ -78,4 +78,22 @@ module.exports = {
       .then(() => ({ error: "" }))
       .catch((err) => ({ error: err.errors[0] }))
   },
+  updateReviewValidation(data) {
+    const updateReviewSchema = Yup.object({
+      description: Yup.string()
+        .min(3, "Review message must have at least 3 characters")
+        .required("Review message is required"),
+      rating: Yup.number()
+        .positive()
+        .integer()
+        .max(5, "Maximum rating must be 5")
+        .min(1, "Minimum rating must be 1")
+        .required("Rating is required"),
+    })
+
+    return updateReviewSchema
+      .validate(data, { abortEarly: false })
+      .then(() => ({ error: "" }))
+      .catch((err) => ({ error: err.errors[0] }))
+  },
 }
