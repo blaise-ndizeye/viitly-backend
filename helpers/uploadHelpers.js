@@ -1,6 +1,5 @@
 const path = require("path")
 const fs = require("fs")
-const { ApolloError } = require("apollo-server-errors")
 
 const imageFormats = [
   ".avif",

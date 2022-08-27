@@ -2,6 +2,7 @@ module.exports = {
   userData(data) {
     return {
       user_id: data._id.toString(),
+      avatar: `${process.env.BASE_URL}/${data.avatar}`,
       name: data.name,
       user_name: data.user_name,
       phone: data.phone,

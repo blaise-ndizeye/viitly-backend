@@ -18,7 +18,7 @@ const reviewMutations = {
 
       const receiverExists = await User.findById(to)
       if (!receiverExists)
-        throw new ApolloError("Receiver of the review doesnot exist")
+        throw new ApolloError("Receiver of the review doesnot exist", 400)
 
       if (from === to)
         throw new ApolloError(

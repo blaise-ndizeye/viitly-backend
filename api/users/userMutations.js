@@ -65,8 +65,16 @@ const userMutations = {
       const salt = await bcrypt.genSalt(10)
       const hashedPassword = await bcrypt.hash(data.password, salt)
 
+      let userProfileImage = ""
+      if (args.avatar) {
+        const { error, fileName } = await uploadOneFile(args.avatar, "image")
+        if (error) throw new ApolloError(error, 400)
+        userProfileImage = fileName
+      }
+
       const newUser = await new User({
         ...data,
+        avatar: userProfileImage,
         password: hashedPassword,
       }).save()
 
@@ -133,41 +141,6 @@ const userMutations = {
       }
     } catch (err) {
       throw new ApolloError(err.message, err.extensions.code)
-    }
-  },
-  async TestUpload(_, { file }, __, ___) {
-    try {
-      const { error, fileName, fileFormat } = await uploadOneFile(file, "video")
-      if (error) throw new ApolloError(error, 400)
-      return {
-        fileName: `${process.env.BASE_URL}/${fileName}`,
-        fileFormat,
-      }
-    } catch (err) {
-      throw new ApolloError(err.message, err.extensions.code)
-    }
-  },
-  async TestMultipleUpload(_, { files }) {
-    try {
-      if (files?.length === 0) return []
-
-      const { error, uploadedFiles } = await uploadManyFiles(files)
-      if (error) throw new ApolloError(error, 400)
-
-      return uploadedFiles.map((file) => ({
-        fileName: `${process.env.BASE_URL}/${file.fileName}`,
-        fileFormat: file.fileFormat,
-      }))
-    } catch (err) {
-      throw new ApolloError(err.message, err.extensions.code)
-    }
-  },
-  async DeleteFile(_, { fileName }) {
-    try {
-      await deleteUploadedFile(fileName)
-      return "File deleted"
-    } catch (err) {
-      throw new ApolloError(err.message, 500 || err?.extensions.code)
     }
   },
 }

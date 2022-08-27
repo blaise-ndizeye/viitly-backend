@@ -57,7 +57,6 @@ const typeDefs = gql`
   }
 
   input UserInput {
-    avatar: Upload
     name: String!
     user_name: String!
     phone: String!
@@ -74,22 +73,14 @@ const typeDefs = gql`
     rating: Int!
   }
 
-  type TestUploadResponse {
-    fileName: String!
-    fileFormat: String!
-  }
-
   type Query {
     hello: String!
   }
 
   type Mutation {
-    RegisterUser(inputs: UserInput!): LogUserResponse!
+    RegisterUser(inputs: UserInput!, avatar: Upload): LogUserResponse!
     LoginUser(credential: String!, password: String!): LogUserResponse!
     SendReview(inputs: ReviewInput!): ReviewResponse!
-    TestUpload(file: Upload!): TestUploadResponse!
-    TestMultipleUpload(files: [Upload!]): [TestUploadResponse!]
-    DeleteFile(fileName: String!): String!
   }
 `
 
