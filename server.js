@@ -3,6 +3,7 @@ const {
   ApolloServerPluginDrainHttpServer,
   ApolloServerPluginLandingPageLocalDefault,
 } = require("apollo-server-core")
+const { graphqlUploadExpress } = require("graphql-upload")
 const express = require("express")
 const http = require("http")
 require("dotenv").config()
@@ -14,6 +15,9 @@ const contextHandler = require("./api/context")
 
 async function startApolloServer() {
   const app = express()
+
+  app.use(graphqlUploadExpress({ maxFiles: 10, maxFileSize: 25000000000 })) //10 files with each maximum 25MB of size
+  app.use(express.static("public/uploads"))
 
   const httpServer = http.createServer(app)
 
@@ -32,11 +36,17 @@ async function startApolloServer() {
   server.applyMiddleware({
     app,
     path: "/api",
+    cors: {
+      origin: [process.env.CLIENT_URL],
+      credentials: true,
+    },
   })
 
   await connectDB()
 
-  await new Promise((resolve) => httpServer.listen({ port: 4000 }, resolve))
+  await new Promise((resolve) =>
+    httpServer.listen({ port: process.env.PORT || 4000 }, resolve)
+  )
   console.log("Server connection established successfully...")
 }
 

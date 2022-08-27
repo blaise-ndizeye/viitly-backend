@@ -6,8 +6,12 @@ const typeDefs = gql`
     BUSINESS
     PROFFESSIONAL
   }
+
+  scalar Upload
+
   type User {
     user_id: ID!
+    avatar: String
     name: String!
     user_name: String!
     email: String!
@@ -53,6 +57,7 @@ const typeDefs = gql`
   }
 
   input UserInput {
+    avatar: Upload
     name: String!
     user_name: String!
     phone: String!
@@ -69,6 +74,11 @@ const typeDefs = gql`
     rating: Int!
   }
 
+  type TestUploadResponse {
+    fileName: String!
+    fileFormat: String!
+  }
+
   type Query {
     hello: String!
   }
@@ -77,6 +87,7 @@ const typeDefs = gql`
     RegisterUser(inputs: UserInput!): LogUserResponse!
     LoginUser(credential: String!, password: String!): LogUserResponse!
     SendReview(inputs: ReviewInput!): ReviewResponse!
+    TestUpload(file: Upload!): TestUploadResponse
   }
 `
 

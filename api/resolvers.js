@@ -1,3 +1,5 @@
+const { GraphQLUpload } = require("graphql-upload")
+
 const customResolvers = require("./customResolvers")
 const reviewMutations = require("./reviews/reviewsMutations")
 const userMutations = require("./users/userMutations")
@@ -11,6 +13,7 @@ const resolvers = {
     ...reviewMutations,
     ...userMutations,
   },
+  Upload: GraphQLUpload,
 }
 
 module.exports = resolvers

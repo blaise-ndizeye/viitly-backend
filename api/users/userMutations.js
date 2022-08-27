@@ -8,13 +8,31 @@ const {
   loginUserValidation,
 } = require("../../validators")
 const { userData } = require("../../helpers/userHelpers")
+const { uploadOneFile } = require("../../helpers/uploadHelpers")
 
 const userMutations = {
   async RegisterUser(_, args, __, ___) {
     try {
       const data = args.inputs
+      const {
+        name,
+        email,
+        user_name,
+        phone,
+        whatsapp,
+        password,
+        confirm_password,
+      } = data
 
-      const { error } = await registerUserValidation(data)
+      const { error } = await registerUserValidation({
+        name,
+        email,
+        phone,
+        user_name,
+        whatsapp,
+        password,
+        confirm_password,
+      })
       if (error) throw new ApolloError(error, 400)
 
       if (data.password !== data.confirm_password)
@@ -108,6 +126,18 @@ const userMutations = {
         message: "User logged in successfully",
         accessToken,
         user: userData(userExists),
+      }
+    } catch (err) {
+      throw new ApolloError(err.message, err.extensions.code)
+    }
+  },
+  async TestUpload(_, { file }, __, ___) {
+    try {
+      const { error, fileName, fileFormat } = await uploadOneFile(file)
+      if (error) throw new ApolloError(error, 400)
+      return {
+        fileName,
+        fileFormat,
       }
     } catch (err) {
       throw new ApolloError(err.message, err.extensions.code)

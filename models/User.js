@@ -3,6 +3,10 @@ const mongoosastic = require("mongoosastic")
 const Schema = mongoose.Schema
 
 const UserSchema = new Schema({
+  avatar: {
+    type: String,
+    required: false,
+  },
   name: {
     type: String,
     required: true,
