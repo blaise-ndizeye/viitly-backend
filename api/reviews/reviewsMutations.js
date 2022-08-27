@@ -33,6 +33,14 @@ const reviewMutations = {
         throw new ApolloError("Only one review is accepted for the user", 400)
 
       const newReview = await new Reviews({ ...inputs }).save()
+      await User.updateOne(
+        { _id: receiverExists._id },
+        {
+          $set: {
+            nReviews: +receiverExists.nReviews + 1,
+          },
+        }
+      )
       return {
         code: 201,
         success: true,

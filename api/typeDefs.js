@@ -24,6 +24,7 @@ const typeDefs = gql`
     verified: Boolean!
     role: Role!
     createdAt: String!
+    reviews: [Review!]!
   }
 
   type Review {

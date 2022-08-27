@@ -75,6 +75,7 @@ const userMutations = {
       const newUser = await new User({
         ...data,
         avatar: userProfileImage,
+        user_name: user_name.toLowerCase(),
         password: hashedPassword,
       }).save()
 
