@@ -8,7 +8,10 @@ const {
   loginUserValidation,
 } = require("../../validators")
 const { userData } = require("../../helpers/userHelpers")
-const { uploadOneFile } = require("../../helpers/uploadHelpers")
+const {
+  uploadOneFile,
+  uploadManyFiles,
+} = require("../../helpers/uploadHelpers")
 
 const userMutations = {
   async RegisterUser(_, args, __, ___) {
@@ -133,12 +136,27 @@ const userMutations = {
   },
   async TestUpload(_, { file }, __, ___) {
     try {
-      const { error, fileName, fileFormat } = await uploadOneFile(file)
+      const { error, fileName, fileFormat } = await uploadOneFile(file, "video")
       if (error) throw new ApolloError(error, 400)
       return {
-        fileName,
+        fileName: `${process.env.BASE_URL}/${fileName}`,
         fileFormat,
       }
+    } catch (err) {
+      throw new ApolloError(err.message, err.extensions.code)
+    }
+  },
+  async TestMultipleUpload(_, { files }) {
+    try {
+      if (files?.length === 0) return []
+
+      const { error, uploadedFiles } = await uploadManyFiles(files)
+      if (error) throw new ApolloError(error, 400)
+
+      return uploadedFiles.map((file) => ({
+        fileName: `${process.env.BASE_URL}/${file.fileName}`,
+        fileFormat: file.fileFormat,
+      }))
     } catch (err) {
       throw new ApolloError(err.message, err.extensions.code)
     }

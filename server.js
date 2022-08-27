@@ -37,7 +37,7 @@ async function startApolloServer() {
     app,
     path: "/api",
     cors: {
-      origin: [process.env.CLIENT_URL],
+      origin: "*",
       credentials: true,
     },
   })

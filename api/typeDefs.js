@@ -87,7 +87,8 @@ const typeDefs = gql`
     RegisterUser(inputs: UserInput!): LogUserResponse!
     LoginUser(credential: String!, password: String!): LogUserResponse!
     SendReview(inputs: ReviewInput!): ReviewResponse!
-    TestUpload(file: Upload!): TestUploadResponse
+    TestUpload(file: Upload!): TestUploadResponse!
+    TestMultipleUpload(files: [Upload!]): [TestUploadResponse!]
   }
 `
 
