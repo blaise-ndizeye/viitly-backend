@@ -89,6 +89,7 @@ const typeDefs = gql`
     SendReview(inputs: ReviewInput!): ReviewResponse!
     TestUpload(file: Upload!): TestUploadResponse!
     TestMultipleUpload(files: [Upload!]): [TestUploadResponse!]
+    DeleteFile(fileName: String!): String!
   }
 `
 

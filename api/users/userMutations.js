@@ -11,6 +11,7 @@ const { userData } = require("../../helpers/userHelpers")
 const {
   uploadOneFile,
   uploadManyFiles,
+  deleteUploadedFile,
 } = require("../../helpers/uploadHelpers")
 
 const userMutations = {
@@ -159,6 +160,14 @@ const userMutations = {
       }))
     } catch (err) {
       throw new ApolloError(err.message, err.extensions.code)
+    }
+  },
+  async DeleteFile(_, { fileName }) {
+    try {
+      await deleteUploadedFile(fileName)
+      return "File deleted"
+    } catch (err) {
+      throw new ApolloError(err.message, 500 || err?.extensions.code)
     }
   },
 }

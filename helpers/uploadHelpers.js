@@ -1,6 +1,6 @@
 const path = require("path")
 const fs = require("fs")
-const { extend } = require("joi")
+const { ApolloError } = require("apollo-server-errors")
 
 const imageFormats = [
   ".avif",
@@ -161,5 +161,11 @@ module.exports = {
       error: "",
       uploadedFiles,
     }
+  },
+  deleteUploadedFile(fileName) {
+    const pathName = path.join(__dirname, `../public/uploads/${fileName}`)
+    return fs.unlink(pathName, () =>
+      console.error(`File doesn't exist: ${fileName}`)
+    )
   },
 }
