@@ -19,6 +19,6 @@ module.exports = {
       throw new ApolloError("Please first verify your account", 401)
   },
   isPayingUser(user) {
-    if (user.role === "PERSONAL") throw new Error("Not authorized", 401)
+    if (user.role === "PERSONAL") throw new ApolloError("Not authorized", 401)
   },
 }

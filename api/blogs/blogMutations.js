@@ -1,6 +1,7 @@
 const { ApolloError } = require("apollo-server-errors")
 
 const Blog = require("../../models/Blog")
+const UploadScope = require("../../models/UploadScope")
 const { uploadBlogValidation } = require("../../validators")
 const {
   isAuthenticated,
@@ -21,6 +22,10 @@ const blogMutations = {
       isValidUser(ctx.user, user_id)
       isAccountVerified(ctx.user)
       isPayingUser(ctx.user)
+
+      const userScope = await UploadScope.findOne({ user_id })
+      if (userScope.blogs_available === 0)
+        throw new ApolloError("Blog upload limit reached", 400)
 
       const { error } = await uploadBlogValidation({
         blog_title,
@@ -54,6 +59,15 @@ const blogMutations = {
         tagged_users: validTaggedUsers,
         blog_media: validUploadedBlogFile,
       }).save()
+
+      await UploadScope.updateOne(
+        { _id: userScope._id },
+        {
+          $set: {
+            blogs_available: +userScope.blogs_available - 1,
+          },
+        }
+      )
 
       return {
         code: 201,

@@ -25,7 +25,12 @@ const typeDefs = gql`
     verified: Boolean!
     role: Role!
     createdAt: String!
+    blogs_upload_limit: Int!
+    posts_upload_limit: Int!
+    products_upload_limit: Int!
     reviews: [Review!]!
+    blogs: [Blog!]!
+    posts: [Post!]!
   }
 
   type Review {

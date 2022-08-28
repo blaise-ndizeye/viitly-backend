@@ -3,16 +3,13 @@ const jwt = require("jsonwebtoken")
 const { ApolloError } = require("apollo-server-errors")
 
 const User = require("../../models/User")
+const UploadScope = require("../../models/UploadScope")
 const {
   registerUserValidation,
   loginUserValidation,
 } = require("../../validators")
 const { userData } = require("../../helpers/userHelpers")
-const {
-  uploadOneFile,
-  uploadManyFiles,
-  deleteUploadedFile,
-} = require("../../helpers/uploadHelpers")
+const { uploadOneFile } = require("../../helpers/uploadHelpers")
 
 const userMutations = {
   async RegisterUser(_, args, __, ___) {
@@ -60,8 +57,6 @@ const userMutations = {
         throw new ApolloError("Whatsapp number is already registered", 400)
       if (pr4) throw new ApolloError("Email is already registered", 400)
 
-      /* Upload functionality will be added here */
-
       const salt = await bcrypt.genSalt(10)
       const hashedPassword = await bcrypt.hash(data.password, salt)
 
@@ -78,6 +73,8 @@ const userMutations = {
         user_name: user_name.toLowerCase(),
         password: hashedPassword,
       }).save()
+
+      await new UploadScope({ user_id: newUser._id.toString() }).save()
 
       /* Send verification code to whatsapp and Generate the 
       notification to the user to verify his/her account */

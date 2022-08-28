@@ -1,6 +1,7 @@
 const { ApolloError } = require("apollo-server-errors")
 
 const Post = require("../../models/Post")
+const UploadScope = require("../../models/UploadScope")
 const {
   isAuthenticated,
   isAccountVerified,
@@ -20,6 +21,10 @@ const postMutations = {
       isValidUser(ctx.user, user_id)
       isAccountVerified(ctx.user)
       isPayingUser(ctx.user)
+
+      const userScope = await UploadScope.findOne({ user_id })
+      if (userScope.posts_available === 0)
+        throw new ApolloError("Post upload limit reached", 400)
 
       if (postMedia?.length === 0)
         throw new ApolloError("Images or videos for the post are required", 400)
@@ -49,6 +54,15 @@ const postMutations = {
         tagged_users: validTaggedUsers.length > 0 ? validTaggedUsers : [],
         post_media: validUploadedPostFiles,
       }).save()
+
+      await UploadScope.updateOne(
+        { _id: userScope._id },
+        {
+          $set: {
+            posts_available: +userScope.posts_available - 1,
+          },
+        }
+      )
 
       return {
         code: 201,
