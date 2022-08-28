@@ -3,7 +3,7 @@ const Yup = require("yup")
 module.exports = {
   addReviewValidation(data) {
     const reviewSchema = Yup.object({
-      from: Yup.string().required("Sender of review is required as [from]"),
+      from: Yup.string().required("Sender of review is required as: [from]"),
       to: Yup.string().required("Receiver of review is required as: [to]"),
       rating: Yup.number()
         .positive()
@@ -92,6 +92,21 @@ module.exports = {
     })
 
     return updateReviewSchema
+      .validate(data, { abortEarly: false })
+      .then(() => ({ error: "" }))
+      .catch((err) => ({ error: err.errors[0] }))
+  },
+  uploadBlogValidation(data) {
+    const uploadBlogSchema = Yup.object({
+      blog_title: Yup.string()
+        .min(5, "Blog title must have at least 5 characters")
+        .required("Blog title is required"),
+      blog_content: Yup.string()
+        .min(20, "Blog content must have at least 20 characters")
+        .required("Blog content is required"),
+    })
+
+    return uploadBlogSchema
       .validate(data, { abortEarly: false })
       .then(() => ({ error: "" }))
       .catch((err) => ({ error: err.errors[0] }))

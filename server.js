@@ -16,7 +16,7 @@ const contextHandler = require("./api/context")
 async function startApolloServer() {
   const app = express()
 
-  app.use(graphqlUploadExpress({ maxFiles: 10, maxFileSize: 25000000000 })) //10 files with each maximum 25MB of size
+  app.use(graphqlUploadExpress({ maxFileSize: 25000000000 })) //10 files with each maximum 25MB of size
   app.use(express.static("public/uploads"))
 
   const httpServer = http.createServer(app)

@@ -55,7 +55,7 @@ const UserSchema = new Schema({
   role: {
     type: String,
     default: "PERSONAL",
-    enum: ["PERSONAL", "BUSINESS", "PROFFESSIONAL"],
+    enum: ["ADMIN", "PERSONAL", "BUSINESS", "PROFFESSIONAL"],
   },
   verified: {
     type: Boolean,

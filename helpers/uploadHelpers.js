@@ -33,7 +33,7 @@ module.exports = {
   /*
   Uploading one file implementation
   */
-  async uploadOneFile(file, fileType = "random") {
+  async uploadOneFile(file, fileType = "") {
     const { createReadStream, filename } = await file
     let uploadedFileFormat = ""
     const stream = createReadStream()
@@ -65,16 +65,11 @@ module.exports = {
           fileFormat: "",
         }
       uploadedFileFormat = "video"
-    } else if (fileType === "random") {
-      if (!isImage && !isVideo)
-        return {
-          error: "Invalid file: Only video or image files are allowed",
-          fileName: "",
-          fileFormat: "",
-        }
     } else
       return {
         error: "Please provide valid file type: image or video",
+        fileName: "",
+        fileFormat: "",
       }
 
     name = `bm${uploadedFileFormat}${Math.floor(Math.random() * 1000000) + 1}`

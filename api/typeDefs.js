@@ -2,6 +2,7 @@ const { gql } = require("apollo-server-express")
 
 const typeDefs = gql`
   enum Role {
+    ADMIN
     PERSONAL
     BUSINESS
     PROFFESSIONAL
@@ -36,6 +37,40 @@ const typeDefs = gql`
     createdAt: String!
   }
 
+  type File {
+    file_format: String!
+    file_name: String!
+  }
+
+  type Post {
+    post_id: ID!
+    owner: User!
+    description: String
+    prized: Boolean!
+    nLikes: Int!
+    nComments: Int!
+    nShares: Int!
+    nViews: Int!
+    createdAt: String!
+    tagged_users: [User!]!
+    post_media: [File!]!
+  }
+
+  type Blog {
+    blog_id: ID!
+    owner: User!
+    blog_title: String!
+    blog_content: String!
+    blog_media: File!
+    prized: Boolean!
+    nLikes: Int!
+    nComments: Int!
+    nShares: Int!
+    nViews: Int!
+    createdAt: String!
+    tagged_users: [User!]!
+  }
+
   interface MutationResponse {
     code: Int!
     success: Boolean!
@@ -57,6 +92,20 @@ const typeDefs = gql`
     review: Review!
   }
 
+  type PostResponse implements MutationResponse {
+    code: Int!
+    success: Boolean!
+    message: String!
+    post: Post!
+  }
+
+  type BlogResponse implements MutationResponse {
+    code: Int!
+    success: Boolean!
+    message: String!
+    blog: Blog!
+  }
+
   input UserInput {
     name: String!
     user_name: String!
@@ -65,6 +114,19 @@ const typeDefs = gql`
     email: String!
     password: String!
     confirm_password: String!
+  }
+
+  input PostInput {
+    user_id: ID!
+    description: String
+    tagged_users: [String!]!
+  }
+
+  input BlogInput {
+    user_id: ID!
+    blog_title: String!
+    blog_content: String!
+    tagged_users: [String!]!
   }
 
   input ReviewInput {
@@ -90,6 +152,8 @@ const typeDefs = gql`
     LoginUser(credential: String!, password: String!): LogUserResponse!
     SendReview(inputs: ReviewInput!): ReviewResponse!
     UpdateReview(inputs: UpdateReviewInput!): ReviewResponse!
+    UploadPost(inputs: PostInput!, postMedia: [Upload!]): PostResponse!
+    UploadBlog(inputs: BlogInput!, blogMedia: Upload): BlogResponse!
   }
 `
 

@@ -9,9 +9,16 @@ module.exports = {
       throw new ApolloError("Not authorized: Invalid operating user", 401)
   },
   isAdmin(user) {
-    if (user.role !== "ADMIN") return new ApolloError("Not authorized", 401)
+    if (user.role !== "ADMIN") throw new ApolloError("Not authorized", 401)
   },
   isBusinessPerson(user) {
-    if (user.role !== "BUSINESS") return new ApolloError("Not authorized", 401)
+    if (user.role !== "BUSINESS") throw new ApolloError("Not authorized", 401)
+  },
+  isAccountVerified(user) {
+    if (!user.verified)
+      throw new ApolloError("Please first verify your account", 401)
+  },
+  isPayingUser(user) {
+    if (user.role === "PERSONAL") throw new Error("Not authorized", 401)
   },
 }
