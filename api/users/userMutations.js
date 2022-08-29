@@ -10,6 +10,7 @@ const {
 } = require("../../validators")
 const { userData } = require("../../helpers/userHelpers")
 const { uploadOneFile } = require("../../helpers/uploadHelpers")
+const { generateServerError } = require("../../helpers/errorHelpers")
 
 const userMutations = {
   async RegisterUser(_, args, __, ___) {
@@ -97,7 +98,7 @@ const userMutations = {
         user: userData(newUser),
       }
     } catch (err) {
-      throw new ApolloError(err.message, err.extensions.code)
+      generateServerError(err)
     }
   },
   async LoginUser(_, args, __, ___) {
@@ -138,7 +139,7 @@ const userMutations = {
         user: userData(userExists),
       }
     } catch (err) {
-      throw new ApolloError(err.message, err.extensions.code)
+      generateServerError(err)
     }
   },
 }

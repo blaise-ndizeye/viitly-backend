@@ -80,7 +80,7 @@ const blogMutations = {
         blog: blogData(newBlog),
       }
     } catch (err) {
-      throw new ApolloError(err.message, err.extensions.code)
+      generateServerError(err)
     }
   },
   async DeleteBlog(_, { user_id, blog_id }, ctx, ___) {

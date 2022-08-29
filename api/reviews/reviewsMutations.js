@@ -8,6 +8,7 @@ const {
 } = require("../../validators")
 const { reviewData } = require("../../helpers/reviewHelpers")
 const { isValidUser, isAuthenticated } = require("../shield")
+const { generateServerError } = require("../../helpers/errorHelpers")
 
 const reviewMutations = {
   async SendReview(_, { inputs }, ctx, ___) {
@@ -51,7 +52,7 @@ const reviewMutations = {
         review: reviewData(newReview),
       }
     } catch (err) {
-      throw new ApolloError(err.message, err.extensions.code)
+      generateServerError(err)
     }
   },
   async UpdateReview(_, args, ctx, ___) {
@@ -89,7 +90,7 @@ const reviewMutations = {
         review: reviewData(updatedReview),
       }
     } catch (err) {
-      throw new ApolloError(err.message, err.extensions.code)
+      generateServerError(err)
     }
   },
   async DeleteReview(_, { user_id, review_id }, ctx, ___) {
@@ -124,7 +125,7 @@ const reviewMutations = {
         message: "Review deleled successfully",
       }
     } catch (err) {
-      throw new ApolloError(err.message, err.extensions.code)
+      generateServerError(err)
     }
   },
 }

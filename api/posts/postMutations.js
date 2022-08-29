@@ -14,6 +14,7 @@ const {
 } = require("../../helpers/uploadHelpers")
 const { postData } = require("../../helpers/postHelpers")
 const { verifyTaggedUsers } = require("../../helpers/tagHelpers")
+const { generateServerError } = require("../../helpers/errorHelpers")
 
 const postMutations = {
   async UploadPost(_, { inputs, postMedia = [] }, ctx, ___) {
@@ -74,7 +75,7 @@ const postMutations = {
         post: postData(newPost),
       }
     } catch (err) {
-      throw new ApolloError(err.message, err.extensions.code)
+      generateServerError(err)
     }
   },
   async DeletePost(_, { user_id, post_id }, ctx, ___) {
@@ -101,11 +102,7 @@ const postMutations = {
         message: "Post deleted successfully",
       }
     } catch (err) {
-      if (!err?.extensions) {
-        throw new ApolloError(err.message, 500)
-      } else {
-        throw new ApolloError(err.message, err.extensions.code)
-      }
+      generateServerError(err)
     }
   },
 }
