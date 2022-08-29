@@ -92,6 +92,41 @@ const reviewMutations = {
       throw new ApolloError(err.message, err.extensions.code)
     }
   },
+  async DeleteReview(_, { user_id, review_id }, ctx, ___) {
+    try {
+      isAuthenticated(ctx)
+      isValidUser(ctx.user, user_id)
+
+      if (!review_id) throw new ApolloError("Review_id is required", 400)
+
+      const reviewExists = await Reviews.findOne({
+        $and: [{ _id: review_id }, { from: user_id }],
+      })
+      if (!reviewExists) throw new ApolloError("Review doesn't exist", 400)
+
+      const reviewReceiver = await User.findOne({ _id: reviewExists.to })
+      if (!reviewReceiver)
+        throw new ApolloError("Review reciever doesn't exist", 400)
+
+      await Reviews.deleteOne({ _id: reviewExists._id })
+      await User.updateOne(
+        { _id: reviewExists.to },
+        {
+          $set: {
+            nReviews: reviewReceiver.nReviews - 1,
+          },
+        }
+      )
+
+      return {
+        code: 200,
+        success: true,
+        message: "Review deleled successfully",
+      }
+    } catch (err) {
+      throw new ApolloError(err.message, err.extensions.code)
+    }
+  },
 }
 
 module.exports = reviewMutations

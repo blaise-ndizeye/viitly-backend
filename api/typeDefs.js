@@ -111,6 +111,12 @@ const typeDefs = gql`
     blog: Blog!
   }
 
+  type DeleteReviewResponse implements MutationResponse {
+    code: Int!
+    success: Boolean!
+    message: String!
+  }
+
   input UserInput {
     name: String!
     user_name: String!
@@ -157,6 +163,7 @@ const typeDefs = gql`
     LoginUser(credential: String!, password: String!): LogUserResponse!
     SendReview(inputs: ReviewInput!): ReviewResponse!
     UpdateReview(inputs: UpdateReviewInput!): ReviewResponse!
+    DeleteReview(user_id: ID!, review_id: ID!): DeleteReviewResponse!
     UploadPost(inputs: PostInput!, postMedia: [Upload!]): PostResponse!
     UploadBlog(inputs: BlogInput!, blogMedia: Upload): BlogResponse!
   }
