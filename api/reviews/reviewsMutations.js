@@ -106,7 +106,7 @@ const reviewMutations = {
 
       const reviewReceiver = await User.findOne({ _id: reviewExists.to })
       if (!reviewReceiver)
-        throw new ApolloError("Review reciever doesn't exist", 400)
+        throw new ApolloError("Review receiver doesn't exist", 400)
 
       await Reviews.deleteOne({ _id: reviewExists._id })
       await User.updateOne(

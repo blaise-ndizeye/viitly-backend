@@ -111,7 +111,7 @@ const typeDefs = gql`
     blog: Blog!
   }
 
-  type DeleteReviewResponse implements MutationResponse {
+  type DeleteDataResponse implements MutationResponse {
     code: Int!
     success: Boolean!
     message: String!
@@ -163,8 +163,9 @@ const typeDefs = gql`
     LoginUser(credential: String!, password: String!): LogUserResponse!
     SendReview(inputs: ReviewInput!): ReviewResponse!
     UpdateReview(inputs: UpdateReviewInput!): ReviewResponse!
-    DeleteReview(user_id: ID!, review_id: ID!): DeleteReviewResponse!
+    DeleteReview(user_id: ID!, review_id: ID!): DeleteDataResponse!
     UploadPost(inputs: PostInput!, postMedia: [Upload!]): PostResponse!
+    DeletePost(user_id: ID!, post_id: ID!): DeleteDataResponse!
     UploadBlog(inputs: BlogInput!, blogMedia: Upload): BlogResponse!
   }
 `

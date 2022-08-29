@@ -8,7 +8,10 @@ const {
   isPayingUser,
   isValidUser,
 } = require("../shield")
-const { uploadManyFiles } = require("../../helpers/uploadHelpers")
+const {
+  uploadManyFiles,
+  deleteUploadedFile,
+} = require("../../helpers/uploadHelpers")
 const { postData } = require("../../helpers/postHelpers")
 const { verifyTaggedUsers } = require("../../helpers/tagHelpers")
 
@@ -72,6 +75,37 @@ const postMutations = {
       }
     } catch (err) {
       throw new ApolloError(err.message, err.extensions.code)
+    }
+  },
+  async DeletePost(_, { user_id, post_id }, ctx, ___) {
+    try {
+      isAuthenticated(ctx)
+      isValidUser(ctx.user, user_id)
+      isAccountVerified(ctx.user)
+      isPayingUser(ctx.user)
+
+      if (!post_id) throw new ApolloError("Post_id is required", 400)
+
+      const postExist = await Post.findOne({ _id: post_id })
+      if (!postExist) throw new ApolloError("Post doesn't exist", 400)
+
+      for (let post_media of postExist.post_media) {
+        deleteUploadedFile(post_media.file_name)
+      }
+
+      await Post.deleteOne({ _id: postExist._id })
+
+      return {
+        code: 200,
+        success: true,
+        message: "Post deleted successfully",
+      }
+    } catch (err) {
+      if (!err?.extensions) {
+        throw new ApolloError(err.message, 500)
+      } else {
+        throw new ApolloError(err.message, err.extensions.code)
+      }
     }
   },
 }

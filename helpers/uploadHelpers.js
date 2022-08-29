@@ -158,8 +158,10 @@ module.exports = {
   },
   deleteUploadedFile(fileName) {
     const pathName = path.join(__dirname, `../public/uploads/${fileName}`)
-    return fs.unlink(pathName, () =>
-      console.error(`File doesn't exist: ${fileName}`)
-    )
+    return fs.unlink(pathName, (err) => {
+      if (err) {
+        console.error(`File doesn't exist: ${fileName}`)
+      }
+    })
   },
 }
