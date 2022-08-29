@@ -167,6 +167,7 @@ const typeDefs = gql`
     UploadPost(inputs: PostInput!, postMedia: [Upload!]): PostResponse!
     DeletePost(user_id: ID!, post_id: ID!): DeleteDataResponse!
     UploadBlog(inputs: BlogInput!, blogMedia: Upload): BlogResponse!
+    DeleteBlog(user_id: ID!, blog_id: ID!): DeleteDataResponse!
   }
 `
 

@@ -9,9 +9,13 @@ const {
   isPayingUser,
   isValidUser,
 } = require("../shield")
-const { uploadOneFile } = require("../../helpers/uploadHelpers")
+const {
+  uploadOneFile,
+  deleteUploadedFile,
+} = require("../../helpers/uploadHelpers")
 const { blogData } = require("../../helpers/blogHelpers")
 const { verifyTaggedUsers } = require("../../helpers/tagHelpers")
+const { generateServerError } = require("../../helpers/errorHelpers")
 
 const blogMutations = {
   async UploadBlog(_, { inputs, blogMedia }, ctx, ___) {
@@ -72,11 +76,38 @@ const blogMutations = {
       return {
         code: 201,
         success: true,
-        message: "Post uploaded successfully",
+        message: "Blog uploaded successfully",
         blog: blogData(newBlog),
       }
     } catch (err) {
       throw new ApolloError(err.message, err.extensions.code)
+    }
+  },
+  async DeleteBlog(_, { user_id, blog_id }, ctx, ___) {
+    try {
+      isAuthenticated(ctx)
+      isValidUser(ctx.user, user_id)
+      isAccountVerified(ctx.user)
+      isPayingUser(ctx.user)
+
+      if (!blog_id) throw new ApolloError("Blog_id is required", 400)
+
+      const blogExist = await Blog.findOne({ _id: blog_id })
+      if (!blogExist) throw new ApolloError("Blog post doesn't exist", 400)
+
+      if (blogExist.blog_media?.file_name !== "") {
+        deleteUploadedFile(blogExist.blog_media.file_name)
+      }
+
+      await Blog.deleteOne({ _id: blog_id })
+
+      return {
+        code: 200,
+        success: true,
+        message: "Blog deleted successfully",
+      }
+    } catch (err) {
+      generateServerError(err)
     }
   },
 }
