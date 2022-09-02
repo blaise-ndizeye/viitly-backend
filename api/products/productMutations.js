@@ -13,7 +13,10 @@ const {
   validateCategory,
   productData,
 } = require("../../helpers/productHelpers")
-const { uploadManyFiles } = require("../../helpers/uploadHelpers")
+const {
+  uploadManyFiles,
+  deleteUploadedFile,
+} = require("../../helpers/uploadHelpers")
 const { uploadProductValidation } = require("../../validators")
 
 const productMutations = {
@@ -124,6 +127,54 @@ const productMutations = {
       )
 
       const updatedProduct = await Product.findOne({ _id: productExist._id })
+
+      return {
+        code: 200,
+        success: true,
+        message: "Product updated successfully",
+        product: productData(updatedProduct),
+      }
+    } catch (err) {
+      generateServerError(err)
+    }
+  },
+  async UpdateProductMedia(_, args, ctx, ___) {
+    try {
+      const { user_id, product_id, productMedia } = args
+
+      isAuthenticated(ctx)
+      isValidUser(ctx.user, user_id)
+      isAccountVerified(ctx.user)
+      isBusinessPerson(ctx.user)
+
+      const productExist = await Product.findOne({
+        $and: [{ _id: product_id }, { user_id }],
+      })
+      if (!productExist) throw new ApolloError("Product doesn't exist", 400)
+
+      const { error, uploadedFiles } = await uploadManyFiles(
+        productMedia,
+        process.env.ASSETS_PER_PRODUCT
+      )
+      if (error) throw new ApolloError(error, 400)
+
+      await Product.updateOne(
+        { _id: productExist._id },
+        {
+          $set: {
+            product_media: uploadedFiles.map((file) => ({
+              file_name: file.fileName,
+              file_format: file.fileFormat,
+            })),
+          },
+        }
+      )
+
+      for (let media of productExist.product_media) {
+        deleteUploadedFile(media.file_name)
+      }
+
+      const updatedProduct = await Product.findById(productExist._id)
 
       return {
         code: 200,
