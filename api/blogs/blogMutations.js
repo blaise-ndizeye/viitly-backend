@@ -119,7 +119,9 @@ const blogMutations = {
       isAccountVerified(ctx.user)
       isPayingUser(ctx.user)
 
-      const blogExists = await Blog.findById(blog_id)
+      const blogExists = await Blog.findOne({
+        $and: [{ _id: blog_id }, { user_id }],
+      })
       if (!blogExists) throw new ApolloError("Blog doesn't exist", 400)
 
       const { error } = await uploadBlogValidation({
@@ -139,6 +141,52 @@ const blogMutations = {
       )
 
       const updatedBlog = await Blog.findById(blogExists._id)
+
+      return {
+        code: 200,
+        success: true,
+        message: "Blog updated successfully",
+        blog: blogData(updatedBlog),
+      }
+    } catch (err) {
+      generateServerError(err)
+    }
+  },
+  async UpdateBlogMedia(_, args, ctx, ___) {
+    try {
+      const { user_id, blog_id, media } = args
+
+      isAuthenticated(ctx)
+      isValidUser(ctx.user, user_id)
+      isAccountVerified(ctx.user)
+      isPayingUser(ctx.user)
+
+      const blogExist = await Blog.findOne({
+        $and: [{ _id: blog_id }, { user_id }],
+      })
+      if (!blogExist) throw new ApolloError("Blog doesn't exist", 400)
+
+      const { error, fileName, fileFormat } = await uploadOneFile(
+        media,
+        "image"
+      )
+      if (error) throw new ApolloError(error, 400)
+
+      await Blog.updateOne(
+        { _id: blogExist._id },
+        {
+          $set: {
+            blog_media: {
+              file_name: fileName,
+              file_format: fileFormat,
+            },
+          },
+        }
+      )
+
+      deleteUploadedFile(blogExist.blog_media.file_name)
+
+      const updatedBlog = await Blog.findById(blogExist._id)
 
       return {
         code: 200,
