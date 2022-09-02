@@ -105,6 +105,44 @@ const postMutations = {
       generateServerError(err)
     }
   },
+  async UpdatePostText(_, { inputs }, ctx, ___) {
+    try {
+      const { user_id, post_id, description } = inputs
+
+      isAuthenticated(ctx)
+      isValidUser(ctx.user, user_id)
+      isAccountVerified(ctx.user)
+      isPayingUser(ctx.user)
+
+      const postExist = await Post.findOne({
+        $and: [{ _id: post_id }, { user_id }],
+      })
+      if (!postExist) throw new ApolloError("Post doesn't exist", 400)
+
+      if (description.length === 0)
+        throw new ApolloError("Description is required", 400)
+
+      await Post.updateOne(
+        { _id: postExist._id },
+        {
+          $set: {
+            description,
+          },
+        }
+      )
+
+      const updatedPost = await Post.findById(postExist._id)
+
+      return {
+        code: 200,
+        success: true,
+        message: "Post updated successfully",
+        post: postData(updatedPost),
+      }
+    } catch (err) {
+      generateServerError(err)
+    }
+  },
 }
 
 module.exports = postMutations

@@ -133,10 +133,10 @@ const typeDefs = gql`
     tagged_users: [String!]!
   }
 
-  input UpdatePostInput {
+  input UpdatePostTextInput {
     user_id: ID!
     post_id: ID!
-    description: String
+    description: String!
   }
 
   input BlogInput {
@@ -185,7 +185,7 @@ const typeDefs = gql`
     DeleteReview(user_id: ID!, review_id: ID!): DeleteDataResponse!
     UploadPost(inputs: PostInput!, postMedia: [Upload!]): PostResponse!
     DeletePost(user_id: ID!, post_id: ID!): DeleteDataResponse!
-    UpdatePostText(inputs: UpdatePostInput!): PostResponse!
+    UpdatePostText(inputs: UpdatePostTextInput!): PostResponse!
     UpdatePostMedia(inputs: UpdatePostMediaInput!): PostResponse!
     UploadBlog(inputs: BlogInput!, blogMedia: Upload): BlogResponse!
     DeleteBlog(user_id: ID!, blog_id: ID!): DeleteDataResponse!
