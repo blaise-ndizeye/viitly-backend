@@ -111,4 +111,18 @@ module.exports = {
       .then(() => ({ error: "" }))
       .catch((err) => ({ error: err.errors[0] }))
   },
+  uploadProductValidation(data) {
+    const uploadProductSchema = Yup.object({
+      title: Yup.string()
+        .min(2, "Title length must be at least 2 characters")
+        .required("Title is required"),
+      price: Yup.number().positive().required("Price is required"),
+      description: Yup.string().required("Description is required"),
+    })
+
+    return uploadProductSchema
+      .validate(data, { abortEarly: false })
+      .then(() => ({ error: "" }))
+      .catch((err) => ({ error: err.errors[0] }))
+  },
 }

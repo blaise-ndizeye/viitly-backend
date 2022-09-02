@@ -12,7 +12,8 @@ module.exports = {
     if (user.role !== "ADMIN") throw new ApolloError("Not authorized", 401)
   },
   isBusinessPerson(user) {
-    if (user.role !== "BUSINESS") throw new ApolloError("Not authorized", 401)
+    if (!["BUSINESS", "ADMIN"].includes(user.role))
+      throw new ApolloError("Not authorized", 401)
   },
   isAccountVerified(user) {
     if (!user.verified)

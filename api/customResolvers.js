@@ -1,5 +1,6 @@
 const Blog = require("../models/Blog")
 const Post = require("../models/Post")
+const Product = require("../models/Product")
 const Review = require("../models/Reviews")
 const User = require("../models/User")
 const UploadScope = require("../models/UploadScope")
@@ -7,6 +8,7 @@ const { userData } = require("../helpers/userHelpers")
 const { reviewData } = require("../helpers/reviewHelpers")
 const { blogData } = require("../helpers/blogHelpers")
 const { postData } = require("../helpers/postHelpers")
+const { productData } = require("../helpers/productHelpers")
 
 const customResolvers = {
   Review: {
@@ -46,6 +48,10 @@ const customResolvers = {
       const postList = await Post.find({ user_id: parent.user_id })
       return postList.map((post) => postData(post))
     },
+    async products(parent) {
+      const productList = await Product.find({ user_id: parent.user_id })
+      return productList.map((product) => productData(product))
+    },
   },
   Post: {
     async owner(parent) {
@@ -65,6 +71,12 @@ const customResolvers = {
     async tagged_users(parent) {
       const users = await User.find({ _id: { $in: parent.tagged_users } })
       return users.map((user) => userData(user))
+    },
+  },
+  Product: {
+    async owner(parent) {
+      const user = await User.findById(parent.owner)
+      return userData(user)
     },
   },
 }

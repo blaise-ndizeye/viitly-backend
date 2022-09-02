@@ -91,7 +91,7 @@ module.exports = {
   /* Uploading many files
      implementation: Only 10 files are allowed
   */
-  async uploadManyFiles(files, numberOfFiles = 3) {
+  async uploadManyFiles(files, numberOfFiles = process.env.ASSETS_PER_POST) {
     let i,
       uploadedFiles = []
 

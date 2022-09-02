@@ -10,6 +10,7 @@ const PostSchema = new Schema({
   description: {
     type: String,
     required: true,
+    es_indexed: true,
   },
   prized: {
     type: Boolean,

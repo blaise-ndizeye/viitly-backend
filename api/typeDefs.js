@@ -8,6 +8,21 @@ const typeDefs = gql`
     PROFFESSIONAL
   }
 
+  enum PriceStrategy {
+    FIXED
+    NEGOTIATE
+  }
+
+  enum PriceCurrency {
+    FRW
+    USD
+  }
+
+  enum ProductAvailability {
+    SALE
+    RENT
+  }
+
   scalar Upload
 
   type User {
@@ -31,6 +46,7 @@ const typeDefs = gql`
     reviews: [Review!]!
     blogs: [Blog!]!
     posts: [Post!]!
+    products: [Product!]!
   }
 
   type Review {
@@ -76,6 +92,25 @@ const typeDefs = gql`
     tagged_users: [User!]!
   }
 
+  type Product {
+    product_id: ID!
+    owner: User!
+    title: String!
+    category: String!
+    price: Float!
+    price_strategy: PriceStrategy!
+    price_currency: PriceCurrency!
+    availability: ProductAvailability!
+    description: String!
+    prized: Boolean!
+    nLikes: Int!
+    nComments: Int!
+    nShares: Int!
+    nViews: Int!
+    createdAt: String!
+    product_media: [File!]!
+  }
+
   interface MutationResponse {
     code: Int!
     success: Boolean!
@@ -109,6 +144,13 @@ const typeDefs = gql`
     success: Boolean!
     message: String!
     blog: Blog!
+  }
+
+  type ProductResponse implements MutationResponse {
+    code: Int!
+    success: Boolean!
+    message: String!
+    product: Product!
   }
 
   type DeleteDataResponse implements MutationResponse {
@@ -172,6 +214,17 @@ const typeDefs = gql`
     post_id: ID!
   }
 
+  input UploadProductInput {
+    user_id: ID!
+    title: String!
+    category: String!
+    price: Float!
+    price_strategy: PriceStrategy!
+    price_currency: PriceCurrency!
+    availability: ProductAvailability!
+    description: String!
+  }
+
   type Query {
     hello: String!
   }
@@ -193,6 +246,10 @@ const typeDefs = gql`
     DeleteBlog(user_id: ID!, blog_id: ID!): DeleteDataResponse!
     UpdateBlogText(inputs: UpdateBlogTextInput!): BlogResponse!
     UpdateBlogMedia(user_id: ID!, blog_id: ID!, media: Upload!): BlogResponse!
+    UploadProduct(
+      inputs: UploadProductInput!
+      productMedia: [Upload!]!
+    ): ProductResponse!
   }
 `
 
