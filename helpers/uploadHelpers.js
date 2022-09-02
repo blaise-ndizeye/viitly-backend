@@ -91,7 +91,7 @@ module.exports = {
   /* Uploading many files
      implementation: Only 10 files are allowed
   */
-  async uploadManyFiles(files) {
+  async uploadManyFiles(files, numberOfFiles = 3) {
     let i,
       uploadedFiles = []
 
@@ -101,9 +101,9 @@ module.exports = {
         uploadedFiles: [],
       }
 
-    if (files.length > 10)
+    if (files.length > numberOfFiles)
       return {
-        error: "Maximum 10 files are allowed",
+        error: `Maximum ${numberOfFiles} files are allowed`,
         uploadedFiles: [],
       }
 
