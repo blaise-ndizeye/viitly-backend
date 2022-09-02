@@ -272,6 +272,7 @@ const typeDefs = gql`
       productMedia: [Upload!]!
     ): ProductResponse!
     UpdateProductText(inputs: UploadProductTextInput): ProductResponse!
+    DeleteProduct(user_id: ID!, product_id: ID!): DeleteDataResponse!
   }
 `
 

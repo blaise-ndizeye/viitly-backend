@@ -186,6 +186,33 @@ const productMutations = {
       generateServerError(err)
     }
   },
+  async DeleteProduct(_, { user_id, product_id }, ctx, ___) {
+    try {
+      isAuthenticated(ctx)
+      isValidUser(ctx.user, user_id)
+      isAccountVerified(ctx.user)
+      isBusinessPerson(ctx.user)
+
+      const productExist = await Product.findOne({
+        $and: [{ _id: product_id }, { user_id }],
+      })
+      if (!productExist) throw new ApolloError("Product doesn't exist", 400)
+
+      for (let media of productExist.product_media) {
+        deleteUploadedFile(media.file_name)
+      }
+
+      await Product.deleteOne({ _id: productExist._id })
+
+      return {
+        code: 200,
+        success: true,
+        message: "Product deleted successfully",
+      }
+    } catch (err) {
+      generateServerError(err)
+    }
+  },
 }
 
 module.exports = productMutations
