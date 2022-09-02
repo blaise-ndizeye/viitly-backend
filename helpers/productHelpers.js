@@ -41,7 +41,7 @@ module.exports = {
       createdAt: product.createdAt.toISOString(),
       product_media: product.product_media.map((media) => ({
         file_name: `${process.env.BASE_URL}/${media.file_name}`,
-        file_format: `${process.env.BASE_URL}/${media.file_format}`,
+        file_format: media.file_format,
       })),
     }
   },
