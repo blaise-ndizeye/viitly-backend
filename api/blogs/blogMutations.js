@@ -154,7 +154,7 @@ const blogMutations = {
   },
   async UpdateBlogMedia(_, args, ctx, ___) {
     try {
-      const { user_id, blog_id, media } = args
+      const { user_id, blog_id, blogMedia } = args
 
       isAuthenticated(ctx)
       isValidUser(ctx.user, user_id)
@@ -167,7 +167,7 @@ const blogMutations = {
       if (!blogExist) throw new ApolloError("Blog doesn't exist", 400)
 
       const { error, fileName, fileFormat } = await uploadOneFile(
-        media,
+        blogMedia,
         "image"
       )
       if (error) throw new ApolloError(error, 400)

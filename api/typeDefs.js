@@ -225,6 +225,18 @@ const typeDefs = gql`
     description: String!
   }
 
+  input UploadProductTextInput {
+    product_id: ID!
+    user_id: ID!
+    title: String!
+    category: String!
+    price: Float!
+    price_strategy: PriceStrategy!
+    price_currency: PriceCurrency!
+    availability: ProductAvailability!
+    description: String!
+  }
+
   type Query {
     hello: String!
   }
@@ -245,11 +257,21 @@ const typeDefs = gql`
     UploadBlog(inputs: BlogInput!, blogMedia: Upload): BlogResponse!
     DeleteBlog(user_id: ID!, blog_id: ID!): DeleteDataResponse!
     UpdateBlogText(inputs: UpdateBlogTextInput!): BlogResponse!
-    UpdateBlogMedia(user_id: ID!, blog_id: ID!, media: Upload!): BlogResponse!
+    UpdateBlogMedia(
+      user_id: ID!
+      blog_id: ID!
+      blogMedia: Upload!
+    ): BlogResponse!
     UploadProduct(
       inputs: UploadProductInput!
       productMedia: [Upload!]!
     ): ProductResponse!
+    UpdateProductMedia(
+      user_id: ID!
+      product_id: ID!
+      productMedia: [Upload!]!
+    ): ProductResponse!
+    UpdateProductText(inputs: UploadProductTextInput): ProductResponse!
   }
 `
 
