@@ -143,6 +143,51 @@ const postMutations = {
       generateServerError(err)
     }
   },
+  async UpdatePostMedia(_, { inputs, postMedia }, ctx, ___) {
+    try {
+      const { user_id, post_id } = inputs
+
+      isAuthenticated(ctx)
+      isValidUser(ctx.user, user_id)
+      isAccountVerified(ctx.user)
+      isPayingUser(ctx.user)
+
+      const postExist = await Post.findOne({
+        $and: [{ _id: post_id }, { user_id }],
+      })
+      if (!postExist) throw new ApolloError("Post doesn't exist", 400)
+
+      const { error, uploadedFiles } = await uploadManyFiles(postMedia)
+      if (error) throw new ApolloError(error, 400)
+
+      await Post.updateOne(
+        { _id: postExist._id },
+        {
+          $set: {
+            post_media: uploadedFiles.map((file) => ({
+              file_name: file.fileName,
+              file_format: file.fileFormat,
+            })),
+          },
+        }
+      )
+
+      for (let file of postExist.post_media) {
+        deleteUploadedFile(file.file_name)
+      }
+
+      const updatedPost = await Post.findById(postExist._id)
+
+      return {
+        code: 200,
+        success: true,
+        message: "Post updated successfully",
+        post: postData(updatedPost),
+      }
+    } catch (err) {
+      generateServerError(err)
+    }
+  },
 }
 
 module.exports = postMutations

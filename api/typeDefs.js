@@ -170,7 +170,6 @@ const typeDefs = gql`
   input UpdatePostMediaInput {
     user_id: ID!
     post_id: ID!
-    postMedia: [Upload!]!
   }
 
   type Query {
@@ -186,7 +185,10 @@ const typeDefs = gql`
     UploadPost(inputs: PostInput!, postMedia: [Upload!]): PostResponse!
     DeletePost(user_id: ID!, post_id: ID!): DeleteDataResponse!
     UpdatePostText(inputs: UpdatePostTextInput!): PostResponse!
-    UpdatePostMedia(inputs: UpdatePostMediaInput!): PostResponse!
+    UpdatePostMedia(
+      inputs: UpdatePostMediaInput!
+      postMedia: [Upload!]!
+    ): PostResponse!
     UploadBlog(inputs: BlogInput!, blogMedia: Upload): BlogResponse!
     DeleteBlog(user_id: ID!, blog_id: ID!): DeleteDataResponse!
     UpdateBlogText(inputs: UpdateBlogTextInput!): BlogResponse!
