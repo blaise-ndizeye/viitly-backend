@@ -133,6 +133,12 @@ const typeDefs = gql`
     tagged_users: [String!]!
   }
 
+  input UpdatePostInput {
+    user_id: ID!
+    post_id: ID!
+    description: String
+  }
+
   input BlogInput {
     user_id: ID!
     blog_title: String!
@@ -154,6 +160,19 @@ const typeDefs = gql`
     rating: Int!
   }
 
+  input UpdateBlogTextInput {
+    user_id: ID!
+    blog_id: ID!
+    blog_title: String!
+    blog_content: String!
+  }
+
+  input UpdatePostMediaInput {
+    user_id: ID!
+    post_id: ID!
+    postMedia: [Upload!]!
+  }
+
   type Query {
     hello: String!
   }
@@ -166,8 +185,12 @@ const typeDefs = gql`
     DeleteReview(user_id: ID!, review_id: ID!): DeleteDataResponse!
     UploadPost(inputs: PostInput!, postMedia: [Upload!]): PostResponse!
     DeletePost(user_id: ID!, post_id: ID!): DeleteDataResponse!
+    UpdatePostText(inputs: UpdatePostInput!): PostResponse!
+    UpdatePostMedia(inputs: UpdatePostMediaInput!): PostResponse!
     UploadBlog(inputs: BlogInput!, blogMedia: Upload): BlogResponse!
     DeleteBlog(user_id: ID!, blog_id: ID!): DeleteDataResponse!
+    UpdateBlogText(inputs: UpdateBlogTextInput!): BlogResponse!
+    UpdateBlogMedia(user_id: ID!, blog_id: ID!, media: Upload!): BlogResponse!
   }
 `
 

@@ -110,6 +110,46 @@ const blogMutations = {
       generateServerError(err)
     }
   },
+  async UpdateBlogText(_, { inputs }, ctx, ___) {
+    try {
+      const { user_id, blog_id, blog_title, blog_content } = inputs
+
+      isAuthenticated(ctx)
+      isValidUser(ctx.user, user_id)
+      isAccountVerified(ctx.user)
+      isPayingUser(ctx.user)
+
+      const blogExists = await Blog.findById(blog_id)
+      if (!blogExists) throw new ApolloError("Blog doesn't exist", 400)
+
+      const { error } = await uploadBlogValidation({
+        blog_title,
+        blog_content,
+      })
+      if (error) throw new ApolloError(error, 400)
+
+      await Blog.updateOne(
+        { _id: blogExists._id },
+        {
+          $set: {
+            blog_title,
+            blog_content,
+          },
+        }
+      )
+
+      const updatedBlog = await Blog.findById(blogExists._id)
+
+      return {
+        code: 200,
+        success: true,
+        message: "Blog updated successfully",
+        blog: blogData(updatedBlog),
+      }
+    } catch (err) {
+      generateServerError(err)
+    }
+  },
 }
 
 module.exports = blogMutations
