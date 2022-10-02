@@ -39,7 +39,7 @@ module.exports = {
       nShares: product.nShares,
       nViews: product.nViews,
       createdAt: product.createdAt.toISOString(),
-      product_media: product.product_media.map((media) => ({
+      product_media: product.product_media?.map((media) => ({
         file_name: `${process.env.BASE_URL}/${media.file_name}`,
         file_format: media.file_format,
       })),

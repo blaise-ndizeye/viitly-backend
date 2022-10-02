@@ -3,12 +3,18 @@ const Post = require("../models/Post")
 const Product = require("../models/Product")
 const Review = require("../models/Reviews")
 const User = require("../models/User")
+const Comment = require("../models/Comment")
 const UploadScope = require("../models/UploadScope")
 const { userData } = require("../helpers/userHelpers")
 const { reviewData } = require("../helpers/reviewHelpers")
 const { blogData } = require("../helpers/blogHelpers")
 const { postData } = require("../helpers/postHelpers")
 const { productData } = require("../helpers/productHelpers")
+const {
+  commentData,
+  getCommentDestination,
+  replyData,
+} = require("../helpers/commentHelpers")
 
 const customResolvers = {
   Review: {
@@ -62,6 +68,10 @@ const customResolvers = {
       const users = await User.find({ _id: { $in: parent.tagged_users } })
       return users.map((user) => userData(user))
     },
+    async comments(parent) {
+      const commentList = await Comment.find({ to: parent.post_id })
+      return commentList.map((comment) => commentData(comment))
+    },
   },
   Blog: {
     async owner(parent) {
@@ -72,10 +82,81 @@ const customResolvers = {
       const users = await User.find({ _id: { $in: parent.tagged_users } })
       return users.map((user) => userData(user))
     },
+    async comments(parent) {
+      const commentList = await Comment.find({ to: parent.blog_id })
+      return commentList.map((comment) => commentData(comment))
+    },
   },
   Product: {
     async owner(parent) {
       const user = await User.findById(parent.owner)
+      return userData(user)
+    },
+    async comments(parent) {
+      const commentList = await Comment.find({ to: parent.product_id })
+      return commentList.map((comment) => commentData(comment))
+    },
+  },
+  CommentSource: {
+    __resolveType(obj, _, __) {
+      if (obj.blog_id) {
+        return "Blog"
+      }
+      if (obj.post_id) {
+        return "Post"
+      }
+      if (obj.product_id) {
+        return "Product"
+      }
+      if (obj.comment_id) {
+        return "Comment"
+      }
+    },
+  },
+  CommentResponseObject: {
+    __resolveType(obj, _, __) {
+      if (obj.comment_id) {
+        return "Comment"
+      }
+      if (obj.reply_id) {
+        return "Reply"
+      }
+    },
+  },
+  Comment: {
+    async from(parent) {
+      const user = await User.findById(parent.from)
+      return userData(user)
+    },
+    async to({ to }) {
+      const { commentDestName, commentDestObj } = await getCommentDestination(
+        to
+      )
+
+      if (commentDestName === "Blog") {
+        return blogData(commentDestObj)
+      }
+
+      if (commentDestName === "Product") {
+        return productData(commentDestObj)
+      }
+
+      if (commentDestName === "Post") {
+        return postData(commentDestObj)
+      }
+
+      if (commentDestName === "Comment") {
+        return replyData(commentDestObj)
+      }
+    },
+    async replies(parent) {
+      const replyList = await Comment.find({ to: parent.comment_id })
+      return replyList.map((reply) => replyData(reply))
+    },
+  },
+  Reply: {
+    async from(parent) {
+      const user = await User.findById(parent.from)
       return userData(user)
     },
   },

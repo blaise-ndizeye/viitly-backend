@@ -11,7 +11,7 @@ module.exports = {
       nViews: data.nViews,
       createdAt: data.createdAt.toISOString(),
       tagged_users: data.tagged_users,
-      post_media: data.post_media.map((media) => ({
+      post_media: data.post_media?.map((media) => ({
         file_format: media.file_format,
         file_name: `${process.env.BASE_URL}/${media.file_name}`,
       })),

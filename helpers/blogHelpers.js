@@ -6,8 +6,8 @@ module.exports = {
       blog_title: data.blog_title,
       blog_content: data.blog_content,
       blog_media: {
-        file_format: data.blog_media.file_format,
-        file_name: `${process.env.BASE_URL}/${data.blog_media.file_name}`,
+        file_format: data.blog_media?.file_format,
+        file_name: `${process.env.BASE_URL}/${data.blog_media?.file_name}`,
       },
       prized: data.prized,
       nLikes: data.nLikes,

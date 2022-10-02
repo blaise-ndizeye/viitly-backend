@@ -25,6 +25,8 @@ const typeDefs = gql`
 
   scalar Upload
 
+  union CommentSource = Product | Post | Blog | Comment
+
   type User {
     user_id: ID!
     avatar: String
@@ -75,6 +77,7 @@ const typeDefs = gql`
     createdAt: String!
     tagged_users: [User!]!
     post_media: [File!]!
+    comments: [Comment!]!
   }
 
   type Blog {
@@ -90,6 +93,7 @@ const typeDefs = gql`
     nViews: Int!
     createdAt: String!
     tagged_users: [User!]!
+    comments: [Comment!]!
   }
 
   type Product {
@@ -109,6 +113,26 @@ const typeDefs = gql`
     nViews: Int!
     createdAt: String!
     product_media: [File!]!
+    comments: [Comment!]!
+  }
+
+  type Reply {
+    reply_id: ID!
+    from: User!
+    body: String!
+    createdAt: String!
+    nLikes: Int!
+  }
+
+  type Comment {
+    comment_id: ID!
+    from: User!
+    to: CommentSource!
+    body: String!
+    createdAt: String!
+    nLikes: Int!
+    nReplies: Int!
+    replies: [Reply!]!
   }
 
   interface MutationResponse {
@@ -157,6 +181,15 @@ const typeDefs = gql`
     code: Int!
     success: Boolean!
     message: String!
+  }
+
+  union CommentResponseObject = Comment | Reply
+
+  type CommentResponse implements MutationResponse {
+    code: Int!
+    success: Boolean!
+    message: String!
+    data: CommentResponseObject!
   }
 
   input UserInput {
@@ -237,6 +270,12 @@ const typeDefs = gql`
     description: String!
   }
 
+  input SendCommentInput {
+    user_id: ID!
+    to: ID!
+    body: String!
+  }
+
   type Query {
     hello: String!
   }
@@ -273,6 +312,7 @@ const typeDefs = gql`
     ): ProductResponse!
     UpdateProductText(inputs: UploadProductTextInput): ProductResponse!
     DeleteProduct(user_id: ID!, product_id: ID!): DeleteDataResponse!
+    SendComment(inputs: SendCommentInput!): CommentResponse!
   }
 `
 
