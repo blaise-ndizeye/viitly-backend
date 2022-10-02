@@ -75,7 +75,10 @@ const commentMutations = {
       return {
         code: 201,
         success: true,
-        message: "Comment sent successfully",
+        message:
+          commentDestName !== "Comment"
+            ? "Comment sent successfully"
+            : "Reply sent successfully",
         data:
           commentDestName !== "Comment"
             ? commentData(newComment)
@@ -125,6 +128,83 @@ const commentMutations = {
           ? "Reply updated successfully"
           : "Comment updated successfully",
         data: isReply ? replyData(updatedComment) : commentData(updatedComment),
+      }
+    } catch (err) {
+      generateServerError(err)
+    }
+  },
+  async DeleteComment(_, args, ctx, ___) {
+    try {
+      const { user_id, comment_id } = args
+
+      isAuthenticated(ctx)
+      isValidUser(ctx.user, user_id)
+
+      if (!comment_id)
+        throw new ApolloError("CommentId => [comment_id] is required", 400)
+
+      const commentExists = await Comment.findOne({
+        $and: [{ _id: comment_id }, { user_id }],
+      })
+      if (!commentExists) throw new ApolloError("Comment doesn't exist", 400)
+
+      const { commentDestName, commentDestObj } = await getCommentDestination(
+        commentExists.to
+      )
+
+      if (commentDestName === "Comment") {
+        await Comment.deleteOne({ _id: commentExists._id })
+      } else {
+        await Comment.deleteMany({
+          $or: [{ to: commentExists._id }, { to: commentDestObj._id }],
+        })
+      }
+
+      if (commentDestName === "Blog") {
+        await Blog.updateOne(
+          { _id: commentDestObj._id },
+          {
+            $set: {
+              nComments: commentDestObj.nComments - 1,
+            },
+          }
+        )
+      } else if (commentDestName === "Post") {
+        await Post.updateOne(
+          { _id: commentDestObj._id },
+          {
+            $set: {
+              nComments: commentDestObj.nComments - 1,
+            },
+          }
+        )
+      } else if (commentDestName === "Product") {
+        await Product.updateOne(
+          { _id: commentDestObj._id },
+          {
+            $set: {
+              nComments: commentDestObj.nComments - 1,
+            },
+          }
+        )
+      } else if (commentDestName === "Comment") {
+        await Comment.updateOne(
+          { _id: commentDestObj._id },
+          {
+            $set: {
+              nReplies: commentDestObj.nReplies - 1,
+            },
+          }
+        )
+      }
+
+      return {
+        code: 200,
+        success: true,
+        message:
+          commentDestName === "Comment"
+            ? "Reply deleted successfully"
+            : "Comment deleted successfully",
       }
     } catch (err) {
       generateServerError(err)
