@@ -276,6 +276,12 @@ const typeDefs = gql`
     body: String!
   }
 
+  input UpdateCommentInput {
+    user_id: ID!
+    comment_id: ID!
+    body: String!
+  }
+
   type Query {
     hello: String!
   }
@@ -313,6 +319,8 @@ const typeDefs = gql`
     UpdateProductText(inputs: UploadProductTextInput): ProductResponse!
     DeleteProduct(user_id: ID!, product_id: ID!): DeleteDataResponse!
     SendComment(inputs: SendCommentInput!): CommentResponse!
+    DeleteComment(user_id: ID!, comment_id: ID!): DeleteDataResponse!
+    UpdateComment(inputs: UpdateCommentInput!): CommentResponse!
   }
 `
 

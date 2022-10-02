@@ -85,6 +85,51 @@ const commentMutations = {
       generateServerError(err)
     }
   },
+  async UpdateComment(_, { inputs }, ctx, ___) {
+    try {
+      const { user_id, comment_id, body } = inputs
+      let isReply = false
+
+      isAuthenticated(ctx)
+      isValidUser(ctx.user, user_id)
+
+      if (!comment_id)
+        throw new ApolloError("CommentId => [comment_id] is required")
+
+      const commentExists = await Comment.findOne({
+        $and: [{ _id: comment_id }, { user_id }],
+      })
+      if (!commentExists) throw new ApolloError("Comment doesn't exist", 400)
+      if (!body) throw new ApolloError("Comment is required")
+
+      const parentComment = await Comment.find({ to: comment_id })
+      if (parentComment.length === 0) {
+        isReply = true
+      }
+
+      await Comment.updateOne(
+        { _id: commentExists._id },
+        {
+          $set: {
+            body,
+          },
+        }
+      )
+
+      const updatedComment = await Comment.findById(commentExists._id)
+
+      return {
+        code: 200,
+        success: true,
+        message: isReply
+          ? "Reply updated successfully"
+          : "Comment updated successfully",
+        data: isReply ? replyData(updatedComment) : commentData(updatedComment),
+      }
+    } catch (err) {
+      generateServerError(err)
+    }
+  },
 }
 
 module.exports = commentMutations
