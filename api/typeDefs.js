@@ -333,8 +333,9 @@ const typeDefs = gql`
     SendComment(inputs: SendCommentInput!): CommentResponse!
     DeleteComment(user_id: ID!, comment_id: ID!): DeleteDataResponse!
     UpdateComment(inputs: UpdateCommentInput!): CommentResponse!
-    SendFollowRequest(user_id: ID!, requested_user_id: ID!): DeleteDataResponse! # ==> reuse the code for the response
-    AcceptFollowRequest(user_id: ID!, follower_id: ID!): DeleteDataResponse! # ==> reuse the code for the response
+    SendFollowRequest(user_id: ID!, requested_user_id: ID!): DeleteDataResponse! # ==> Not properly named inorder reuse the code for the response
+    AcceptFollowRequest(user_id: ID!, follower_id: ID!): DeleteDataResponse! # ==> Not properly named inorder reuse the code for the response
+    UnfollowUser(user_id: ID!, follower_id: ID!): DeleteDataResponse! # ==> Not properly named inorder to reuse the code for the response
   }
 `
 

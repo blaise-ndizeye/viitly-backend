@@ -145,6 +145,91 @@ const followMutations = {
       generateServerError(err)
     }
   },
+  async UnfollowUser(_, { user_id, follower_id }, ctx, ___) {
+    try {
+      isAuthenticated(ctx)
+      isValidUser(ctx.user, user_id)
+      isAccountVerified(ctx.user)
+
+      if (!follower_id || follower_id.length < 1)
+        throw new ApolloError("Follower Id => [follower_id] is required", 400)
+
+      const followerExist = await User.findById(follower_id)
+      if (!followerExist) throw new ApolloError("Follower doesn't exist", 400)
+
+      //* If this user is the one being followed first
+      const fRelation1 = Following.findOne({
+        $and: [{ user_id }, { follower_id }, { accepted: true }],
+      })
+
+      //* If this user is the one who followed first
+      const fRelation2 = Following.findOne({
+        $and: [{ follower_id: user_id }, { user_id: follower_id }],
+      })
+
+      const [followRelation1, followRelation2] = await Promise.all([
+        fRelation1,
+        fRelation2,
+      ])
+
+      if (!followRelation1 && !followRelation2)
+        throw new ApolloError("The follow relationship is not found")
+
+      if (followRelation1 !== null) {
+        await Following.updateOne(
+          { _id: followRelation1._id },
+          {
+            $set: {
+              accepted: false,
+            },
+          }
+        )
+
+        await User.updateOne(
+          { _id: followerExist._id },
+          {
+            $set: {
+              nFollowers: followerExist.nFollowers - 1,
+              nFollowings: +followerExist.nFollowings + 1,
+            },
+          }
+        )
+      }
+
+      if (followRelation2 !== null) {
+        await Following.deleteOne({ _id: followRelation2._id })
+        await User.updateOne(
+          { _id: follower_id },
+          {
+            $set: {
+              nFollowers: followerExist.nFollowers - 1,
+            },
+          }
+        )
+        await User.updateOne(
+          { _id: user_id },
+          {
+            $set: {
+              nFollowers: followRelation2.accepted
+                ? ctx.user.nFollowers - 1
+                : ctx.user.nFollowers,
+              nFollowings: followRelation2.accepted
+                ? ctx.user.nFollowings
+                : ctx.user.nFollowings - 1,
+            },
+          }
+        )
+      }
+
+      return {
+        code: 200,
+        success: true,
+        message: `You have unfollowed ${followerExist.name} successfully`,
+      }
+    } catch (err) {
+      generateServerError(err)
+    }
+  },
 }
 
 module.exports = followMutations
