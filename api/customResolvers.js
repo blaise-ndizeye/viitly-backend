@@ -17,6 +17,8 @@ const {
   replyData,
 } = require("../helpers/commentHelpers")
 const { followData } = require("../helpers/followHelpers")
+const Message = require("../models/Message")
+const { messageData } = require("../helpers/messageHelpers")
 
 const customResolvers = {
   Review: {
@@ -74,6 +76,13 @@ const customResolvers = {
         $and: [{ follower_id: parent.user_id }, { accepted: false }],
       })
       return followingsList.map((followinger) => followData(followinger))
+    },
+    async messages(parent) {
+      const messagesList = await Message.find({
+        $or: [{ to: parent.user_id }, { from: parent.user_id }],
+      }).sort({ _id: -1 })
+
+      return messagesList.map((message) => messageData(message))
     },
   },
   Post: {
@@ -185,6 +194,42 @@ const customResolvers = {
     async user(parent) {
       const user = await User.findById(parent.user)
       return userData(user)
+    },
+  },
+  Message: {
+    async from(parent) {
+      const user = await User.findById(parent.from)
+      return userData(user)
+    },
+    async to(parent) {
+      const user = await User.findById(parent.to)
+      return userData(user)
+    },
+    async refer_item(parent) {
+      if (parent.refer_type === "PRODUCT" && parent.refer_item !== "") {
+        const product = await Product.findOne({ _id: parent.refer_item })
+        return productData(product)
+      }
+      if (parent.refer_type === "POST" && parent.refer_item !== "") {
+        const post = await Post.findOne({ _id: parent.refer_item })
+        return postData(post)
+      }
+      if (parent.refer_type === "BLOG" && parent.refer_item !== "") {
+        const blog = await Blog.findOne({ _id: parent.refer_item })
+        return blogData(blog)
+      }
+      //return null
+    },
+  },
+  ReferItem: {
+    __resolveType(obj, __, ___) {
+      if (obj.product_id) {
+        return "Product"
+      } else if (obj.post_id) {
+        return "Post"
+      } else if (obj.blog_id) {
+        return "Blog"
+      }
     },
   },
 }

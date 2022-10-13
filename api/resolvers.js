@@ -4,6 +4,7 @@ const blogMutations = require("./blogs/blogMutations")
 const commentMutations = require("./comments/commentMutation")
 const customResolvers = require("./customResolvers")
 const followMutations = require("./follow/followMutations")
+const messageMutations = require("./messages/messageMutations")
 const postMutations = require("./posts/postMutations")
 const productMutations = require("./products/productMutations")
 const reviewMutations = require("./reviews/reviewsMutations")
@@ -18,6 +19,7 @@ const resolvers = {
     ...blogMutations,
     ...commentMutations,
     ...followMutations,
+    ...messageMutations,
     ...postMutations,
     ...productMutations,
     ...reviewMutations,

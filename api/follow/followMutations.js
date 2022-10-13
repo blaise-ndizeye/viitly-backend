@@ -4,7 +4,7 @@ const Following = require("../../models/Following")
 const User = require("../../models/User")
 const { isAuthenticated, isAccountVerified, isValidUser } = require("../shield")
 const { generateServerError } = require("../../helpers/errorHelpers")
-const { followData } = require("../../helpers/followHelpers")
+// const { followData } = require("../../helpers/followHelpers")
 
 const followMutations = {
   async SendFollowRequest(_, { user_id, requested_user_id }, ctx, ___) {
@@ -122,6 +122,7 @@ const followMutations = {
         {
           $set: {
             accepted: true,
+            acceptedAt: Date.now(),
           },
         }
       )
@@ -181,6 +182,7 @@ const followMutations = {
           {
             $set: {
               accepted: false,
+              acceptedAt: null,
             },
           }
         )

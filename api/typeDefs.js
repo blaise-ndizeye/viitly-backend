@@ -23,9 +23,18 @@ const typeDefs = gql`
     RENT
   }
 
+  enum ReferType {
+    PRODUCT
+    POST
+    BLOG
+    NOTHING
+  }
+
   scalar Upload
 
   union CommentSource = Product | Post | Blog | Comment
+
+  union ReferItem = Product | Post | Blog
 
   type User {
     user_id: ID!
@@ -52,6 +61,7 @@ const typeDefs = gql`
     blogs: [Blog!]!
     posts: [Post!]!
     products: [Product!]!
+    messages: [Message!]!
   }
 
   type Follower {
@@ -145,6 +155,18 @@ const typeDefs = gql`
     nLikes: Int!
     nReplies: Int!
     replies: [Reply!]!
+  }
+
+  type Message {
+    from: User!
+    to: User!
+    text: String
+    refer_type: ReferType
+    refer_item: ReferItem
+    createdAt: String!
+    deleted_for_receiver: Boolean!
+    deleted_for_sender: Boolean!
+    forwarded: Boolean!
   }
 
   interface MutationResponse {
@@ -294,6 +316,13 @@ const typeDefs = gql`
     body: String!
   }
 
+  input SendMessageInput {
+    from: ID!
+    to: ID!
+    text: String!
+    referFrom: String # The item from which the message was sent from but not required
+  }
+
   type Query {
     hello: String!
   }
@@ -336,6 +365,7 @@ const typeDefs = gql`
     SendFollowRequest(user_id: ID!, requested_user_id: ID!): DeleteDataResponse! # ==> Not properly named inorder reuse the code for the response
     AcceptFollowRequest(user_id: ID!, follower_id: ID!): DeleteDataResponse! # ==> Not properly named inorder reuse the code for the response
     UnfollowUser(user_id: ID!, follower_id: ID!): DeleteDataResponse! # ==> Not properly named inorder to reuse the code for the response
+    SendMessage(inputs: SendMessageInput!): DeleteDataResponse! # ==> Not properly named inorder to reuse the code for the response
   }
 `
 
