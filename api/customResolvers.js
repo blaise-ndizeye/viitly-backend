@@ -61,12 +61,17 @@ const customResolvers = {
       return productList.map((product) => productData(product))
     },
     async followers(parent) {
-      const followersList = await Following.find({ user_id: parent.user_id })
+      const followersList = await Following.find({
+        $or: [
+          { user_id: parent.user_id },
+          { $and: [{ follower_id: parent.user_id }, { accepted: true }] },
+        ],
+      })
       return followersList.map((follower) => followData(follower))
     },
     async followings(parent) {
       const followingsList = await Following.find({
-        follower_id: parent.user_id,
+        $and: [{ follower_id: parent.user_id }, { accepted: false }],
       })
       return followingsList.map((followinger) => followData(followinger))
     },
