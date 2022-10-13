@@ -37,6 +37,11 @@ const UserSchema = new Schema({
     required: true,
     default: 0,
   },
+  nFollowings: {
+    type: Number,
+    required: true,
+    default: 0,
+  },
   nPosts: {
     type: Number,
     required: true,

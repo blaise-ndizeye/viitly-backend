@@ -9,6 +9,7 @@ module.exports = {
       email: data.email,
       whatsapp: data.whatsapp,
       nFollowers: data.nFollowers,
+      nFollowings: data.nFollowings,
       nPosts: data.nPosts,
       nProducts: data.nProducts,
       nReviews: data.nReviews,

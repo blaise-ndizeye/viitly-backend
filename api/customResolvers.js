@@ -4,6 +4,7 @@ const Product = require("../models/Product")
 const Review = require("../models/Reviews")
 const User = require("../models/User")
 const Comment = require("../models/Comment")
+const Following = require("../models/Following")
 const UploadScope = require("../models/UploadScope")
 const { userData } = require("../helpers/userHelpers")
 const { reviewData } = require("../helpers/reviewHelpers")
@@ -15,6 +16,7 @@ const {
   getCommentDestination,
   replyData,
 } = require("../helpers/commentHelpers")
+const { followData } = require("../helpers/followHelpers")
 
 const customResolvers = {
   Review: {
@@ -57,6 +59,16 @@ const customResolvers = {
     async products(parent) {
       const productList = await Product.find({ user_id: parent.user_id })
       return productList.map((product) => productData(product))
+    },
+    async followers(parent) {
+      const followersList = await Following.find({ user_id: parent.user_id })
+      return followersList.map((follower) => followData(follower))
+    },
+    async followings(parent) {
+      const followingsList = await Following.find({
+        follower_id: parent.user_id,
+      })
+      return followingsList.map((followinger) => followData(followinger))
     },
   },
   Post: {
@@ -157,6 +169,16 @@ const customResolvers = {
   Reply: {
     async from(parent) {
       const user = await User.findById(parent.from)
+      return userData(user)
+    },
+  },
+  Follower: {
+    async follower(parent) {
+      const user = await User.findById(parent.follower)
+      return userData(user)
+    },
+    async user(parent) {
+      const user = await User.findById(parent.user)
       return userData(user)
     },
   },

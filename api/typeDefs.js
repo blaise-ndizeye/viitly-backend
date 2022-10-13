@@ -36,6 +36,7 @@ const typeDefs = gql`
     phone: String!
     whatsapp: String!
     nFollowers: Int!
+    nFollowings: Int!
     nPosts: Int!
     nProducts: Int!
     nReviews: Int!
@@ -45,10 +46,21 @@ const typeDefs = gql`
     blogs_upload_limit: Int!
     posts_upload_limit: Int!
     products_upload_limit: Int!
+    followers: [Follower!]!
+    followings: [Follower!]!
     reviews: [Review!]!
     blogs: [Blog!]!
     posts: [Post!]!
     products: [Product!]!
+  }
+
+  type Follower {
+    following_id: ID!
+    accepted: Boolean!
+    user: User!
+    follower: User!
+    requestedAt: String!
+    acceptedAt: String
   }
 
   type Review {
@@ -321,6 +333,7 @@ const typeDefs = gql`
     SendComment(inputs: SendCommentInput!): CommentResponse!
     DeleteComment(user_id: ID!, comment_id: ID!): DeleteDataResponse!
     UpdateComment(inputs: UpdateCommentInput!): CommentResponse!
+    SendFollowRequest(user_id: ID!, requested_user_id: ID!): DeleteDataResponse!
   }
 `
 
