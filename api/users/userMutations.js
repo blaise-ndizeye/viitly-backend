@@ -18,6 +18,7 @@ const {
   isAccountVerified,
   isValidUser,
 } = require("../shield")
+const { problemData } = require("../../helpers/problemHelpers")
 
 const userMutations = {
   async RegisterUser(_, args, __, ___) {
@@ -155,13 +156,18 @@ const userMutations = {
       isValidUser(ctx.user, user_id)
       isAccountVerified(ctx.user)
 
+      if (ctx.user.role === "ADMIN")
+        throw new ApolloError(
+          "Problems can be reported by users which are not admins",
+          400
+        )
       if (!body || body.length < 10)
         throw new ApolloError(
           "The problem must contain at least 10 characters and more descriptive",
           400
         )
 
-      await new ReportedProblems({
+      const newProblem = await new ReportedProblems({
         user_id,
         body,
       }).save()
@@ -170,6 +176,7 @@ const userMutations = {
         code: 200,
         success: true,
         message: "The problem was reported successfully",
+        reported_problem: problemData(newProblem),
       }
     } catch (err) {
       generateServerError(err)
