@@ -21,6 +21,7 @@ const {
   isValidUser,
 } = require("../shield")
 const { problemData } = require("../../helpers/problemHelpers")
+const { $where } = require("../../models/User")
 
 const userMutations = {
   async RegisterUser(_, args, __, ___) {
@@ -284,6 +285,105 @@ const userMutations = {
         code: 200,
         success: true,
         message: "Avatar updated successfully",
+        accessToken,
+        user: userData(updatedUser),
+      }
+    } catch (err) {
+      generateServerError(err)
+    }
+  },
+  async UpdateUserCredentials(_, { inputs }, ctx, ___) {
+    try {
+      const {
+        user_id,
+        name,
+        user_name,
+        phone,
+        whatsapp,
+        email,
+        password = "",
+        old_password,
+      } = inputs
+
+      isAuthenticated(ctx)
+      isValidUser(ctx.user, user_id)
+      isAccountVerified(ctx.user)
+
+      const userExists = await User.findById(ctx.user.user_id)
+
+      const { error } = await registerUserValidation({
+        name,
+        email,
+        phone,
+        user_name,
+        whatsapp,
+        password: password !== "" ? password : "1234567",
+        confirm_password: password !== "" ? password : "1234567",
+      })
+      if (error) throw new ApolloError(error, 400)
+
+      if (user_name.toLowerCase() !== userExists.user_name) {
+        const userNameExists = await User.findOne({
+          user_name: user_name.toLowerCase(),
+        })
+
+        if (userNameExists) throw new ApolloError("Username not available", 400)
+      }
+
+      if (phone !== userExists.phone) {
+        const phoneExists = await User.findOne({
+          phone,
+        })
+        if (phoneExists)
+          throw new ApolloError("Phone number is already registered", 400)
+      }
+
+      if (whatsapp !== userExists.whatsapp) {
+        const whatsappExists = await User.findOne({
+          whatsapp,
+        })
+        if (whatsappExists)
+          throw new ApolloError("Whatsapp number is already registered", 400)
+      }
+
+      if (email !== userExists.email) {
+        const emailExists = await User.findOne({
+          email,
+        })
+        if (emailExists)
+          throw new ApolloError("Email is already registered", 400)
+      }
+
+      const passwordMatch = await bcrypt.compare(
+        old_password,
+        userExists.password
+      )
+      if (!passwordMatch) throw new ApolloError("Incorrect password", 400)
+
+      const salt = await bcrypt.genSalt(10)
+      const newHashedPassword = await bcrypt.hash(password, salt)
+
+      await User.updateOne(
+        { _id: userExists._id },
+        {
+          $set: {
+            name,
+            email,
+            user_name,
+            whatsapp,
+            phone,
+            password: password !== "" ? newHashedPassword : userExists.password,
+          },
+        }
+      )
+
+      const updatedUser = await User.findById(userExists._id)
+      const accessToken = await generateAccessToken(updatedUser)
+
+      return {
+        code: 200,
+        success: true,
+        message: "Credentials updated successfully",
         accessToken,
         user: userData(updatedUser),
       }

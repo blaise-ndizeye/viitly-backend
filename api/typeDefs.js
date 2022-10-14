@@ -254,6 +254,17 @@ const typeDefs = gql`
     confirm_password: String!
   }
 
+  input UpdateUserInput {
+    user_id: ID!
+    name: String!
+    user_name: String!
+    phone: String!
+    whatsapp: String!
+    email: String!
+    password: String
+    old_password: String!
+  }
+
   input PostInput {
     user_id: ID!
     description: String
@@ -393,6 +404,7 @@ const typeDefs = gql`
     ): ReportedProblemResponse!
     DeleteReportedProblem(user_id: ID!, problem_id: ID!): DeleteDataResponse!
     UpdateUserAvatar(user_id: ID!, avatar: Upload!): LogUserResponse!
+    UpdateUserCredentials(inputs: UpdateUserInput!): LogUserResponse!
   }
 `
 
