@@ -391,6 +391,59 @@ const userMutations = {
       generateServerError(err)
     }
   },
+  async VerifyAccount(_, { user_id, verification_code = "" }, ctx, ___) {
+    try {
+      isAuthenticated(ctx)
+      isValidUser(ctx.user, user_id)
+
+      if (!verification_code || verification_code.length < 6)
+        throw new ApolloError("Verification code has six characters", 400)
+
+      const user = await User.findOne({ _id: user_id })
+
+      if (
+        user.verification_code === "" &&
+        process.env.NODE_ENV === "production"
+      )
+        throw new ApolloError(
+          "Request aborted :=> no verification code set",
+          400
+        )
+
+      if (
+        (process.env.NODE_ENV === "production" &&
+          user.verification_code !== verification_code) ||
+        (process.env.NODE_ENV === "development" &&
+          verification_code !== "101010")
+      )
+        throw new ApolloError("Incorrect verification code", 400)
+
+      if (
+        (process.env.NODE_ENV === "development" &&
+          verification_code === "101010") ||
+        (process.env.NODE_ENV === "production" &&
+          verification_code === user.verification_code)
+      ) {
+        await User.updateOne(
+          { _id: user_id },
+          {
+            $set: {
+              verified: true,
+              verification_code: "",
+            },
+          }
+        )
+      }
+
+      return {
+        code: 200,
+        success: true,
+        message: "Account verified successfully",
+      }
+    } catch (err) {
+      generateServerError(err)
+    }
+  },
 }
 
 module.exports = userMutations

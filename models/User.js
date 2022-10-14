@@ -56,6 +56,10 @@ const UserSchema = new Schema({
     type: Boolean,
     default: false,
   },
+  verification_code: {
+    type: String,
+    default: "",
+  },
   password: {
     type: String,
     required: true,

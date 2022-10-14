@@ -406,6 +406,10 @@ const typeDefs = gql`
     DeleteReportedProblem(user_id: ID!, problem_id: ID!): DeleteDataResponse!
     UpdateUserAvatar(user_id: ID!, avatar: Upload!): LogUserResponse!
     UpdateUserCredentials(inputs: UpdateUserInput!): LogUserResponse!
+    VerifyAccount(
+      user_id: String!
+      verification_code: String!
+    ): DeleteDataResponse!
   }
 `
 
