@@ -12,7 +12,12 @@ const { userData } = require("../../helpers/userHelpers")
 const { uploadOneFile } = require("../../helpers/uploadHelpers")
 const { generateServerError } = require("../../helpers/errorHelpers")
 const ReportedProblems = require("../../models/ReportedProblems")
-const { isAuthenticated, isAccountVerified, isValidUser } = require("../shield")
+const {
+  isAdmin,
+  isAuthenticated,
+  isAccountVerified,
+  isValidUser,
+} = require("../shield")
 
 const userMutations = {
   async RegisterUser(_, args, __, ___) {
@@ -165,6 +170,33 @@ const userMutations = {
         code: 200,
         success: true,
         message: "The problem was reported successfully",
+      }
+    } catch (err) {
+      generateServerError(err)
+    }
+  },
+  async DeleteReportedProblem(_, { user_id, problem_id }, ctx, ___) {
+    try {
+      isAuthenticated(ctx)
+      isValidUser(ctx.user, user_id)
+      isAccountVerified(ctx.user)
+      isAdmin(ctx.user)
+
+      if (!problem_id || problem_id.length < 5)
+        throw new ApolloError(
+          "Reported Problem Id => [problem_id] is required",
+          400
+        )
+
+      const problemExists = await ReportedProblems.findOne({ _id: problem_id })
+      if (!problemExists)
+        throw new ApolloError("Reported Problem not found", 400)
+
+      await ReportedProblems.deleteOne({ _id: problemExists._id })
+      return {
+        code: 200,
+        success: true,
+        message: "Problem deleted successfully",
       }
     } catch (err) {
       generateServerError(err)

@@ -172,6 +172,14 @@ const typeDefs = gql`
     seen: Boolean!
   }
 
+  type ReportedProblem {
+    problem_id: ID!
+    reporter: User!
+    body: String!
+    solved: Boolean!
+    createdAt: String!
+  }
+
   interface MutationResponse {
     code: Int!
     success: Boolean!
@@ -218,6 +226,13 @@ const typeDefs = gql`
     code: Int!
     success: Boolean!
     message: String!
+  }
+
+  type ReportedProblemResponse implements MutationResponse {
+    code: Int!
+    success: Boolean!
+    message: String!
+    reported_problem: ReportedProblem!
   }
 
   union CommentResponseObject = Comment | Reply
@@ -371,7 +386,9 @@ const typeDefs = gql`
     SendMessage(inputs: SendMessageInput!): DeleteDataResponse! # ==> Not properly named inorder to reuse the code for the response
     MarkMessageAsRead(user_id: ID!, message_id: ID!): DeleteDataResponse! # ==> Not properly named inorder to reuse the code for the response
     DeleteMessage(user_id: ID!, message_id: ID!): DeleteDataResponse!
-    ReportProblem(user_id: ID!, body: String!): DeleteDataResponse!
+    ReportProblem(user_id: ID!, body: String!): ReportedProblemResponse!
+    MarkProblemAsSolved(user_id: ID!, problem_id: ID!): ReportedProblemResponse!
+    DeleteReportedProblem(user_id: ID!, problem_id: ID!): DeleteDataResponse!
   }
 `
 

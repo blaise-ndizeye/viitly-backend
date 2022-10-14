@@ -242,6 +242,12 @@ const customResolvers = {
       }
     },
   },
+  ReportedProblem: {
+    async reporter(parent) {
+      const user = await User.findById(parent.reporter)
+      return userData(user)
+    },
+  },
 }
 
 module.exports = customResolvers
