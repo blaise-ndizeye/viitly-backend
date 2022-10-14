@@ -11,6 +11,8 @@ const {
 const { userData } = require("../../helpers/userHelpers")
 const { uploadOneFile } = require("../../helpers/uploadHelpers")
 const { generateServerError } = require("../../helpers/errorHelpers")
+const ReportedProblems = require("../../models/ReportedProblems")
+const { isAuthenticated, isAccountVerified, isValidUser } = require("../shield")
 
 const userMutations = {
   async RegisterUser(_, args, __, ___) {
@@ -137,6 +139,32 @@ const userMutations = {
         message: "User logged in successfully",
         accessToken,
         user: userData(userExists),
+      }
+    } catch (err) {
+      generateServerError(err)
+    }
+  },
+  async ReportProblem(_, { user_id, body }, ctx, ___) {
+    try {
+      isAuthenticated(ctx)
+      isValidUser(ctx.user, user_id)
+      isAccountVerified(ctx.user)
+
+      if (!body || body.length < 10)
+        throw new ApolloError(
+          "The problem must contain at least 10 characters and more descriptive",
+          400
+        )
+
+      await new ReportedProblems({
+        user_id,
+        body,
+      }).save()
+
+      return {
+        code: 200,
+        success: true,
+        message: "The problem was reported successfully",
       }
     } catch (err) {
       generateServerError(err)

@@ -371,6 +371,7 @@ const typeDefs = gql`
     SendMessage(inputs: SendMessageInput!): DeleteDataResponse! # ==> Not properly named inorder to reuse the code for the response
     MarkMessageAsRead(user_id: ID!, message_id: ID!): DeleteDataResponse! # ==> Not properly named inorder to reuse the code for the response
     DeleteMessage(user_id: ID!, message_id: ID!): DeleteDataResponse!
+    ReportProblem(user_id: ID!, body: String!): DeleteDataResponse!
   }
 `
 
