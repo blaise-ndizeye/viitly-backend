@@ -387,7 +387,10 @@ const typeDefs = gql`
     MarkMessageAsRead(user_id: ID!, message_id: ID!): DeleteDataResponse! # ==> Not properly named inorder to reuse the code for the response
     DeleteMessage(user_id: ID!, message_id: ID!): DeleteDataResponse!
     ReportProblem(user_id: ID!, body: String!): ReportedProblemResponse!
-    MarkProblemAsSolved(user_id: ID!, problem_id: ID!): ReportedProblemResponse!
+    ToggleProblemSolvedMark(
+      user_id: ID!
+      problem_id: ID!
+    ): ReportedProblemResponse!
     DeleteReportedProblem(user_id: ID!, problem_id: ID!): DeleteDataResponse!
   }
 `

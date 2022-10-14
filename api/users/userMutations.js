@@ -209,6 +209,63 @@ const userMutations = {
       generateServerError(err)
     }
   },
+  async ToggleProblemSolvedMark(_, { user_id, problem_id }, ctx, ___) {
+    try {
+      isAuthenticated(ctx)
+      isValidUser(ctx.user, user_id)
+      isAccountVerified(ctx.user)
+      isAdmin(ctx.user)
+
+      if (!problem_id || problem_id.length < 5)
+        throw new ApolloError(
+          "Reported Problem Id => [problem_id] is required",
+          400
+        )
+
+      const problemExists = await ReportedProblems.findOne({
+        _id: problem_id,
+      })
+      if (!problemExists)
+        throw new ApolloError("Reported Problem not found", 400)
+
+      if (!problemExists.solved) {
+        await ReportedProblems.updateOne(
+          {
+            _id: problemExists._id,
+          },
+          {
+            $set: {
+              solved: true,
+            },
+          }
+        )
+      } else {
+        await ReportedProblems.updateOne(
+          {
+            _id: problemExists._id,
+          },
+          {
+            $set: {
+              solved: false,
+            },
+          }
+        )
+      }
+
+      const solvedProblem = await ReportedProblems.findById(problemExists._id)
+
+      return {
+        code: 200,
+        success: true,
+        message: `Problem marked as ${
+          solvedProblem.solved ? "solved" : "unsolved"
+        } successfully`,
+        reported_problem: problemData(solvedProblem),
+      }
+    } catch (err) {
+      generateServerError(err)
+    }
+  },
 }
 
 module.exports = userMutations
