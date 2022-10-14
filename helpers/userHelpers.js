@@ -1,3 +1,5 @@
+const jwt = require("jsonwebtoken")
+
 module.exports = {
   userData(data) {
     return {
@@ -17,5 +19,18 @@ module.exports = {
       verified: data.verified,
       createdAt: data.createdAt.toISOString(),
     }
+  },
+  async generateAccessToken(user = { _id: "" }) {
+    const generatedToken = await jwt.sign(
+      {
+        user_id: user._id.toString(),
+      },
+      process.env.ACCESS_SECRET,
+      {
+        expiresIn: "7d",
+      }
+    )
+
+    return generatedToken
   },
 }

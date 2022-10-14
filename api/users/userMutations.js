@@ -1,5 +1,4 @@
 const bcrypt = require("bcryptjs")
-const jwt = require("jsonwebtoken")
 const { ApolloError } = require("apollo-server-errors")
 
 const User = require("../../models/User")
@@ -8,7 +7,7 @@ const {
   registerUserValidation,
   loginUserValidation,
 } = require("../../validators")
-const { userData } = require("../../helpers/userHelpers")
+const { userData, generateAccessToken } = require("../../helpers/userHelpers")
 const { uploadOneFile } = require("../../helpers/uploadHelpers")
 const { generateServerError } = require("../../helpers/errorHelpers")
 const ReportedProblems = require("../../models/ReportedProblems")
@@ -88,15 +87,7 @@ const userMutations = {
       /* Send verification code to whatsapp and Generate the 
       notification to the user to verify his/her account */
 
-      const accessToken = await jwt.sign(
-        {
-          user_id: newUser._id.toString(),
-        },
-        process.env.ACCESS_SECRET,
-        {
-          expiresIn: "7d",
-        }
-      )
+      const accessToken = await generateAccessToken(newUser)
 
       return {
         code: 201,
@@ -118,10 +109,10 @@ const userMutations = {
 
       const userExists = await User.findOne({
         $or: [
-          { user_name: credential },
-          { phone: credential.substring(1) },
+          { user_name: credential.toLowerCase() },
+          { phone: credential },
           { email: credential },
-          { whatsapp: credential.substring(1) },
+          { whatsapp: credential },
         ],
       })
       if (!userExists) throw new ApolloError("User doesn't exist", 400)
@@ -129,15 +120,7 @@ const userMutations = {
       const passwordMatch = await bcrypt.compare(password, userExists.password)
       if (!passwordMatch) throw new ApolloError("Incorrect password", 400)
 
-      const accessToken = await jwt.sign(
-        {
-          user_id: userExists._id.toString(),
-        },
-        process.env.ACCESS_SECRET,
-        {
-          expiresIn: "7d",
-        }
-      )
+      const accessToken = await generateAccessToken(userExists)
 
       return {
         code: 200,
