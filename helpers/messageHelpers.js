@@ -5,6 +5,7 @@ module.exports = {
       from: data.from,
       to: data.to,
       forwarded: data.forwarded,
+      seen: data.seen,
       refer_type: data.refer_type === "" ? "NOTHING" : data.refer_type,
       refer_item: data.refer_item,
       text: data.text,

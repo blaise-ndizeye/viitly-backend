@@ -77,6 +77,41 @@ const messageMutations = {
       generateServerError(err)
     }
   },
+  async MarkMessageAsRead(_, { user_id, message_id }, ctx, ___) {
+    try {
+      isAuthenticated(ctx)
+      isValidUser(ctx.user, user_id)
+      isAccountVerified(ctx.user)
+
+      const messageExists = await Message.findOne({
+        $and: [{ _id: message_id }, { to: user_id }],
+      })
+
+      if (!messageExists)
+        return {
+          code: 200,
+          success: false,
+          message: "Not the receiver",
+        }
+
+      await Message.updateOne(
+        { _id: messageExists._id },
+        {
+          $set: {
+            seen: true,
+          },
+        }
+      )
+
+      return {
+        code: 200,
+        success: true,
+        message: `${messageExists._id.toString().substr(3, 7)} Marked as seen`,
+      }
+    } catch (err) {
+      generateServerError(err)
+    }
+  },
 }
 
 module.exports = messageMutations

@@ -14,6 +14,10 @@ const messageSchema = new Schema({
     type: Boolean,
     default: false,
   },
+  seen: {
+    type: Boolean,
+    default: false,
+  },
   refer_type: String,
   refer_item: String,
   text: String,

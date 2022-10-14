@@ -158,6 +158,7 @@ const typeDefs = gql`
   }
 
   type Message {
+    message_id: ID!
     from: User!
     to: User!
     text: String
@@ -167,6 +168,7 @@ const typeDefs = gql`
     deleted_for_receiver: Boolean!
     deleted_for_sender: Boolean!
     forwarded: Boolean!
+    seen: Boolean!
   }
 
   interface MutationResponse {
@@ -366,6 +368,7 @@ const typeDefs = gql`
     AcceptFollowRequest(user_id: ID!, follower_id: ID!): DeleteDataResponse! # ==> Not properly named inorder reuse the code for the response
     UnfollowUser(user_id: ID!, follower_id: ID!): DeleteDataResponse! # ==> Not properly named inorder to reuse the code for the response
     SendMessage(inputs: SendMessageInput!): DeleteDataResponse! # ==> Not properly named inorder to reuse the code for the response
+    MarkMessageAsRead(user_id: ID!, message_id: ID!): DeleteDataResponse! # ==> Not properly named inorder to reuse the code for the response
   }
 `
 
