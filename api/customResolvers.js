@@ -84,6 +84,12 @@ const customResolvers = {
 
       return messagesList.map((message) => messageData(message))
     },
+    async new_messages(parent) {
+      const newMessages = await Message.find({
+        $and: [{ to: parent.user_id }, { seen: false }],
+      })
+      return newMessages.length
+    },
   },
   Post: {
     async owner(parent) {

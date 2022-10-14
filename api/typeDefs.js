@@ -49,6 +49,7 @@ const typeDefs = gql`
     nPosts: Int!
     nProducts: Int!
     nReviews: Int!
+    new_messages: Int!
     verified: Boolean!
     role: Role!
     createdAt: String!
