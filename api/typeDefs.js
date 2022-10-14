@@ -46,6 +46,7 @@ const typeDefs = gql`
     whatsapp: String!
     nFollowers: Int!
     nFollowings: Int!
+    nBlogs: Int!
     nPosts: Int!
     nProducts: Int!
     nReviews: Int!

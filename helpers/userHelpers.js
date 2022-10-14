@@ -12,8 +12,6 @@ module.exports = {
       whatsapp: data.whatsapp,
       nFollowers: data.nFollowers,
       nFollowings: data.nFollowings,
-      nPosts: data.nPosts,
-      nProducts: data.nProducts,
       nReviews: data.nReviews,
       role: data.role,
       verified: data.verified,

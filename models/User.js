@@ -42,16 +42,6 @@ const UserSchema = new Schema({
     required: true,
     default: 0,
   },
-  nPosts: {
-    type: Number,
-    required: true,
-    default: 0,
-  },
-  nProducts: {
-    type: Number,
-    required: true,
-    default: 0,
-  },
   nReviews: {
     type: Number,
     required: true,

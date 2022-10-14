@@ -94,6 +94,18 @@ const customResolvers = {
       })
       return newMessages.length
     },
+    async nBlogs(parent) {
+      const blogList = await Blog.find({ user_id: parent.user_id })
+      return blogList.length
+    },
+    async nPosts(parent) {
+      const postList = await Post.find({ user_id: parent.user_id })
+      return postList.length
+    },
+    async nProducts(parent) {
+      const productList = await Product.find({ user_id: parent.user_id })
+      return productList.length
+    },
   },
   Post: {
     async owner(parent) {
