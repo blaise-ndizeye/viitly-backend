@@ -112,6 +112,68 @@ const messageMutations = {
       generateServerError(err)
     }
   },
+  async DeleteMessage(_, { user_id, message_id }, ctx, ___) {
+    try {
+      isAuthenticated(ctx)
+      isValidUser(ctx.user, user_id)
+      isAccountVerified(ctx.user)
+
+      const messageExists = await Message.findOne({
+        $and: [
+          { _id: message_id },
+          { $or: [{ to: user_id }, { from: user_id }] },
+        ],
+      })
+
+      if (!messageExists)
+        return {
+          code: 200,
+          success: false,
+          message: "Message not found",
+        }
+
+      if (
+        (messageExists.from === user_id &&
+          messageExists.deleted_for_receiver) ||
+        (messageExists.to === user_id && messageExists.deleted_for_sender) ||
+        (messageExists.from === user_id && !messageExists.seen)
+      ) {
+        await Message.deleteOne({ _id: messageExists._id })
+      } else if (
+        messageExists.from === user_id &&
+        !messageExists.deleted_for_receiver
+      ) {
+        await Message.updateOne(
+          { _id: messageExists._id },
+          {
+            $set: {
+              deleted_for_sender: true,
+            },
+          }
+        )
+      } else if (
+        messageExists.to === user_id &&
+        !messageExists.deleted_for_sender
+      ) {
+        await Message.updateOne(
+          { _id: messageExists._id },
+          {
+            $set: {
+              deleted_for_receiver: true,
+            },
+          }
+        )
+      }
+
+      return {
+        code: 200,
+        success: true,
+        message: "Message deleted",
+      }
+    } catch (err) {
+      generateServerError(err)
+    }
+  },
 }
 
 module.exports = messageMutations

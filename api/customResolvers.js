@@ -86,7 +86,11 @@ const customResolvers = {
     },
     async new_messages(parent) {
       const newMessages = await Message.find({
-        $and: [{ to: parent.user_id }, { seen: false }],
+        $and: [
+          { to: parent.user_id },
+          { seen: false },
+          { deleted_for_receiver: false },
+        ],
       })
       return newMessages.length
     },
