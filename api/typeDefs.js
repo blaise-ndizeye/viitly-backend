@@ -392,6 +392,7 @@ const typeDefs = gql`
       problem_id: ID!
     ): ReportedProblemResponse!
     DeleteReportedProblem(user_id: ID!, problem_id: ID!): DeleteDataResponse!
+    UpdateUserAvatar(user_id: ID!, avatar: Upload!): LogUserResponse!
   }
 `
 

@@ -8,7 +8,10 @@ const {
   loginUserValidation,
 } = require("../../validators")
 const { userData, generateAccessToken } = require("../../helpers/userHelpers")
-const { uploadOneFile } = require("../../helpers/uploadHelpers")
+const {
+  uploadOneFile,
+  deleteUploadedFile,
+} = require("../../helpers/uploadHelpers")
 const { generateServerError } = require("../../helpers/errorHelpers")
 const ReportedProblems = require("../../models/ReportedProblems")
 const {
@@ -244,6 +247,45 @@ const userMutations = {
           solvedProblem.solved ? "solved" : "unsolved"
         } successfully`,
         reported_problem: problemData(solvedProblem),
+      }
+    } catch (err) {
+      generateServerError(err)
+    }
+  },
+  async UpdateUserAvatar(_, { user_id, avatar }, ctx, ___) {
+    try {
+      isAuthenticated(ctx)
+      isValidUser(ctx.user, user_id)
+      isAccountVerified(ctx.user)
+
+      if (!avatar) throw new ApolloError("Avatar is required", 400)
+
+      const user = await User.findById(ctx.user.user_id)
+
+      const { error, fileName } = await uploadOneFile(avatar, "image")
+
+      if (error) throw new ApolloError(error, 400)
+
+      await User.updateOne(
+        { _id: ctx.user.user_id },
+        {
+          $set: {
+            avatar: fileName,
+          },
+        }
+      )
+
+      if (user.avatar !== "") deleteUploadedFile(user.avatar)
+
+      const updatedUser = await User.findById(ctx.user.user_id)
+      const accessToken = await generateAccessToken(updatedUser)
+
+      return {
+        code: 200,
+        success: true,
+        message: "Avatar updated successfully",
+        accessToken,
+        user: userData(updatedUser),
       }
     } catch (err) {
       generateServerError(err)
