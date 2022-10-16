@@ -26,6 +26,7 @@ async function startApolloServer() {
     resolvers,
     context: ({ req }) => contextHandler({ req }),
     csrfPrevention: true,
+    cache: "bounded",
     plugins: [
       ApolloServerPluginDrainHttpServer({ httpServer }),
       ApolloServerPluginLandingPageLocalDefault({ embed: true }),

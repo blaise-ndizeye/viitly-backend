@@ -21,7 +21,8 @@ const {
   isValidUser,
 } = require("../shield")
 const { problemData } = require("../../helpers/problemHelpers")
-const { $where } = require("../../models/User")
+const mailTransporter = require("../../utils/mail/send")
+const { getRandomNumber } = require("../../helpers/customHelpers")
 
 const userMutations = {
   async RegisterUser(_, args, __, ___) {
@@ -90,6 +91,28 @@ const userMutations = {
 
       /* Send verification code to whatsapp and Generate the 
       notification to the user to verify his/her account */
+      if (process.env.NODE_ENV === "production") {
+        let generatedCode = getRandomNumber(100000, 999999)
+
+        const transport = mailTransporter({
+          hostUser: process.env.HOST_EMAIL,
+          hostUserPassword: process.env.HOST_EMAIL_PASSWORD,
+          to: [email],
+          subject: "Welcome to your Wiitify account",
+          bodyText: `${generatedCode} is your account verification code.`,
+        })
+
+        const update = User.updateOne(
+          { _id: newUser._id },
+          {
+            $set: {
+              verification_code: generatedCode,
+            },
+          }
+        )
+
+        await Promise.all([transport, update])
+      }
 
       const accessToken = await generateAccessToken(newUser)
 
@@ -257,7 +280,6 @@ const userMutations = {
     try {
       isAuthenticated(ctx)
       isValidUser(ctx.user, user_id)
-      isAccountVerified(ctx.user)
 
       if (!avatar) throw new ApolloError("Avatar is required", 400)
 
@@ -307,7 +329,6 @@ const userMutations = {
 
       isAuthenticated(ctx)
       isValidUser(ctx.user, user_id)
-      isAccountVerified(ctx.user)
 
       const userExists = await User.findById(ctx.user.user_id)
 
