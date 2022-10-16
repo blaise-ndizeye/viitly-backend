@@ -410,6 +410,7 @@ const typeDefs = gql`
       user_id: String!
       verification_code: String!
     ): DeleteDataResponse!
+    RequestNewVerificationCode(user_id: ID!): DeleteDataResponse!
   }
 `
 

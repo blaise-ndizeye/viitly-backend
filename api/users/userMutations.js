@@ -465,6 +465,51 @@ const userMutations = {
       generateServerError(err)
     }
   },
+  async RequestNewVerificationCode(_, { user_id }, ctx, ___) {
+    try {
+      isAuthenticated(ctx)
+      isValidUser(ctx.user, user_id)
+
+      if (process.env.NODE_ENV !== "production")
+        throw new ApolloError(
+          "This operation is only allowed in production",
+          400
+        )
+
+      const user = await User.findOne({ _id: user_id })
+      if (user.verified)
+        throw new ApolloError(`${user.email} account is already verified`)
+
+      let generatedCode = getRandomNumber(100000, 999999)
+
+      const transport = mailTransporter({
+        hostUser: process.env.HOST_EMAIL,
+        hostUserPassword: process.env.HOST_EMAIL_PASSWORD,
+        to: [user.email],
+        subject: "Welcome to your Wiitify account",
+        bodyText: `${generatedCode} is your account verification code.`,
+      })
+
+      const update = User.updateOne(
+        { _id: user._id },
+        {
+          $set: {
+            verification_code: generatedCode,
+          },
+        }
+      )
+
+      await Promise.all([transport, update])
+
+      return {
+        code: 200,
+        success: true,
+        message: `Verification code sent to ${user.email} successfully`,
+      }
+    } catch (err) {
+      generateServerError(err)
+    }
+  },
 }
 
 module.exports = userMutations
