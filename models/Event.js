@@ -1,22 +1,18 @@
 const mongoose = require("mongoose")
 const { Schema } = mongoose
 
-const commentSchema = new Schema({
+const eventSchema = new Schema({
   user_id: {
     type: String,
     required: true,
   },
-  body: {
+  parent_id: {
     type: String,
     required: true,
   },
-  to: {
+  event_type: {
     type: String,
     required: true,
-  },
-  nReplies: {
-    type: Number,
-    default: 0,
   },
   createdAt: {
     type: Date,
@@ -24,4 +20,4 @@ const commentSchema = new Schema({
   },
 })
 
-module.exports = mongoose.model("Comment", commentSchema)
+module.exports = mongoose.model("Event", eventSchema)

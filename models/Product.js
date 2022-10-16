@@ -10,18 +10,22 @@ const productSchema = new Schema({
   title: {
     type: String,
     required: true,
+    es_indexed: true,
   },
   category: {
     type: String,
     required: true,
+    es_indexed: true,
   },
   price: {
     type: Number,
     required: true,
+    es_indexed: true,
   },
   price_strategy: {
     type: String,
     required: true,
+    es_indexed: true,
     default: "NEGOTIATE",
     enum: ["FIXED", "NEGOTIATE"],
   },
@@ -33,30 +37,20 @@ const productSchema = new Schema({
   availability: {
     type: String,
     required: true,
+    es_indexed: true,
     default: "SALE",
     enum: ["SALE", "RENT"],
   },
   description: {
     type: String,
     required: true,
+    es_indexed: true,
   },
   prized: {
     type: Boolean,
     default: false,
   },
-  nLikes: {
-    type: Number,
-    default: 0,
-  },
-  nShares: {
-    type: Number,
-    default: 0,
-  },
   nComments: {
-    type: Number,
-    default: 0,
-  },
-  nViews: {
     type: Number,
     default: 0,
   },

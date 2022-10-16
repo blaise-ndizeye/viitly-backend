@@ -23,19 +23,7 @@ const BlogSchema = new Schema({
     type: Boolean,
     default: false,
   },
-  nLikes: {
-    type: Number,
-    default: 0,
-  },
   nComments: {
-    type: Number,
-    default: 0,
-  },
-  nShares: {
-    type: Number,
-    default: 0,
-  },
-  nViews: {
     type: Number,
     default: 0,
   },

@@ -30,6 +30,13 @@ const typeDefs = gql`
     NOTHING
   }
 
+  enum EventType {
+    LIKE
+    SHARE
+    VIEW
+    DISLIKE
+  }
+
   scalar Upload
 
   union CommentSource = Product | Post | Blog | Comment
@@ -99,6 +106,9 @@ const typeDefs = gql`
     nShares: Int!
     nViews: Int!
     createdAt: String!
+    liked_by: [User!]!
+    viewed_by: [User!]!
+    shared_by: [User!]!
     tagged_users: [User!]!
     post_media: [File!]!
     comments: [Comment!]!
@@ -114,7 +124,8 @@ const typeDefs = gql`
     nLikes: Int!
     nComments: Int!
     nShares: Int!
-    nViews: Int!
+    liked_by: [User!]!
+    shared_by: [User!]!
     createdAt: String!
     tagged_users: [User!]!
     comments: [Comment!]!
@@ -136,6 +147,9 @@ const typeDefs = gql`
     nShares: Int!
     nViews: Int!
     createdAt: String!
+    liked_by: [User!]!
+    shared_by: [User!]!
+    viewed_by: [User!]!
     product_media: [File!]!
     comments: [Comment!]!
   }
@@ -146,6 +160,7 @@ const typeDefs = gql`
     body: String!
     createdAt: String!
     nLikes: Int!
+    liked_by: [User!]!
   }
 
   type Comment {
@@ -156,6 +171,7 @@ const typeDefs = gql`
     createdAt: String!
     nLikes: Int!
     nReplies: Int!
+    liked_by: [User!]!
     replies: [Reply!]!
   }
 
@@ -353,6 +369,12 @@ const typeDefs = gql`
     referFrom: String # The item from which the message was sent from but not required
   }
 
+  input CommitEventInput {
+    user_id: ID!
+    parent_id: ID!
+    event_type: EventType!
+  }
+
   type Query {
     hello: String!
   }
@@ -411,6 +433,7 @@ const typeDefs = gql`
       verification_code: String!
     ): DeleteDataResponse!
     RequestNewVerificationCode(user_id: ID!): DeleteDataResponse!
+    CommitEvent(inputs: CommitEventInput!): DeleteDataResponse!
   }
 `
 

@@ -1,4 +1,5 @@
 const Blog = require("../models/Blog")
+const Event = require("../models/Event")
 const Post = require("../models/Post")
 const Product = require("../models/Product")
 const Review = require("../models/Reviews")
@@ -19,6 +20,60 @@ const {
 const { followData } = require("../helpers/followHelpers")
 const Message = require("../models/Message")
 const { messageData } = require("../helpers/messageHelpers")
+
+let retrieveHelpers = {
+  async getNLikes(parentId) {
+    const likes = await Event.find({
+      $and: [{ parent_id: parentId }, { event_type: "LIKE" }],
+    })
+    return likes.length
+  },
+  async getNShares(parentId) {
+    const shares = await Event.find({
+      $and: [{ parent_id: parentId }, { event_type: "SHARE" }],
+    })
+    return shares.length
+  },
+  async getNViews(parentId) {
+    const views = await Event.find({
+      $and: [{ parent_id: parentId }, { event_type: "VIEW" }],
+    })
+    return views.length
+  },
+  async getLikers(parentId) {
+    const likes = await Event.find({
+      $and: [{ parent_id: parentId }, { event_type: "LIKE" }],
+    })
+    const likers = []
+    for (let like of likes) {
+      let liker = await User.findOne({ _id: like.user_id })
+      likers.push(liker)
+    }
+    return likers.map((user) => userData(user))
+  },
+  async getViewers(parentId) {
+    const views = await Event.find({
+      $and: [{ parent_id: parentId }, { event_type: "VIEW" }],
+    })
+    const viewers = []
+    for (let view of views) {
+      let viewer = await User.findOne({ _id: view.user_id })
+      viewers.push(viewer)
+    }
+    return viewers.map((user) => userData(user))
+  },
+  async getWhoShares(parentId) {
+    const shares = await Event.find({
+      $and: [{ parent_id: parentId }, { event_type: "SHARE" }],
+    })
+    const whoShares = []
+    for (let share of shares) {
+      let whom = await User.findOne({ _id: share.user_id })
+      whoShares.push(whom)
+    }
+    return whoShares.map((user) => userData(user))
+  },
+}
 
 const customResolvers = {
   Review: {
@@ -120,6 +175,24 @@ const customResolvers = {
       const commentList = await Comment.find({ to: parent.post_id })
       return commentList.map((comment) => commentData(comment))
     },
+    async nLikes(parent) {
+      return await retrieveHelpers.getNLikes(parent.post_id)
+    },
+    async nShares(parent) {
+      return await retrieveHelpers.getNShares(parent.post_id)
+    },
+    async nViews(parent) {
+      return await retrieveHelpers.getNViews(parent.post_id)
+    },
+    async liked_by(parent) {
+      return await retrieveHelpers.getLikers(parent.post_id)
+    },
+    async viewed_by(parent) {
+      return await retrieveHelpers.getViewers(parent.post_id)
+    },
+    async shared_by(parent) {
+      return await retrieveHelpers.getWhoShares(parent.post_id)
+    },
   },
   Blog: {
     async owner(parent) {
@@ -134,6 +207,18 @@ const customResolvers = {
       const commentList = await Comment.find({ to: parent.blog_id })
       return commentList.map((comment) => commentData(comment))
     },
+    async nLikes(parent) {
+      return await retrieveHelpers.getNLikes(parent.blog_id)
+    },
+    async nShares(parent) {
+      return await retrieveHelpers.getNShares(parent.blog_id)
+    },
+    async liked_by(parent) {
+      return await retrieveHelpers.getLikers(parent.blog_id)
+    },
+    async shared_by(parent) {
+      return await retrieveHelpers.getWhoShares(parent.blog_id)
+    },
   },
   Product: {
     async owner(parent) {
@@ -143,6 +228,24 @@ const customResolvers = {
     async comments(parent) {
       const commentList = await Comment.find({ to: parent.product_id })
       return commentList.map((comment) => commentData(comment))
+    },
+    async nLikes(parent) {
+      return await retrieveHelpers.getNLikes(parent.product_id)
+    },
+    async nShares(parent) {
+      return await retrieveHelpers.getNShares(parent.product_id)
+    },
+    async nViews(parent) {
+      return await retrieveHelpers.getNViews(parent.product_id)
+    },
+    async liked_by(parent) {
+      return await retrieveHelpers.getLikers(parent.product_id)
+    },
+    async viewed_by(parent) {
+      return await retrieveHelpers.getViewers(parent.product_id)
+    },
+    async shared_by(parent) {
+      return await retrieveHelpers.getWhoShares(parent.product_id)
     },
   },
   CommentSource: {
@@ -201,11 +304,23 @@ const customResolvers = {
       const replyList = await Comment.find({ to: parent.comment_id })
       return replyList.map((reply) => replyData(reply))
     },
+    async nLikes(parent) {
+      return await retrieveHelpers.getNLikes(parent.comment_id)
+    },
+    async liked_by(parent) {
+      return await retrieveHelpers.getLikers(parent.comment_id)
+    },
   },
   Reply: {
     async from(parent) {
       const user = await User.findById(parent.from)
       return userData(user)
+    },
+    async nLikes(parent) {
+      return await retrieveHelpers.getNLikes(parent.reply_id)
+    },
+    async liked_by(parent) {
+      return await retrieveHelpers.getLikers(parent.reply_id)
     },
   },
   Follower: {
