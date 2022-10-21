@@ -12,6 +12,7 @@ const Blog = require("../../models/Blog")
 const Post = require("../../models/Post")
 const Product = require("../../models/Product")
 const Comment = require("../../models/Comment")
+const Notification = require("../../models/Notification")
 
 async function getParentObject(obj_id) {
   let parentFound = null
@@ -89,6 +90,16 @@ const eventMutations = {
             parent_id: parentObj?._id,
             event_type,
           }).save()
+          if (event_type === "LIKE") {
+            await new Notification({
+              notification_type: "LIKE",
+              ref_object: parentObj._id.toString(),
+              specified_user: parentObj?.role
+                ? parentObj._id.toString()
+                : parentObj.user_id,
+              body: "You have gained a new like",
+            }).save()
+          }
           break
         case "DISLIKE":
           await Event.deleteOne({

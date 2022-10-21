@@ -43,6 +43,8 @@ const typeDefs = gql`
 
   union ReferItem = Product | Post | Blog
 
+  union ReferNotificationObject = Product | Post | Blog | Comment | User | Reply
+
   type User {
     user_id: ID!
     avatar: String
@@ -58,6 +60,7 @@ const typeDefs = gql`
     nProducts: Int!
     nReviews: Int!
     new_messages: Int!
+    new_notifications: Int!
     verified: Boolean!
     role: Role!
     createdAt: String!
@@ -71,6 +74,7 @@ const typeDefs = gql`
     posts: [Post!]!
     products: [Product!]!
     messages: [Message!]!
+    notifications: [Notification!]!
   }
 
   type Follower {
@@ -187,6 +191,13 @@ const typeDefs = gql`
     deleted_for_sender: Boolean!
     forwarded: Boolean!
     seen: Boolean!
+  }
+
+  type Notification {
+    notification_id: ID!
+    body: String!
+    refer_to: ReferNotificationObject
+    createdAt: String!
   }
 
   type ReportedProblem {

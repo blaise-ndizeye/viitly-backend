@@ -7,19 +7,21 @@ const User = require("../models/User")
 const Comment = require("../models/Comment")
 const Following = require("../models/Following")
 const UploadScope = require("../models/UploadScope")
+const Message = require("../models/Message")
+const Notification = require("../models/Notification")
 const { userData } = require("../helpers/userHelpers")
 const { reviewData } = require("../helpers/reviewHelpers")
 const { blogData } = require("../helpers/blogHelpers")
 const { postData } = require("../helpers/postHelpers")
 const { productData } = require("../helpers/productHelpers")
+const { messageData } = require("../helpers/messageHelpers")
+const { notificationData } = require("../helpers/notificationHelpers")
 const {
   commentData,
   getCommentDestination,
   replyData,
 } = require("../helpers/commentHelpers")
 const { followData } = require("../helpers/followHelpers")
-const Message = require("../models/Message")
-const { messageData } = require("../helpers/messageHelpers")
 
 let retrieveHelpers = {
   async getNLikes(parentId) {
@@ -72,6 +74,50 @@ let retrieveHelpers = {
       whoShares.push(whom)
     }
     return whoShares.map((user) => userData(user))
+  },
+  async getNotifications(parent) {
+    const allNotifications = []
+
+    const user = await User.findOne({ _id: parent.user_id })
+
+    const list1 = await Notification.find({
+      $or: [
+        { specified_user: parent.user_id },
+        { notification_type: "ALL" },
+        {
+          $and: [
+            { specified_user: parent.user_id },
+            {
+              notification_type: {
+                $in: ["REQUEST_CC", "ACCEPT_CC", "FOLLOW", "LIKE"],
+              },
+            },
+          ],
+        },
+      ],
+    })
+
+    list1.forEach((item) => allNotifications.push(item))
+
+    if (user.role === "PROFFESSIONAL") {
+      const list2 = await Notification.find({
+        notification_type: "PROFFESSIONAL",
+      })
+
+      list2.forEach((item) => allNotifications.push(item))
+    }
+
+    if (user.role === "BUSINESS") {
+      const list3 = await Notification.find({
+        notification_type: "BUSINESS",
+      })
+
+      list3.forEach((item) => allNotifications.push(item))
+    }
+
+    return allNotifications.filter(
+      (notification) => !notification.deleted_for.includes(parent.user_id)
+    )
   },
 }
 
@@ -160,6 +206,16 @@ const customResolvers = {
     async nProducts(parent) {
       const productList = await Product.find({ user_id: parent.user_id })
       return productList.length
+    },
+    async notifications(parent) {
+      let allNotifications = await retrieveHelpers.getNotifications(parent)
+      return allNotifications.map((item) => notificationData(item))
+    },
+    async new_notifications(parent) {
+      const userNotifications = await retrieveHelpers.getNotifications(parent)
+      return userNotifications.filter(
+        (notification) => !notification.seen_by.includes(parent.user_id)
+      ).length
     },
   },
   Post: {
@@ -264,6 +320,25 @@ const customResolvers = {
       }
     },
   },
+  ReferNotificationObject: {
+    __resolveType(obj, _, __) {
+      if (obj.blog_id) {
+        return "Blog"
+      }
+      if (obj.post_id) {
+        return "Post"
+      }
+      if (obj.product_id) {
+        return "Product"
+      }
+      if (obj.comment_id) {
+        return "Comment"
+      }
+      if (obj.user_id) {
+        return "User"
+      }
+    },
+  },
   CommentResponseObject: {
     __resolveType(obj, _, __) {
       if (obj.comment_id) {
@@ -309,6 +384,29 @@ const customResolvers = {
     },
     async liked_by(parent) {
       return await retrieveHelpers.getLikers(parent.comment_id)
+    },
+  },
+  Notification: {
+    async refer_to(parent) {
+      const { commentDestName, commentDestObj } = await getCommentDestination(
+        parent.refer_to
+      )
+      const userFound = await User.findOne({ _id: parent.refer_to })
+
+      switch (commentDestName) {
+        case "Blog":
+          return blogData(commentDestObj)
+        case "Product":
+          return productData(commentDestObj)
+        case "Post":
+          return postData(commentDestObj)
+        case "Comment":
+          return commentData(commentDestObj)
+        default:
+          if (userFound) {
+            return userData(userFound)
+          } else return null
+      }
     },
   },
   Reply: {

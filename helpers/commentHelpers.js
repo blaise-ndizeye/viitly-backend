@@ -10,7 +10,6 @@ module.exports = {
       from: data.user_id,
       to: data.to,
       body: data.body,
-      nLikes: data.nLikes,
       nReplies: data.nReplies,
       createdAt: data.createdAt.toISOString(),
     }
@@ -21,7 +20,6 @@ module.exports = {
       from: data.user_id,
       to: data.to,
       body: data.body,
-      nLikes: data.nLikes,
       createdAt: data.createdAt.toISOString(),
     }
   },
