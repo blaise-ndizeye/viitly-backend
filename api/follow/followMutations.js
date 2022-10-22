@@ -2,6 +2,7 @@ const { ApolloError } = require("apollo-server-errors")
 
 const Following = require("../../models/Following")
 const User = require("../../models/User")
+const Notification = require("../../models/Notification")
 const { isAuthenticated, isAccountVerified, isValidUser } = require("../shield")
 const { generateServerError } = require("../../helpers/errorHelpers")
 // const { followData } = require("../../helpers/followHelpers")
@@ -87,6 +88,13 @@ const followMutations = {
         }
       )
 
+      await new Notification({
+        notification_type: "FOLLOW",
+        ref_object: user_id,
+        specified_user: requestedUserExist._id.toString(),
+        body: "You have gained new follower",
+      }).save()
+
       return {
         code: 201,
         success: true,
@@ -136,6 +144,13 @@ const followMutations = {
           },
         }
       )
+
+      await new Notification({
+        notification_type: "FOLLOW",
+        ref_object: user_id,
+        specified_user: followerExist._id.toString(),
+        body: "You have gained new follower",
+      }).save()
 
       return {
         code: 200,

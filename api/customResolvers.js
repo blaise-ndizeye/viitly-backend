@@ -95,14 +95,14 @@ let retrieveHelpers = {
           ],
         },
       ],
-    })
+    }).sort({ _id: -1 })
 
     list1.forEach((item) => allNotifications.push(item))
 
     if (user.role === "PROFFESSIONAL") {
       const list2 = await Notification.find({
         notification_type: "PROFFESSIONAL",
-      })
+      }).sort({ _id: -1 })
 
       list2.forEach((item) => allNotifications.push(item))
     }
@@ -110,7 +110,7 @@ let retrieveHelpers = {
     if (user.role === "BUSINESS") {
       const list3 = await Notification.find({
         notification_type: "BUSINESS",
-      })
+      }).sort({ _id: -1 })
 
       list3.forEach((item) => allNotifications.push(item))
     }
