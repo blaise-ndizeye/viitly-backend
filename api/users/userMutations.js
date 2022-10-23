@@ -713,6 +713,30 @@ const userMutations = {
       generateServerError(err)
     }
   },
+  async DeleteWallet(_, { user_id, wallet_id }, ctx, ___) {
+    try {
+      isAuthenticated(ctx)
+      isValidUser(ctx.user, user_id)
+      isAccountVerified(ctx.user)
+      isAdmin(ctx.user)
+
+      if (!wallet_id || wallet_id.length < 5)
+        throw new ApolloError("Wallet ID:=> [wallet_id] is required", 400)
+
+      const walletExists = await Wallet.findOne({ _id: wallet_id })
+      if (!walletExists) throw new ApolloError("Wallet not found", 404)
+
+      await Wallet.deleteOne({ _id: walletExists._id })
+
+      return {
+        code: 200,
+        success: true,
+        message: "Wallet deleted successfully",
+      }
+    } catch (err) {
+      generateServerError(err)
+    }
+  },
 }
 
 module.exports = userMutations
