@@ -2,6 +2,7 @@ const { ApolloError } = require("apollo-server-errors")
 
 const Post = require("../../models/Post")
 const UploadScope = require("../../models/UploadScope")
+const Notification = require("../../models/Notification")
 const {
   isAuthenticated,
   isAccountVerified,
@@ -36,6 +37,9 @@ const postMutations = {
       if (description.length === 0)
         throw new ApolloError("Description is required", 400)
 
+      if (tagged_users.length > 0 && tagged_users.includes(user_id))
+        throw new ApolloError("You can not tag to your own post", 400)
+
       const { tagError, validTaggedUsers } = await verifyTaggedUsers(
         tagged_users
       )
@@ -67,6 +71,17 @@ const postMutations = {
           },
         }
       )
+
+      if (validTaggedUsers.length > 0) {
+        for (let tagged_user of validTaggedUsers) {
+          await new Notification({
+            notification_type: "INVITE",
+            ref_object: newPost._id.toString(),
+            specified_user: tagged_user,
+            body: "You have new post suggestion",
+          }).save()
+        }
+      }
 
       return {
         code: 201,

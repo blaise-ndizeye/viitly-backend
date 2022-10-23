@@ -561,7 +561,7 @@ const userMutations = {
         throw new ApolloError("Notification doesn't exist", 400)
 
       if (
-        ["LIKE", "FOLLOW", "REQUEST_CC", "ACCEPT_CC"].includes(
+        ["LIKE", "FOLLOW", "REQUEST_CC", "ACCEPT_CC", "INVITE"].includes(
           notificationExist.notification_type
         ) &&
         notificationExist.specified_user === user_id

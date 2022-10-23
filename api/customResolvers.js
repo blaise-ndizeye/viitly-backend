@@ -89,7 +89,7 @@ let retrieveHelpers = {
             { specified_user: parent.user_id },
             {
               notification_type: {
-                $in: ["REQUEST_CC", "ACCEPT_CC", "FOLLOW", "LIKE"],
+                $in: ["REQUEST_CC", "ACCEPT_CC", "FOLLOW", "LIKE", "INVITE"],
               },
             },
           ],

@@ -2,6 +2,7 @@ const { ApolloError } = require("apollo-server-errors")
 
 const Blog = require("../../models/Blog")
 const UploadScope = require("../../models/UploadScope")
+const Notification = require("../../models/Notification")
 const { uploadBlogValidation } = require("../../validators")
 const {
   isAuthenticated,
@@ -36,6 +37,9 @@ const blogMutations = {
         blog_content,
       })
       if (error) throw new ApolloError(error, 400)
+
+      if (tagged_users.length > 0 && tagged_users.includes(user_id))
+        throw new ApolloError("You can not tag to your own blog", 400)
 
       const { tagError, validTaggedUsers } = await verifyTaggedUsers(
         tagged_users
@@ -72,6 +76,17 @@ const blogMutations = {
           },
         }
       )
+
+      if (validTaggedUsers.length > 0) {
+        for (let tagged_user of validTaggedUsers) {
+          await new Notification({
+            notification_type: "INVITE",
+            ref_object: newBlog._id.toString(),
+            specified_user: tagged_user,
+            body: "You have new blog suggestion",
+          }).save()
+        }
+      }
 
       return {
         code: 201,
