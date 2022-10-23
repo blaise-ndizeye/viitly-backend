@@ -239,6 +239,7 @@ const customResolvers = {
           walletList = await Wallet.find({
             $or: [{ scope: "ALL" }, { scope: "BUSINESS" }],
           })
+          break
         default:
           walletList = []
           break

@@ -655,6 +655,64 @@ const userMutations = {
       generateServerError(err)
     }
   },
+  async UpdateWallet(_, { inputs }, ctx, ___) {
+    try {
+      const {
+        user_id,
+        wallet_id,
+        price,
+        blogs_to_offer,
+        posts_to_offer,
+        products_to_offer,
+        currency,
+        scope,
+      } = inputs
+
+      isAuthenticated(ctx)
+      isValidUser(ctx.user, user_id)
+      isAccountVerified(ctx.user)
+      isAdmin(ctx.user)
+
+      if (price === 0) throw new ApolloError("Invalid Price", 400)
+
+      if (!["ALL", "BUSINESS", "PROFFESSIONAL", "PERSONAL"].includes(scope))
+        throw new ApolloError("Invalid scope provided")
+
+      const walletExists = await Wallet.findById(wallet_id)
+      if (!walletExists) throw new ApolloError("Wallet not found", 400)
+
+      await Wallet.updateOne(
+        {
+          _id: walletExists._id,
+        },
+        {
+          $set: {
+            price,
+            blogs_to_offer,
+            posts_to_offer,
+            products_to_offer: ["ALL", "PERSONAL", "PROFFESSIONAL"].includes(
+              scope
+            )
+              ? 0
+              : products_to_offer,
+            currency,
+            scope,
+          },
+        }
+      )
+
+      const updatedWallet = await Wallet.findOne({ _id: walletExists._id })
+
+      return {
+        code: 200,
+        success: true,
+        message: "Wallet updated successfully",
+        wallet: walletData(updatedWallet),
+      }
+    } catch (err) {
+      generateServerError(err)
+    }
+  },
 }
 
 module.exports = userMutations
