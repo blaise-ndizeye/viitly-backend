@@ -9,6 +9,7 @@ const Following = require("../models/Following")
 const UploadScope = require("../models/UploadScope")
 const Message = require("../models/Message")
 const Notification = require("../models/Notification")
+const Wallet = require("../models/Wallet")
 const { userData } = require("../helpers/userHelpers")
 const { reviewData } = require("../helpers/reviewHelpers")
 const { blogData } = require("../helpers/blogHelpers")
@@ -22,6 +23,7 @@ const {
   replyData,
 } = require("../helpers/commentHelpers")
 const { followData } = require("../helpers/followHelpers")
+const { walletData } = require("../helpers/walletHelpers")
 
 let retrieveHelpers = {
   async getNLikes(parentId) {
@@ -216,6 +218,32 @@ const customResolvers = {
       return userNotifications.filter(
         (notification) => !notification.seen_by.includes(parent.user_id)
       ).length
+    },
+    async wallets(parent) {
+      let walletList
+      switch (parent.role) {
+        case "ADMIN":
+          walletList = await Wallet.find()
+          break
+        case "PERSONAL":
+          walletList = await Wallet.find({
+            $or: [{ scope: "ALL" }, { scope: "PERSONAL" }],
+          })
+          break
+        case "PROFFESSIONAL":
+          walletList = await Wallet.find({
+            $or: [{ scope: "ALL" }, { scope: "BUSINESS" }],
+          })
+          break
+        case "BUSINESS":
+          walletList = await Wallet.find({
+            $or: [{ scope: "ALL" }, { scope: "BUSINESS" }],
+          })
+        default:
+          walletList = []
+          break
+      }
+      return walletList.map((wallet) => walletData(wallet))
     },
   },
   Post: {

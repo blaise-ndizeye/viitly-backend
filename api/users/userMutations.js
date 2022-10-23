@@ -5,6 +5,7 @@ const User = require("../../models/User")
 const UploadScope = require("../../models/UploadScope")
 const Notification = require("../../models/Notification")
 const ReportedProblems = require("../../models/ReportedProblems")
+const Wallet = require("../../models/Wallet")
 const {
   registerUserValidation,
   loginUserValidation,
@@ -24,6 +25,7 @@ const {
 const { problemData } = require("../../helpers/problemHelpers")
 const mailTransporter = require("../../utils/mail/send")
 const { getRandomNumber } = require("../../helpers/customHelpers")
+const { walletData } = require("../../helpers/walletHelpers")
 
 const userMutations = {
   async RegisterUser(_, args, __, ___) {
@@ -592,6 +594,62 @@ const userMutations = {
         code: 200,
         success: true,
         message: "Notification deleted successfully",
+      }
+    } catch (err) {
+      generateServerError(err)
+    }
+  },
+  async CreateWallet(_, { inputs }, ctx, ___) {
+    try {
+      const {
+        user_id,
+        price,
+        blogs_to_offer,
+        posts_to_offer,
+        products_to_offer,
+        currency,
+        scope,
+      } = inputs
+
+      isAuthenticated(ctx)
+      isValidUser(ctx.user, user_id)
+      isAccountVerified(ctx.user)
+      isAdmin(ctx.user)
+
+      if (price === 0) throw new ApolloError("Invalid Price", 400)
+
+      if (!["ALL", "BUSINESS", "PROFFESSIONAL", "PERSONAL"].includes(scope))
+        throw new ApolloError("Invalid scope provided")
+
+      const walletExists = await Wallet.findOne({
+        $and: [
+          { blogs_to_offer },
+          { posts_to_offer },
+          { products_to_offer },
+          { scope },
+          { currency },
+        ],
+      })
+
+      if (walletExists)
+        throw new ApolloError("Wallet with these data already exists")
+
+      const newWallet = await new Wallet({
+        price,
+        blogs_to_offer,
+        products_to_offer: ["ALL", "PERSONAL", "PROFFESSIONAL"].includes(scope)
+          ? 0
+          : products_to_offer,
+        posts_to_offer,
+        currency,
+        scope,
+      }).save()
+
+      return {
+        code: 200,
+        success: true,
+        message: "Wallet created successfully",
+        wallet: walletData(newWallet),
       }
     } catch (err) {
       generateServerError(err)

@@ -37,11 +37,18 @@ const typeDefs = gql`
     DISLIKE
   }
 
+  enum Currency {
+    FRW
+    USD
+  }
+
   scalar Upload
 
   union CommentSource = Product | Post | Blog | Comment
 
   union ReferItem = Product | Post | Blog
+
+  union CommentResponseObject = Comment | Reply
 
   union ReferNotificationObject = Product | Post | Blog | Comment | User | Reply
 
@@ -75,6 +82,7 @@ const typeDefs = gql`
     products: [Product!]!
     messages: [Message!]!
     notifications: [Notification!]!
+    wallets: [Wallet!]!
   }
 
   type Follower {
@@ -208,6 +216,17 @@ const typeDefs = gql`
     createdAt: String!
   }
 
+  type Wallet {
+    wallet_id: ID!
+    price: Int!
+    blogs_to_offer: Int!
+    posts_to_offer: Int!
+    products_to_offer: Int!
+    scope: String!
+    currency: Currency!
+    createdAt: String!
+  }
+
   interface MutationResponse {
     code: Int!
     success: Boolean!
@@ -263,13 +282,18 @@ const typeDefs = gql`
     reported_problem: ReportedProblem!
   }
 
-  union CommentResponseObject = Comment | Reply
-
   type CommentResponse implements MutationResponse {
     code: Int!
     success: Boolean!
     message: String!
     data: CommentResponseObject!
+  }
+
+  type WalletResponse implements MutationResponse {
+    code: Int!
+    success: Boolean!
+    message: String!
+    wallet: Wallet!
   }
 
   input UserInput {
@@ -386,6 +410,27 @@ const typeDefs = gql`
     event_type: EventType!
   }
 
+  input CreateWalletInput {
+    user_id: ID!
+    price: Int!
+    blogs_to_offer: Int!
+    posts_to_offer: Int!
+    products_to_offer: Int!
+    currency: Currency!
+    scope: String!
+  }
+
+  input UpdateWalletInput {
+    user_id: ID!
+    wallet_id: ID!
+    price: Int!
+    blogs_to_offer: Int!
+    posts_to_offer: Int!
+    products_to_offer: Int!
+    scope: String!
+    currency: Currency!
+  }
+
   type Query {
     hello: String!
   }
@@ -450,6 +495,9 @@ const typeDefs = gql`
       notification_id: ID!
     ): DeleteDataResponse!
     DeleteNotification(user_id: ID!, notification_id: ID!): DeleteDataResponse!
+    CreateWallet(inputs: CreateWalletInput!): WalletResponse!
+    UpdateWallet(inputs: UpdateWalletInput!): WalletResponse!
+    DeleteWallet(user_id: ID!, wallet_id: ID!): DeleteDataResponse!
   }
 `
 
