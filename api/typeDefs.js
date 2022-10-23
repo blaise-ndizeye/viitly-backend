@@ -445,6 +445,10 @@ const typeDefs = gql`
     ): DeleteDataResponse!
     RequestNewVerificationCode(user_id: ID!): DeleteDataResponse!
     CommitEvent(inputs: CommitEventInput!): DeleteDataResponse!
+    MarkNotificationAsRead(
+      user_id: ID!
+      notification_id: ID!
+    ): DeleteDataResponse!
   }
 `
 

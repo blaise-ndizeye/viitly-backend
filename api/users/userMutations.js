@@ -3,6 +3,8 @@ const { ApolloError } = require("apollo-server-errors")
 
 const User = require("../../models/User")
 const UploadScope = require("../../models/UploadScope")
+const Notification = require("../../models/Notification")
+const ReportedProblems = require("../../models/ReportedProblems")
 const {
   registerUserValidation,
   loginUserValidation,
@@ -13,7 +15,6 @@ const {
   deleteUploadedFile,
 } = require("../../helpers/uploadHelpers")
 const { generateServerError } = require("../../helpers/errorHelpers")
-const ReportedProblems = require("../../models/ReportedProblems")
 const {
   isAdmin,
   isAuthenticated,
@@ -505,6 +506,39 @@ const userMutations = {
         code: 200,
         success: true,
         message: `Verification code sent to ${user.email} successfully`,
+      }
+    } catch (err) {
+      generateServerError(err)
+    }
+  },
+  async MarkNotificationAsRead(_, { user_id, notification_id }, ctx, ___) {
+    try {
+      isAuthenticated(ctx)
+      isValidUser(ctx.user, user_id)
+
+      if (!notification_id || notification_id.length < 5)
+        throw new ApolloError(
+          "Notification Id [notification_id] is required",
+          400
+        )
+
+      const notificationExist = await Notification.findById(notification_id)
+      if (!notificationExist)
+        throw new ApolloError("Notification doesn't exist", 400)
+
+      await Notification.updateOne(
+        { _id: notificationExist._id },
+        {
+          $push: {
+            seen_by: user_id,
+          },
+        }
+      )
+
+      return {
+        code: 200,
+        success: true,
+        message: "Notification marked as read successfully",
       }
     } catch (err) {
       generateServerError(err)
