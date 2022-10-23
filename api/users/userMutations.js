@@ -544,6 +544,59 @@ const userMutations = {
       generateServerError(err)
     }
   },
+  async DeleteNotification(_, { user_id, notification_id }, ctx, ___) {
+    try {
+      isAuthenticated(ctx)
+      isValidUser(ctx.user, user_id)
+      isAccountVerified(ctx.user)
+
+      if (!notification_id || notification_id.length < 5)
+        throw new ApolloError(
+          "Notification Id [notification_id] is required",
+          400
+        )
+
+      const notificationExist = await Notification.findById(notification_id)
+      if (!notificationExist)
+        throw new ApolloError("Notification doesn't exist", 400)
+
+      if (
+        ["LIKE", "FOLLOW", "REQUEST_CC", "ACCEPT_CC"].includes(
+          notificationExist.notification_type
+        ) &&
+        notificationExist.specified_user === user_id
+      ) {
+        await Notification.deleteOne({ _id: notification_id })
+      }
+
+      if (
+        ["ALL", "BUSINESS", "PROFFESSIONAL"].includes(
+          notificationExist.notification_type
+        )
+      ) {
+        if (ctx.user.role === "ADMIN") {
+          await Notification.deleteOne({ _id: notification_id })
+        } else {
+          await Notification.updateOne(
+            { _id: notification_id },
+            {
+              $push: {
+                deleted_for: user_id,
+              },
+            }
+          )
+        }
+      }
+
+      return {
+        code: 200,
+        success: true,
+        message: "Notification deleted successfully",
+      }
+    } catch (err) {
+      generateServerError(err)
+    }
+  },
 }
 
 module.exports = userMutations

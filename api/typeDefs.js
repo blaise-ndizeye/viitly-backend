@@ -449,6 +449,7 @@ const typeDefs = gql`
       user_id: ID!
       notification_id: ID!
     ): DeleteDataResponse!
+    DeleteNotification(user_id: ID!, notification_id: ID!): DeleteDataResponse!
   }
 `
 
