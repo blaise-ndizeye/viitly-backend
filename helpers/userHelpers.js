@@ -31,4 +31,13 @@ module.exports = {
 
     return generatedToken
   },
+  locationData(data) {
+    return {
+      province: data.province,
+      district: data.district,
+      market_description: data.market_description,
+      latitude: data.latitude,
+      longitude: data.longitude,
+    }
+  },
 }

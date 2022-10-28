@@ -83,6 +83,8 @@ const typeDefs = gql`
     messages: [Message!]!
     notifications: [Notification!]!
     wallets: [Wallet!]!
+    location: Location!
+    transactions: [Transaction!]!
   }
 
   type Follower {
@@ -225,6 +227,25 @@ const typeDefs = gql`
     scope: String!
     currency: Currency!
     createdAt: String!
+  }
+
+  type Location {
+    province: String!
+    district: String!
+    market_description: String
+    latitude: String
+    longitude: String
+  }
+
+  type Transaction {
+    transaction_id: ID!
+    provider_trans_id: ID!
+    amount_paid: Int!
+    currency_used: String!
+    description: String!
+    transaction_role: String!
+    createdAt: String!
+    done_by: User!
   }
 
   interface MutationResponse {

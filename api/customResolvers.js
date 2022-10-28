@@ -10,7 +10,9 @@ const UploadScope = require("../models/UploadScope")
 const Message = require("../models/Message")
 const Notification = require("../models/Notification")
 const Wallet = require("../models/Wallet")
-const { userData } = require("../helpers/userHelpers")
+const Location = require("../models/Location")
+const Transaction = require("../models/Transaction")
+const { userData, locationData } = require("../helpers/userHelpers")
 const { reviewData } = require("../helpers/reviewHelpers")
 const { blogData } = require("../helpers/blogHelpers")
 const { postData } = require("../helpers/postHelpers")
@@ -23,7 +25,7 @@ const {
   replyData,
 } = require("../helpers/commentHelpers")
 const { followData } = require("../helpers/followHelpers")
-const { walletData } = require("../helpers/walletHelpers")
+const { walletData, transactionData } = require("../helpers/walletHelpers")
 
 let retrieveHelpers = {
   async getNLikes(parentId) {
@@ -245,6 +247,16 @@ const customResolvers = {
           break
       }
       return walletList.map((wallet) => walletData(wallet))
+    },
+    async transactions(parent) {
+      const transactionList = await Transaction.find({
+        user_id: parent.user_id,
+      })
+      return transactionList.map((transaction) => transactionData(transaction))
+    },
+    async location(parent) {
+      const userLocation = await Location.findOne({ user_id: parent.user_id })
+      return locationData(userLocation)
     },
   },
   Post: {
@@ -499,6 +511,15 @@ const customResolvers = {
   ReportedProblem: {
     async reporter(parent) {
       const user = await User.findById(parent.reporter)
+      return userData(user)
+    },
+  },
+  Transaction: {
+    async done_by(parent) {
+      const transaction = await Transaction.findOne({
+        _id: parent.transaction_id,
+      })
+      const user = await User.findOne({ _id: transaction.user_id })
       return userData(user)
     },
   },

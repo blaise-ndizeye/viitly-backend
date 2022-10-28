@@ -11,4 +11,15 @@ module.exports = {
       createdAt: data.createdAt.toISOString(),
     }
   },
+  transactionData(data) {
+    return {
+      transaction_id: data._id.toString(),
+      provider_trans_id: data.service_provider_gen_id,
+      amount_paid: data.amount_paid,
+      currency_used: data.currency_used,
+      description: data.description,
+      transaction_role: data.transaction_role,
+      createdAt: data.createdAt.toISOString(),
+    }
+  },
 }
