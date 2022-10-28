@@ -462,6 +462,14 @@ const typeDefs = gql`
     longitude: String
   }
 
+  input SwitchToBusinessInputs {
+    user_id: ID!
+    receptient_id: ID!
+    blogs_to_offer: Int!
+    posts_to_offer: Int!
+    products_to_offer: Int!
+  }
+
   input UpdateLocationInput {
     user_id: ID!
     province: String!
@@ -539,6 +547,7 @@ const typeDefs = gql`
     UpdateWallet(inputs: UpdateWalletInput!): WalletResponse!
     DeleteWallet(user_id: ID!, wallet_id: ID!): DeleteDataResponse!
     SwitchToProAccount(inputs: SwitchToProInputs!): LogUserResponse!
+    SwitchToBusinessAccount(inputs: SwitchToBusinessInputs!): LogUserResponse!
     UpdateUserLocation(inputs: UpdateLocationInput): LogUserResponse!
   }
 `

@@ -886,7 +886,67 @@ const userMutations = {
       return {
         code: 200,
         success: true,
-        message: "user Location updated successfully",
+        message: "User Location updated successfully",
+        accessToken,
+        user: userData(updatedUser),
+      }
+    } catch (err) {
+      generateServerError(err)
+    }
+  },
+  async SwitchToBusinessAccount(_, { inputs }, ctx, ___) {
+    try {
+      const {
+        user_id,
+        receptient_id,
+        blogs_to_offer = 0,
+        posts_to_offer = 0,
+        products_to_offer = 0,
+      } = inputs
+
+      isAuthenticated(ctx)
+      isValidUser(ctx.user, user_id)
+      isAccountVerified(ctx.user)
+      isAdmin(ctx.user)
+
+      const receptientExists = await User.findOne({ _id: receptient_id })
+      if (!receptientExists)
+        throw new ApolloError("Receptient doesn't exist", 404)
+
+      if (receptientExists.role === "BUSINESS")
+        throw new ApolloError("Account is already a Business account", 400)
+
+      const userScope = await UploadScope.findOne({ user_id: receptient_id })
+
+      await UploadScope.updateOne(
+        { user_id: receptient_id },
+        {
+          $set: {
+            blogs_available: +userScope.blogs_available + blogs_to_offer,
+            posts_available: +userScope.posts_available + posts_to_offer,
+            products_available:
+              +userScope.products_available + products_to_offer,
+          },
+        }
+      )
+
+      await User.updateOne(
+        { _id: receptientExists._id },
+        {
+          $set: {
+            role: "BUSINESS",
+          },
+        }
+      )
+
+      const updatedUser = await User.findOne({ _id: receptientExists._id })
+
+      const accessToken = await generateAccessToken(updatedUser)
+
+      return {
+        code: 200,
+        success: true,
+        message: "Account switched to business successfully",
         accessToken,
         user: userData(updatedUser),
       }
