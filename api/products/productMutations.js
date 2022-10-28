@@ -243,6 +243,32 @@ const productMutations = {
       generateServerError(err)
     }
   },
+  async DeleteSavedProduct(_, { user_id, product_id }, ctx, ___) {
+    try {
+      isAuthenticated(ctx)
+      isValidUser(ctx.user, user_id)
+      isAccountVerified(ctx.user)
+
+      if (!product_id || product_id.length < 5)
+        throw new ApolloError("Product Id:=> product_id is required", 400)
+
+      const savedProductExists = await SavedProduct.findOne({
+        $and: [{ user_id }, { product_id }],
+      })
+      if (!savedProductExists)
+        throw new ApolloError("Saved product not found", 404)
+
+      await SavedProduct.deleteOne({ _id: savedProductExists._id })
+
+      return {
+        code: 200,
+        success: true,
+        message: "Saved Product deleted successfully",
+      }
+    } catch (err) {
+      generateServerError(err)
+    }
+  },
 }
 
 module.exports = productMutations
