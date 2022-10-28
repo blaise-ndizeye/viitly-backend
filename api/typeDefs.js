@@ -431,6 +431,16 @@ const typeDefs = gql`
     currency: Currency!
   }
 
+  input SwitchToProInputs {
+    user_id: ID!
+    wallet_id: ID!
+    province: String!
+    district: String!
+    market_description: String
+    latitude: String
+    longitude: String
+  }
+
   type Query {
     hello: String!
   }
@@ -498,6 +508,7 @@ const typeDefs = gql`
     CreateWallet(inputs: CreateWalletInput!): WalletResponse!
     UpdateWallet(inputs: UpdateWalletInput!): WalletResponse!
     DeleteWallet(user_id: ID!, wallet_id: ID!): DeleteDataResponse!
+    SwitchToProAccount(inputs: SwitchToProInputs!): LogUserResponse!
   }
 `
 

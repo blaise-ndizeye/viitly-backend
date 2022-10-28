@@ -1,10 +1,12 @@
 const bcrypt = require("bcryptjs")
 const { ApolloError } = require("apollo-server-errors")
 
+const Location = require("../../models/Location")
 const User = require("../../models/User")
 const UploadScope = require("../../models/UploadScope")
 const Notification = require("../../models/Notification")
 const ReportedProblems = require("../../models/ReportedProblems")
+const Transaction = require("../../models/Transaction")
 const Wallet = require("../../models/Wallet")
 const {
   registerUserValidation,
@@ -26,6 +28,7 @@ const { problemData } = require("../../helpers/problemHelpers")
 const mailTransporter = require("../../utils/mail/send")
 const { getRandomNumber } = require("../../helpers/customHelpers")
 const { walletData } = require("../../helpers/walletHelpers")
+const { makePayment } = require("../../helpers/paymentHelpers")
 
 const userMutations = {
   async RegisterUser(_, args, __, ___) {
@@ -732,6 +735,97 @@ const userMutations = {
         code: 200,
         success: true,
         message: "Wallet deleted successfully",
+      }
+    } catch (err) {
+      generateServerError(err)
+    }
+  },
+  async SwitchToProAccount(_, { inputs }, ctx, ___) {
+    try {
+      const {
+        user_id,
+        wallet_id,
+        province,
+        district,
+        market_description,
+        latitude = "",
+        longitude = "",
+      } = inputs
+
+      isAuthenticated(ctx)
+      isValidUser(ctx.user, user_id)
+      isAccountVerified(ctx.user)
+
+      if (ctx.user.role !== "PERSONAL")
+        throw new ApolloError("Only personal accounts are allowed", 400)
+
+      if (!wallet_id || wallet_id.length < 5)
+        throw new ApolloError("Wallet Id:=> [wallet_id] is required", 400)
+
+      const walletExists = await Wallet.findOne({ _id: wallet_id })
+      if (!walletExists) throw new ApolloError("Wallet not found", 404)
+
+      if (province.length < 3 || district.length < 3)
+        throw new ApolloError(
+          "Province and sector must have at least 3 characters",
+          400
+        )
+
+      const { errorMessage, generatedTransaction } = await makePayment(
+        walletExists,
+        user_id
+      )
+      if (errorMessage) throw new ApolloError(errorMessage, 400)
+
+      await new Location({
+        user_id,
+        province,
+        district,
+        market_description,
+        latitude,
+        longitude,
+      }).save()
+
+      await new Transaction({
+        service_provider_gen_id: generatedTransaction.id,
+        user_id,
+        amount_paid: walletExists.price,
+        currency_used: walletExists.currency,
+        description: "Switching to proffessional account",
+        transaction_role: "PAYMENT",
+      }).save()
+
+      const uploadScope = await UploadScope.findOne({ user_id })
+
+      await UploadScope.updateOne(
+        { _id: uploadScope._id },
+        {
+          $set: {
+            blogs_available: +uploadScope.blogs_available + 5,
+            posts_available: +uploadScope.posts_available + 4,
+          },
+        }
+      )
+
+      await User.updateOne(
+        { _id: user_id },
+        {
+          $set: {
+            role: "PROFFESSIONAL",
+          },
+        }
+      )
+
+      const updatedUser = await User.findOne({ _id: user_id })
+
+      const accessToken = await generateAccessToken(updatedUser)
+
+      return {
+        code: 200,
+        success: true,
+        message: "Account switched to Proffessional",
+        accessToken,
+        user: userData(updatedUser),
       }
     } catch (err) {
       generateServerError(err)
