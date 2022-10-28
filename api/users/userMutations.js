@@ -96,8 +96,6 @@ const userMutations = {
 
       await new UploadScope({ user_id: newUser._id.toString() }).save()
 
-      /* Send verification code to whatsapp and Generate the 
-      notification to the user to verify his/her account */
       if (process.env.NODE_ENV === "production") {
         let generatedCode = getRandomNumber(100000, 999999)
 

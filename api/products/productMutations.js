@@ -1,9 +1,12 @@
 const { ApolloError } = require("apollo-server-errors")
 
+const CoinCodeProduct = require("../../models/CoinCodeProduct")
+const Notification = require("../../models/Notification")
 const Product = require("../../models/Product")
 const UploadScope = require("../../models/UploadScope")
 const SavedProduct = require("../../models/SavedProduct")
 const { generateServerError } = require("../../helpers/errorHelpers")
+const { getRandomNumber } = require("../../helpers/customHelpers")
 const {
   isValidUser,
   isAuthenticated,
@@ -264,6 +267,53 @@ const productMutations = {
         code: 200,
         success: true,
         message: "Saved Product deleted successfully",
+      }
+    } catch (err) {
+      generateServerError(err)
+    }
+  },
+  async RequestCoinCode(_, { user_id, product_id }, ctx, ___) {
+    try {
+      isAuthenticated(ctx)
+      isValidUser(ctx.user, user_id)
+      isAccountVerified(ctx.user)
+
+      if (!product_id || product_id.length < 5)
+        throw new ApolloError("Product Id:=> product_id is required", 400)
+
+      const savedProductExists = await SavedProduct.findOne({
+        $and: [{ user_id }, { product_id }],
+      })
+      if (!savedProductExists)
+        throw new ApolloError("Saved product not found", 404)
+
+      const productFound = await Product.findOne({ _id: product_id })
+
+      let generatedCode = getRandomNumber(1000000, 9999999)
+      await new CoinCodeProduct({
+        product_id,
+        user_id,
+        coin_code: `CC${generatedCode}`,
+      }).save()
+
+      await new Notification({
+        notification_type: "REQUEST_CC",
+        ref_object: productFound._id.toString(),
+        specified_user: user_id,
+        body: `Request is sent to the product owner with coin-code: CC${generatedCode}`,
+      }).save()
+
+      await new Notification({
+        notification_type: "REQUEST_CC",
+        ref_object: productFound._id.toString(),
+        specified_user: productFound.user_id,
+        body: "You have new product sale suggestion with coin-code",
+      }).save()
+
+      return {
+        code: 200,
+        success: true,
+        message: "Product requested successfully",
       }
     } catch (err) {
       generateServerError(err)
