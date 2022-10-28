@@ -549,6 +549,7 @@ const typeDefs = gql`
     SwitchToProAccount(inputs: SwitchToProInputs!): LogUserResponse!
     SwitchToBusinessAccount(inputs: SwitchToBusinessInputs!): LogUserResponse!
     UpdateUserLocation(inputs: UpdateLocationInput): LogUserResponse!
+    BoostResources(user_id: ID!, wallet_id: ID!): LogUserResponse!
   }
 `
 

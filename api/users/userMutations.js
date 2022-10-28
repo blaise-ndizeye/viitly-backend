@@ -802,8 +802,10 @@ const userMutations = {
         { _id: uploadScope._id },
         {
           $set: {
-            blogs_available: +uploadScope.blogs_available + 5,
-            posts_available: +uploadScope.posts_available + 4,
+            blogs_available:
+              +uploadScope.blogs_available + walletExists.blogs_to_offer,
+            posts_available:
+              +uploadScope.posts_available + walletExists.posts_to_offer,
           },
         }
       )
@@ -947,6 +949,76 @@ const userMutations = {
         code: 200,
         success: true,
         message: "Account switched to business successfully",
+        accessToken,
+        user: userData(updatedUser),
+      }
+    } catch (err) {
+      generateServerError(err)
+    }
+  },
+  async BoostResources(_, { user_id, wallet_id }, ctx, ___) {
+    try {
+      isAuthenticated(ctx)
+      isValidUser(ctx.user, user_id)
+      isAccountVerified(ctx.user)
+      isPayingUser(ctx.user)
+
+      if (ctx.user.role === "ADMIN") {
+        await UploadScope.updateOne(
+          { user_id },
+          {
+            $set: {
+              blogs_available: 100,
+              posts_available: 100,
+              products_available: 100,
+            },
+          }
+        )
+      } else {
+        if (!wallet_id || wallet_id.length < 5)
+          throw new ApolloError("Wallet Id:=> wallet_id is required", 400)
+
+        const walletExists = await Wallet.findOne({ _id: wallet_id })
+        if (!walletExists) throw new ApolloError("Wallet not found", 404)
+
+        const { errorMessage, generatedTransaction } = await makePayment(
+          walletExists,
+          user_id
+        )
+        if (errorMessage) throw new ApolloError(errorMessage, 400)
+
+        await new Transaction({
+          service_provider_gen_id: generatedTransaction.id,
+          user_id,
+          amount_paid: walletExists.price,
+          currency_used: walletExists.currency,
+          description: "Boosting resources",
+          transaction_role: "PAYMENT",
+        }).save()
+
+        const uploadScope = await UploadScope.findOne({ user_id })
+
+        await UploadScope.updateOne(
+          { _id: uploadScope._id },
+          {
+            $set: {
+              blogs_available:
+                +uploadScope.blogs_available + walletExists.blogs_to_offer,
+              posts_available:
+                +uploadScope.posts_available + walletExists.posts_to_offer,
+            },
+          }
+        )
+      }
+
+      const updatedUser = await User.findOne({ _id: user_id })
+
+      const accessToken = await generateAccessToken(updatedUser)
+
+      return {
+        code: 200,
+        success: true,
+        message: "Resources boosted successfully",
         accessToken,
         user: userData(updatedUser),
       }
