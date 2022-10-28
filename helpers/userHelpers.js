@@ -32,6 +32,14 @@ module.exports = {
     return generatedToken
   },
   locationData(data) {
+    if (!data)
+      return {
+        province: "",
+        district: "",
+        market_description: "",
+        latitude: "",
+        longitude: "",
+      }
     return {
       province: data.province,
       district: data.district,

@@ -22,6 +22,7 @@ const {
   isAdmin,
   isAuthenticated,
   isAccountVerified,
+  isPayingUser,
   isValidUser,
 } = require("../shield")
 const { problemData } = require("../../helpers/problemHelpers")
@@ -824,6 +825,68 @@ const userMutations = {
         code: 200,
         success: true,
         message: "Account switched to Proffessional",
+        accessToken,
+        user: userData(updatedUser),
+      }
+    } catch (err) {
+      generateServerError(err)
+    }
+  },
+  async UpdateUserLocation(_, { inputs }, ctx, ___) {
+    try {
+      const {
+        user_id,
+        province,
+        district,
+        market_description = "",
+        latitude = "",
+        longitude = "",
+      } = inputs
+
+      isAuthenticated(ctx)
+      isValidUser(ctx.user, user_id)
+      isAccountVerified(ctx.user)
+      isPayingUser(ctx.user)
+
+      if (province.length < 3 || district.length < 3)
+        throw new ApolloError(
+          "Province and sector must have at least 3 characters",
+          400
+        )
+
+      const userLocationExists = await Location.findOne({ user_id })
+      if (!userLocationExists) {
+        await new Location({
+          user_id,
+          province,
+          district,
+          market_description,
+          latitude,
+          longitude,
+        }).save()
+      } else {
+        await Location.updateOne(
+          { user_id },
+          {
+            $set: {
+              province,
+              district,
+              market_description,
+              latitude,
+              longitude,
+            },
+          }
+        )
+      }
+
+      const updatedUser = await User.findOne({ _id: user_id })
+
+      const accessToken = await generateAccessToken(updatedUser)
+
+      return {
+        code: 200,
+        success: true,
+        message: "user Location updated successfully",
         accessToken,
         user: userData(updatedUser),
       }
