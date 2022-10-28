@@ -22,7 +22,7 @@ const transactionSchema = new Schema({
   transaction_role: {
     type: String,
     required: true,
-    enum: ["PAYMENT", "PRIZING"],
+    enum: ["PAYMENT", "PRIZING", "SELL"],
   },
   createdAt: {
     type: Date,

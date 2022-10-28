@@ -42,4 +42,15 @@ module.exports = {
       })),
     }
   },
+  prizeData(data) {
+    return {
+      prize_id: data._id.toString(),
+      owner: data.user_id,
+      prize_event: data.prize_event,
+      prize_amount: data.prize_amount,
+      prize_amount_currency: data.prize_amount_currency,
+      prized: data.prized,
+      prizedAt: data.createdAt.toISOString(),
+    }
+  },
 }

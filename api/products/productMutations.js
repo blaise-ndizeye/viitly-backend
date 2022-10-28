@@ -5,6 +5,8 @@ const Notification = require("../../models/Notification")
 const Product = require("../../models/Product")
 const UploadScope = require("../../models/UploadScope")
 const SavedProduct = require("../../models/SavedProduct")
+const Transaction = require("../../models/Transaction")
+const Prize = require("../../models/Prize")
 const { generateServerError } = require("../../helpers/errorHelpers")
 const { getRandomNumber } = require("../../helpers/customHelpers")
 const {
@@ -314,6 +316,78 @@ const productMutations = {
         code: 200,
         success: true,
         message: "Product requested successfully",
+      }
+    } catch (err) {
+      generateServerError(err)
+    }
+  },
+  async AcceptCoinCodeProductRequest(_, { inputs }, ctx, ___) {
+    try {
+      const { user_id, product_id, receptient_id, coinCode } = inputs
+
+      isAuthenticated(ctx)
+      isValidUser(ctx.user, user_id)
+      isAccountVerified(ctx.user)
+      isBusinessPerson(ctx.user)
+
+      if (!product_id || product_id.length < 5)
+        throw new ApolloError("Product Id:=> product_id is required", 400)
+
+      if (!receptient_id || receptient_id.length < 5)
+        throw new ApolloError("Receptient Id: receptient_id is required", 400)
+
+      const productExists = await Product.findOne({
+        $and: [{ user_id }, { product_id }],
+      })
+      if (!productExists) throw new ApolloError("Product not found", 404)
+
+      const coinCodeProductExist = await CoinCodeProduct.findOne({
+        $and: [
+          { product_id: productExists._id.toString() },
+          { user_id: receptient_id },
+        ],
+      })
+      if (!coinCodeProductExist)
+        throw new ApolloError("Requested coin-coded product not found", 400)
+
+      if (coinCodeProductExist.coin_code !== coinCode)
+        throw new ApolloError("Invalid Coin-Code", 400)
+
+      await new Notification({
+        notification_type: "ACCEPT_CC",
+        ref_object: productExists._id.toString(),
+        specified_user: coinCodeProductExist.user_id,
+        body: "You have been prized for the requested product",
+      }).save()
+
+      await new Prize({
+        user_id: coinCodeProductExist.user_id,
+        prize_event: "ACCEPT_CC",
+        prize_amount: productExists.price * 0.05,
+        prize_amount_currency: productExists.price_currency,
+      }).save()
+
+      await CoinCodeProduct.deleteOne({ _id: coinCodeProductExist._id })
+      await Notification.deleteMany({
+        $and: [
+          { notification_type: "REQUEST_CC" },
+          { ref_object: productExists._id.toString() },
+        ],
+      })
+
+      await new Transaction({
+        service_provider_gen_id: "WFY_SELL",
+        user_id,
+        amount_paid: productExists.price * 0.05,
+        currency_used: productExists.price_currency,
+        description: "Sell the product",
+        transaction_role: "SELL",
+      }).save()
+
+      return {
+        code: 200,
+        success: true,
+        message: "Product sold using coin-code successfully",
       }
     } catch (err) {
       generateServerError(err)

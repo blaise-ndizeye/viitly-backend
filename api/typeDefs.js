@@ -86,6 +86,7 @@ const typeDefs = gql`
     location: Location!
     transactions: [Transaction!]!
     saved_products: [Product!]!
+    prizes: [Prize!]!
   }
 
   type Follower {
@@ -247,6 +248,16 @@ const typeDefs = gql`
     transaction_role: String!
     createdAt: String!
     done_by: User!
+  }
+
+  type Prize {
+    prize_id: ID!
+    owner: User!
+    prize_event: String!
+    prize_amount: Int!
+    prize_amount_currency: String!
+    prized: Boolean!
+    prizedAt: String!
   }
 
   interface MutationResponse {
@@ -480,6 +491,13 @@ const typeDefs = gql`
     latitude: String
   }
 
+  input AcceptCoinCodeProductInput {
+    user_id: ID!
+    product_id: ID!
+    receptient_id: ID!
+    coinCode: String!
+  }
+
   type Query {
     hello: String!
   }
@@ -554,6 +572,9 @@ const typeDefs = gql`
     SaveProduct(user_id: ID!, product_id: ID!): DeleteDataResponse! # This response is being reused for many objects for decreasing duplication
     DeleteSavedProduct(user_id: ID!, product_id: ID!): DeleteDataResponse!
     RequestCoinCode(user_id: ID!, product_id: ID!): DeleteDataResponse!
+    AcceptCoinCodeProductRequest(
+      inputs: AcceptCoinCodeProductInput!
+    ): DeleteDataResponse!
   }
 `
 
