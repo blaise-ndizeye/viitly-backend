@@ -2,6 +2,7 @@ const { ApolloError } = require("apollo-server-errors")
 
 const Product = require("../../models/Product")
 const UploadScope = require("../../models/UploadScope")
+const SavedProduct = require("../../models/SavedProduct")
 const { generateServerError } = require("../../helpers/errorHelpers")
 const {
   isValidUser,
@@ -208,6 +209,35 @@ const productMutations = {
         code: 200,
         success: true,
         message: "Product deleted successfully",
+      }
+    } catch (err) {
+      generateServerError(err)
+    }
+  },
+  async SaveProduct(_, { user_id, product_id }, ctx, ___) {
+    try {
+      isAuthenticated(ctx)
+      isValidUser(ctx.user, user_id)
+      isAccountVerified(ctx.user)
+
+      if (!product_id || product_id.length < 5)
+        throw new ApolloError("Product Id:=> product_id is required", 400)
+
+      const productExists = await Product.findOne({ _id: product_id })
+      if (!productExists) throw new ApolloError("Product not found", 404)
+
+      if (productExists.user_id === user_id)
+        throw new ApolloError("This is your own product", 400)
+
+      await new SavedProduct({
+        user_id,
+        product_id: productExists._id.toString(),
+      }).save()
+
+      return {
+        code: 200,
+        success: true,
+        message: "Product saved successfully",
       }
     } catch (err) {
       generateServerError(err)

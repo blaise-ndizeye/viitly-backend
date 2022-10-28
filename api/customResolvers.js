@@ -9,6 +9,7 @@ const Following = require("../models/Following")
 const UploadScope = require("../models/UploadScope")
 const Message = require("../models/Message")
 const Notification = require("../models/Notification")
+const SavedProduct = require("../models/SavedProduct")
 const Wallet = require("../models/Wallet")
 const Location = require("../models/Location")
 const Transaction = require("../models/Transaction")
@@ -257,6 +258,17 @@ const customResolvers = {
     async location(parent) {
       const userLocation = await Location.findOne({ user_id: parent.user_id })
       return locationData(userLocation)
+    },
+    async saved_products(parent) {
+      const savedProducts = await SavedProduct.find({ user_id: parent.user_id })
+      let relatedProducts = []
+
+      for (let item of savedProducts) {
+        const product = await Product.findOne({ _id: item.product_id })
+        relatedProducts.push(product)
+      }
+
+      return relatedProducts.map((product) => productData(product))
     },
   },
   Post: {

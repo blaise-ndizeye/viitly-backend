@@ -85,6 +85,7 @@ const typeDefs = gql`
     wallets: [Wallet!]!
     location: Location!
     transactions: [Transaction!]!
+    saved_products: [Product!]!
   }
 
   type Follower {
@@ -550,6 +551,8 @@ const typeDefs = gql`
     SwitchToBusinessAccount(inputs: SwitchToBusinessInputs!): LogUserResponse!
     UpdateUserLocation(inputs: UpdateLocationInput): LogUserResponse!
     BoostResources(user_id: ID!, wallet_id: ID!): LogUserResponse!
+    SaveProduct(user_id: ID!, product_id: ID!): DeleteDataResponse! # This response is being reused for many objects for decreasing duplication
+    DeleteSavedProduct(user_id: ID!, product_id: ID!): DeleteDataResponse!
   }
 `
 
