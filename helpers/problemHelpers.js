@@ -8,4 +8,13 @@ module.exports = {
       createdAt: data.createdAt.toISOString(),
     }
   },
+  reportedContentData(data) {
+    return {
+      reported_content_id: data._id.toString(),
+      problem: data.problem,
+      reportedAt: data.reportedAt.toISOString(),
+      reported_by: data.user_id,
+      content: data.content_id,
+    }
+  },
 }

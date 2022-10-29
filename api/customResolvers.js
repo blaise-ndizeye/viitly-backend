@@ -15,6 +15,7 @@ const Wallet = require("../models/Wallet")
 const Location = require("../models/Location")
 const Transaction = require("../models/Transaction")
 const CoinCodeProduct = require("../models/CoinCodeProduct")
+const ReportedContent = require("../models/ReportedContent")
 const { userData, locationData } = require("../helpers/userHelpers")
 const { reviewData } = require("../helpers/reviewHelpers")
 const { blogData } = require("../helpers/blogHelpers")
@@ -33,6 +34,7 @@ const {
 } = require("../helpers/commentHelpers")
 const { followData } = require("../helpers/followHelpers")
 const { walletData, transactionData } = require("../helpers/walletHelpers")
+const { reportedContentData } = require("../helpers/problemHelpers")
 
 let retrieveHelpers = {
   async getNLikes(parentId) {
@@ -409,6 +411,9 @@ const customResolvers = {
       if (obj.user_id) {
         return "User"
       }
+      if (obj.reported_content_id) {
+        return "ReportedContent"
+      }
     },
   },
   CommentResponseObject: {
@@ -464,6 +469,9 @@ const customResolvers = {
         parent.refer_to
       )
       const userFound = await User.findOne({ _id: parent.refer_to })
+      const reportedContentFound = await ReportedContent.findOne({
+        _id: parent.refer_to,
+      })
 
       switch (commentDestName) {
         case "Blog":
@@ -477,6 +485,8 @@ const customResolvers = {
         default:
           if (userFound) {
             return userData(userFound)
+          } else if (reportedContentFound) {
+            return reportedContentData(reportedContentFound)
           } else return null
       }
     },
@@ -568,6 +578,31 @@ const customResolvers = {
     async requested_by(parent) {
       const user = await User.findOne({ _id: parent.requested_by })
       return userData(user)
+    },
+  },
+  ReportedContent: {
+    async reported_by(parent) {
+      const user = await User.findOne({ _id: parent.reported_by })
+      return userData(user)
+    },
+    async content(parent) {
+      const pr1 = Blog.findOne({ _id: parent.content })
+      const pr2 = Post.findOne({ _id: parent.content })
+      const pr3 = Product.findOne({ _id: parent.content })
+
+      const [isBlog, isPost, isProduct] = await Promise.all([pr1, pr2, pr3])
+
+      if (isBlog) {
+        return blogData(isBlog)
+      }
+
+      if (isPost) {
+        return postData(isPost)
+      }
+
+      if (isProduct) {
+        return productData(isProduct)
+      }
     },
   },
 }

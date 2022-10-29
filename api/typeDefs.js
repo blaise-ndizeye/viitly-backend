@@ -50,7 +50,14 @@ const typeDefs = gql`
 
   union CommentResponseObject = Comment | Reply
 
-  union ReferNotificationObject = Product | Post | Blog | Comment | User | Reply
+  union ReferNotificationObject =
+      Product
+    | Post
+    | Blog
+    | Comment
+    | User
+    | Reply
+    | ReportedContent
 
   type User {
     user_id: ID!
@@ -269,6 +276,14 @@ const typeDefs = gql`
     prize_amount_currency: String!
     prized: Boolean!
     prizedAt: String!
+  }
+
+  type ReportedContent {
+    reported_content_id: ID!
+    problem: String!
+    reportedAt: String!
+    content: ReferItem!
+    reported_by: User!
   }
 
   interface MutationResponse {

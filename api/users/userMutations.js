@@ -151,7 +151,7 @@ const userMutations = {
           { whatsapp: credential },
         ],
       })
-      if (!userExists) throw new ApolloError("User doesn't exist", 400)
+      if (!userExists) throw new ApolloError("Account doesn't exist", 400)
 
       const passwordMatch = await bcrypt.compare(password, userExists.password)
       if (!passwordMatch) throw new ApolloError("Incorrect password", 400)
@@ -161,7 +161,7 @@ const userMutations = {
       return {
         code: 200,
         success: true,
-        message: "User logged in successfully",
+        message: "Logged in successfully",
         accessToken,
         user: userData(userExists),
       }
@@ -1065,7 +1065,7 @@ const userMutations = {
       if (isPost) contentFound = isPost
       if (isProduct) contentFound = isProduct
 
-      await new ReportedContent({
+      const newReportedContent = await new ReportedContent({
         user_id,
         content_id: contentFound._id.toString(),
         problem,
@@ -1075,7 +1075,7 @@ const userMutations = {
       for (let admin of allAdmins) {
         await new Notification({
           notification_type: "REPORT_CONTENT",
-          ref_object: contentFound._id.toString(),
+          ref_object: newReportedContent._id.toString(),
           specified_user: admin._id.toString(),
           body: "You have new reported content",
         }).save()
