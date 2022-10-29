@@ -5,8 +5,12 @@ const Notification = require("../../models/Notification")
 const Product = require("../../models/Product")
 const UploadScope = require("../../models/UploadScope")
 const SavedProduct = require("../../models/SavedProduct")
+const ReportedContent = require("../../models/ReportedContent")
 const Transaction = require("../../models/Transaction")
 const Prize = require("../../models/Prize")
+const Message = require("../../models/Message")
+const Event = require("../../models/Event")
+const Comment = require("../../models/Comment")
 const { generateServerError } = require("../../helpers/errorHelpers")
 const { getRandomNumber } = require("../../helpers/customHelpers")
 const {
@@ -208,7 +212,44 @@ const productMutations = {
         deleteUploadedFile(media.file_name)
       }
 
-      await Product.deleteOne({ _id: productExist._id })
+      //* Deleting comment replies for the product
+      const productComments = await Comment.find({
+        to: productExist._id.toString(),
+      })
+      for (let productComment of productComments) {
+        await Comment.deleteMany({ to: productComment._id.toString() })
+      }
+
+      //* Deleting all notifications related to product reports
+      const allReports = await ReportedContent.find({
+        content_id: productExist._id.toString(),
+      })
+      for (let report of allReports) {
+        await Notification.deleteMany({ ref_object: report._id.toString() })
+      }
+
+      const pr1 = Product.deleteOne({ _id: productExist._id })
+      const pr2 = SavedProduct.deleteMany({
+        product_id: productExist._id.toString(),
+      })
+      const pr3 = ReportedContent.deleteMany({
+        content_id: productExist._id.toString(),
+      })
+      const pr4 = Notification.deleteMany({
+        ref_object: productExist._id.toString(),
+      })
+      const pr5 = CoinCodeProduct.deleteMany({
+        product_id: productExist._id.toString(),
+      })
+      const pr6 = Message.deleteMany({
+        refer_item: productExist._id.toString(),
+      })
+      const pr7 = Event.deleteMany({
+        parent_id: productExist._id.toString(),
+      })
+      const pr8 = Comment.deleteMany({ to: productExist._id.toString() })
+
+      await Promise.all([pr1, pr2, pr3, pr4, pr5, pr6, pr7, pr8])
 
       return {
         code: 200,

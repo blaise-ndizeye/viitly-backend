@@ -3,6 +3,10 @@ const { ApolloError } = require("apollo-server-errors")
 const Post = require("../../models/Post")
 const UploadScope = require("../../models/UploadScope")
 const Notification = require("../../models/Notification")
+const Message = require("../../models/Message")
+const Event = require("../../models/Event")
+const Comment = require("../../models/Comment")
+const ReportedContent = require("../../models/ReportedContent")
 const {
   isAuthenticated,
   isAccountVerified,
@@ -109,7 +113,32 @@ const postMutations = {
         deleteUploadedFile(post_media.file_name)
       }
 
-      await Post.deleteOne({ _id: postExist._id })
+      //* Deleting comment replies for the post
+      const postComments = await Comment.find({ to: postExist._id.toString() })
+      for (let postComment of postComments) {
+        await Comment.deleteMany({ to: postComment._id.toString() })
+      }
+
+      //* Deleting all notifications related to post reports
+      const allReports = await ReportedContent.find({
+        content_id: postExist._id.toString(),
+      })
+      for (let report of allReports) {
+        await Notification.deleteMany({ ref_object: report._id.toString() })
+      }
+
+      const pr1 = Post.deleteOne({ _id: postExist._id })
+      const pr2 = Notification.deleteMany({
+        ref_object: postExist._id.toString(),
+      })
+      const pr3 = Message.deleteMany({ refer_item: postExist._id.toString() })
+      const pr4 = Event.deleteMany({ parent_id: postExist._id.toString() })
+      const pr5 = ReportedContent.deleteMany({
+        content_id: postExist._id.toString(),
+      })
+      const pr6 = Comment.deleteMany({ to: postExist._id.toString() })
+
+      await Promise.all([pr1, pr2, pr3, pr4, pr5, pr6])
 
       return {
         code: 200,
