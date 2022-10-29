@@ -602,6 +602,10 @@ const typeDefs = gql`
       inputs: DeclineCoinCodeProductInput!
     ): DeleteDataResponse!
     ReportContent(inputs: ReportContentInput!): DeleteDataResponse!
+    BlockReportedContent(
+      user_id: ID!
+      reported_content_id: ID!
+    ): DeleteDataResponse!
   }
 `
 

@@ -16,6 +16,7 @@ const notificationSchema = new Schema({
       "PROFFESSIONAL",
       "BUSINESS",
       "REPORT_CONTENT",
+      "BLOCK_CONTENT",
     ],
   },
   ref_object: {

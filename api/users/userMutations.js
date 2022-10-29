@@ -578,6 +578,7 @@ const userMutations = {
           "DECLINE_CC",
           "ACCEPT_CC",
           "REPORT_CONTENT",
+          "BLOCK_CONTENT",
         ].includes(notificationExist.notification_type) &&
         notificationExist.specified_user === user_id
       ) {
@@ -1084,6 +1085,85 @@ const userMutations = {
         code: 200,
         success: true,
         message: "Content problem reported successfully",
+      }
+    } catch (err) {
+      generateServerError(err)
+    }
+  },
+  async BlockReportedContent(_, { user_id, reported_content_id }, ctx, ___) {
+    try {
+      isAuthenticated(ctx)
+      isValidUser(ctx.user, user_id)
+      isAccountVerified(ctx.user)
+      isAdmin(ctx.user)
+
+      if (!reported_content_id || reported_content_id.length < 5)
+        throw new ApolloError("Content Id:=> content_id is required", 400)
+
+      const reportedContentExists = await ReportedContent.findOne({
+        _id: reported_content_id,
+      })
+      if (!reportedContentExists)
+        throw new ApolloError("Reported content not found", 404)
+
+      const pr1 = Blog.findOne({ _id: reportedContentExists.content_id })
+      const pr2 = Post.findOne({ _id: reportedContentExists.content_id })
+      const pr3 = Product.findOne({ _id: reportedContentExists.content_id })
+
+      const [isBlog, isPost, isProduct] = await Promise.all([pr1, pr2, pr3])
+
+      if (!isBlog && !isPost && !isProduct)
+        throw new ApolloError("The content doesn't exist", 404)
+
+      let contentFound = null
+
+      if (isBlog) {
+        contentFound = isBlog
+        await Blog.updateOne(
+          { _id: isBlog._id },
+          {
+            $set: {
+              blocked: true,
+            },
+          }
+        )
+      }
+
+      if (isPost) {
+        contentFound = isPost
+        await Post.updateOne(
+          { _id: isPost._id },
+          {
+            $set: {
+              blocked: true,
+            },
+          }
+        )
+      }
+
+      if (isProduct) {
+        contentFound = isProduct
+        await Product.updateOne(
+          { _id: isProduct._id },
+          {
+            $set: {
+              blocked: true,
+            },
+          }
+        )
+      }
+
+      await new Notification({
+        notification_type: "BLOCK_CONTENT",
+        ref_object: contentFound._id.toString(),
+        specified_user: contentFound.user_id,
+        body: `Your item have been blocked due to inapropriate content`,
+      }).save()
+
+      return {
+        code: 200,
+        success: true,
+        message: "Content has been blocked successfully",
       }
     } catch (err) {
       generateServerError(err)
