@@ -122,6 +122,7 @@ const blogMutations = {
       const blogComments = await Comment.find({ to: blogExist._id.toString() })
       for (let blogComment of blogComments) {
         await Comment.deleteMany({ to: blogComment._id.toString() })
+        await Event.deleteMany({ parent_id: blogComment._id.toString() })
       }
 
       //* Deleting all notifications related to blog reports

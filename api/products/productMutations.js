@@ -218,6 +218,7 @@ const productMutations = {
       })
       for (let productComment of productComments) {
         await Comment.deleteMany({ to: productComment._id.toString() })
+        await Event.deleteMany({ parent_id: productComment._id.toString() })
       }
 
       //* Deleting all notifications related to product reports

@@ -117,6 +117,7 @@ const postMutations = {
       const postComments = await Comment.find({ to: postExist._id.toString() })
       for (let postComment of postComments) {
         await Comment.deleteMany({ to: postComment._id.toString() })
+        await Event.deleteMany({ parent_id: postComment._id.toString() })
       }
 
       //* Deleting all notifications related to post reports
