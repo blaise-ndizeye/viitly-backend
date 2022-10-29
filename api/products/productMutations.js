@@ -357,7 +357,7 @@ const productMutations = {
         notification_type: "ACCEPT_CC",
         ref_object: productExists._id.toString(),
         specified_user: coinCodeProductExist.user_id,
-        body: "You have been prized for the requested product",
+        body: `You have been prized for the requested product with coin-code: ${coinCodeProductExist.coin_code}`,
       }).save()
 
       await new Prize({
@@ -368,12 +368,6 @@ const productMutations = {
       }).save()
 
       await CoinCodeProduct.deleteOne({ _id: coinCodeProductExist._id })
-      await Notification.deleteMany({
-        $and: [
-          { notification_type: "REQUEST_CC" },
-          { ref_object: productExists._id.toString() },
-        ],
-      })
 
       await new Transaction({
         service_provider_gen_id: "WFY_SELL",
@@ -388,6 +382,53 @@ const productMutations = {
         code: 200,
         success: true,
         message: "Product sold using coin-code successfully",
+      }
+    } catch (err) {
+      generateServerError(err)
+    }
+  },
+  async DeclineCoinCodeProductRequest(_, { inputs }, ctx, ___) {
+    try {
+      const { user_id, product_id, receptient_id } = inputs
+
+      isAuthenticated(ctx)
+      isValidUser(ctx.user, user_id)
+      isAccountVerified(ctx.user)
+      isBusinessPerson(ctx.user)
+
+      if (!product_id || product_id.length < 5)
+        throw new ApolloError("Product Id:=> product_id is required", 400)
+
+      if (!receptient_id || receptient_id.length < 5)
+        throw new ApolloError("Receptient Id: receptient_id is required", 400)
+
+      const productExists = await Product.findOne({
+        $and: [{ user_id }, { product_id }],
+      })
+      if (!productExists) throw new ApolloError("Product not found", 404)
+
+      const coinCodeProductExists = await CoinCodeProduct.findOne({
+        $and: [
+          { product_id: productExists._id.toString() },
+          { user_id: receptient_id },
+        ],
+      })
+      if (!coinCodeProductExists)
+        throw new ApolloError("Requested coin-coded product not found", 400)
+
+      await new Notification({
+        notification_type: "DECLINE_CC",
+        ref_object: productExists._id.toString(),
+        specified_user: coinCodeProductExists.user_id,
+        body: `Your requested product with coin-code: ${coinCodeProductExists.coin_code} has been declined`,
+      }).save()
+
+      await CoinCodeProduct.deleteOne({ _id: coinCodeProductExists._id })
+
+      return {
+        code: 200,
+        success: true,
+        message: "Product request declined successfully",
       }
     } catch (err) {
       generateServerError(err)

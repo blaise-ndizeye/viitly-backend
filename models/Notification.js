@@ -10,6 +10,7 @@ const notificationSchema = new Schema({
       "FOLLOW", //relate with specified_user
       "REQUEST_CC", // relate with specified_user
       "ACCEPT_CC", // relate with specified_user
+      "DECLINE_CC", // relate with specified_user
       "INVITE", // relate with specified_user
       "ALL",
       "PROFFESSIONAL",

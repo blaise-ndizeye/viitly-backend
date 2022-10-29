@@ -72,7 +72,7 @@ module.exports = {
         fileFormat: "",
       }
 
-    name = `bm${uploadedFileFormat}${Math.floor(Math.random() * 1000000) + 1}`
+    name = `WFY${uploadedFileFormat}${Math.floor(Math.random() * 1000000) + 1}`
     const uploadedFile = `${name}${Date.now()}${ext}`
     let url = path.join(__dirname, `../public/uploads/${uploadedFile}`)
 
@@ -136,7 +136,9 @@ module.exports = {
         uploadedFileFormat = "video"
       }
 
-      name = `bm${uploadedFileFormat}${Math.floor(Math.random() * 1000000) + 1}`
+      name = `WFY${uploadedFileFormat}${
+        Math.floor(Math.random() * 1000000) + 1
+      }`
       const uploadedFile = `${name}${Date.now()}${ext}`
       let url = path.join(__dirname, `../public/uploads/${uploadedFile}`)
 

@@ -14,11 +14,16 @@ const Prize = require("../models/Prize")
 const Wallet = require("../models/Wallet")
 const Location = require("../models/Location")
 const Transaction = require("../models/Transaction")
+const CoinCodeProduct = require("../models/CoinCodeProduct")
 const { userData, locationData } = require("../helpers/userHelpers")
 const { reviewData } = require("../helpers/reviewHelpers")
 const { blogData } = require("../helpers/blogHelpers")
 const { postData } = require("../helpers/postHelpers")
-const { productData, prizeData } = require("../helpers/productHelpers")
+const {
+  productData,
+  prizeData,
+  requestedProductData,
+} = require("../helpers/productHelpers")
 const { messageData } = require("../helpers/messageHelpers")
 const { notificationData } = require("../helpers/notificationHelpers")
 const {
@@ -270,6 +275,15 @@ const customResolvers = {
       }
 
       return relatedProducts.map((product) => productData(product))
+    },
+    async requested_products(parent) {
+      const coinCodeProducts = await CoinCodeProduct.find({
+        user_id: parent.user_id,
+      })
+
+      return coinCodeProducts.map((ccProduct) =>
+        requestedProductData(ccProduct)
+      )
     },
     async prizes(parent) {
       const allPrizes = await Prize.find({ user_id: parent.user_id })
@@ -543,6 +557,16 @@ const customResolvers = {
   Prize: {
     async owner(parent) {
       const user = await User.findOne({ _id: parent.owner })
+      return userData(user)
+    },
+  },
+  RequestedProduct: {
+    async product(parent) {
+      const requestedProduct = await Product.findOne({ _id: parent.product })
+      return productData(requestedProduct)
+    },
+    async requested_by(parent) {
+      const user = await User.findOne({ _id: parent.requested_by })
       return userData(user)
     },
   },

@@ -86,6 +86,7 @@ const typeDefs = gql`
     location: Location!
     transactions: [Transaction!]!
     saved_products: [Product!]!
+    requested_products: [RequestedProduct!]!
     prizes: [Prize!]!
   }
 
@@ -168,6 +169,13 @@ const typeDefs = gql`
     viewed_by: [User!]!
     product_media: [File!]!
     comments: [Comment!]!
+  }
+
+  type RequestedProduct {
+    request_id: ID!
+    product: Product!
+    requested_by: User!
+    requestedAt: String!
   }
 
   type Reply {
@@ -498,6 +506,12 @@ const typeDefs = gql`
     coinCode: String!
   }
 
+  input DeclineCoinCodeProductInput {
+    user_id: ID!
+    receptient_id: ID!
+    product_id: ID!
+  }
+
   type Query {
     hello: String!
   }
@@ -574,6 +588,9 @@ const typeDefs = gql`
     RequestCoinCode(user_id: ID!, product_id: ID!): DeleteDataResponse!
     AcceptCoinCodeProductRequest(
       inputs: AcceptCoinCodeProductInput!
+    ): DeleteDataResponse!
+    DeclineCoinCodeProductRequest(
+      inputs: DeclineCoinCodeProductInput!
     ): DeleteDataResponse!
   }
 `

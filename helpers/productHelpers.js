@@ -53,4 +53,12 @@ module.exports = {
       prizedAt: data.createdAt.toISOString(),
     }
   },
+  requestedProductData(data) {
+    return {
+      request_id: data._id.toString(),
+      product: data.product_id,
+      requested_by: data.user_id,
+      requestedAt: data.createdAt.toISOString(),
+    }
+  },
 }
