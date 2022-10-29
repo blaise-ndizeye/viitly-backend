@@ -123,6 +123,7 @@ const typeDefs = gql`
     nShares: Int!
     nViews: Int!
     createdAt: String!
+    blocked: Boolean!
     liked_by: [User!]!
     viewed_by: [User!]!
     shared_by: [User!]!
@@ -141,6 +142,7 @@ const typeDefs = gql`
     nLikes: Int!
     nComments: Int!
     nShares: Int!
+    blocked: Boolean!
     liked_by: [User!]!
     shared_by: [User!]!
     createdAt: String!
@@ -164,6 +166,7 @@ const typeDefs = gql`
     nShares: Int!
     nViews: Int!
     createdAt: String!
+    blocked: Boolean!
     liked_by: [User!]!
     shared_by: [User!]!
     viewed_by: [User!]!
@@ -512,6 +515,12 @@ const typeDefs = gql`
     product_id: ID!
   }
 
+  input ReportContentInput {
+    user_id: ID!
+    content_id: ID!
+    problem: String!
+  }
+
   type Query {
     hello: String!
   }
@@ -592,6 +601,7 @@ const typeDefs = gql`
     DeclineCoinCodeProductRequest(
       inputs: DeclineCoinCodeProductInput!
     ): DeleteDataResponse!
+    ReportContent(inputs: ReportContentInput!): DeleteDataResponse!
   }
 `
 

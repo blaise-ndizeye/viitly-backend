@@ -15,6 +15,7 @@ const notificationSchema = new Schema({
       "ALL",
       "PROFFESSIONAL",
       "BUSINESS",
+      "REPORT_CONTENT",
     ],
   },
   ref_object: {

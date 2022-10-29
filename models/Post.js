@@ -20,6 +20,10 @@ const PostSchema = new Schema({
     type: Number,
     default: 0,
   },
+  blocked: {
+    type: Boolean,
+    default: false,
+  },
   createdAt: {
     type: Date,
     default: Date.now,

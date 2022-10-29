@@ -8,6 +8,10 @@ const Notification = require("../../models/Notification")
 const ReportedProblems = require("../../models/ReportedProblems")
 const Transaction = require("../../models/Transaction")
 const Wallet = require("../../models/Wallet")
+const Blog = require("../../models/Blog")
+const Post = require("../../models/Post")
+const Product = require("../../models/Product")
+const ReportedContent = require("../../models/ReportedContent")
 const {
   registerUserValidation,
   loginUserValidation,
@@ -573,6 +577,7 @@ const userMutations = {
           "INVITE",
           "DECLINE_CC",
           "ACCEPT_CC",
+          "REPORT_CONTENT",
         ].includes(notificationExist.notification_type) &&
         notificationExist.specified_user === user_id
       ) {
@@ -1025,6 +1030,60 @@ const userMutations = {
         message: "Resources boosted successfully",
         accessToken,
         user: userData(updatedUser),
+      }
+    } catch (err) {
+      generateServerError(err)
+    }
+  },
+  async ReportContent(_, { inputs }, ctx, ___) {
+    try {
+      const { user_id, content_id, problem } = inputs
+
+      isAuthenticated(ctx)
+      isValidUser(ctx.user, user_id)
+      isAccountVerified(ctx.user)
+
+      if (!content_id || content_id.length < 5)
+        throw new ApolloError("Content Id:=> content_id is required", 400)
+
+      if (!problem || problem.length < 5)
+        throw new ApolloError("Problem must be more descriptive", 400)
+
+      const pr1 = Blog.findOne({ _id: content_id })
+      const pr2 = Post.findOne({ _id: content_id })
+      const pr3 = Product.findOne({ _id: content_id })
+
+      const [isBlog, isPost, isProduct] = await Promise.all([pr1, pr2, pr3])
+
+      if (!isBlog && !isPost && !isProduct)
+        throw new ApolloError("Reported content doesn't exist", 404)
+
+      let contentFound = null
+
+      if (isBlog) contentFound = isBlog
+      if (isPost) contentFound = isPost
+      if (isProduct) contentFound = isProduct
+
+      await new ReportedContent({
+        user_id,
+        content_id: contentFound._id.toString(),
+        problem,
+      }).save()
+
+      const allAdmins = await User.find({ role: "ADMIN" })
+      for (let admin of allAdmins) {
+        await new Notification({
+          notification_type: "REPORT_CONTENT",
+          ref_object: contentFound._id.toString(),
+          specified_user: admin._id.toString(),
+          body: "You have new reported content",
+        }).save()
+      }
+
+      return {
+        code: 200,
+        success: true,
+        message: "Content problem reported successfully",
       }
     } catch (err) {
       generateServerError(err)

@@ -35,6 +35,7 @@ module.exports = {
       description: product.description,
       prized: product.prized,
       nComments: product.nComments,
+      blocked: product.blocked,
       createdAt: product.createdAt.toISOString(),
       product_media: product.product_media?.map((media) => ({
         file_name: `${process.env.BASE_URL}/${media.file_name}`,

@@ -9,6 +9,7 @@ module.exports = {
       nComments: data.nComments,
       nShares: data.nShares,
       nViews: data.nViews,
+      blocked: data.blocked,
       createdAt: data.createdAt.toISOString(),
       tagged_users: data.tagged_users,
       post_media: data.post_media?.map((media) => ({
