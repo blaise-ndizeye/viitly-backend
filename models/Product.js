@@ -46,10 +46,6 @@ const productSchema = new Schema({
     required: true,
     es_indexed: true,
   },
-  prized: {
-    type: Boolean,
-    default: false,
-  },
   blocked: {
     type: Boolean,
     default: false,

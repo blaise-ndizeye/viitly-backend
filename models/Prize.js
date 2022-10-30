@@ -9,7 +9,7 @@ const prizeSchema = new Schema({
   prize_event: {
     type: String,
     required: true,
-    enum: ["ACCEPT_CC", "POST_LIKES", "POST_VIEWS"],
+    enum: ["ACCEPT_CC", "BLOG_PRIZE", "POST_PRIZE"],
   },
   prize_amount: {
     type: Number,

@@ -33,7 +33,6 @@ module.exports = {
       price_currency: product.price_currency,
       availability: product.availability,
       description: product.description,
-      prized: product.prized,
       nComments: product.nComments,
       blocked: product.blocked,
       createdAt: product.createdAt.toISOString(),

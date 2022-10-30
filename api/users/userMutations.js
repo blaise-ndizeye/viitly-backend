@@ -11,6 +11,8 @@ const Wallet = require("../../models/Wallet")
 const Blog = require("../../models/Blog")
 const Post = require("../../models/Post")
 const Product = require("../../models/Product")
+const Prize = require("../../models/Prize")
+const Event = require("../../models/Event")
 const ReportedContent = require("../../models/ReportedContent")
 const {
   registerUserValidation,
@@ -34,6 +36,7 @@ const mailTransporter = require("../../utils/mail/send")
 const { getRandomNumber } = require("../../helpers/customHelpers")
 const { walletData } = require("../../helpers/walletHelpers")
 const { makePayment } = require("../../helpers/paymentHelpers")
+const { prizeData } = require("../../helpers/productHelpers")
 
 const userMutations = {
   async RegisterUser(_, args, __, ___) {
@@ -1163,6 +1166,124 @@ const userMutations = {
         code: 200,
         success: true,
         message: "Content has been blocked successfully",
+      }
+    } catch (err) {
+      generateServerError(err)
+    }
+  },
+  async RequestPostBlogPrizes(_, { user_id }, ctx, ___) {
+    try {
+      isAuthenticated(ctx)
+      isValidUser(ctx.user, user_id)
+      isAccountVerified(ctx.user)
+
+      let postPrizeViews = Number(process.env.POST_PRIZE_VIEWS)
+      let postPrizeLikes = Number(process.env.POST_PRIZE_LIKES)
+      let postPrizeShares = Number(process.env.POST_PRIZE_SHARES)
+      let blogPrizeLikes = Number(process.env.BLOG_PRIZE_LIKES)
+      let blogPrizeShares = Number(process.env.BLOG_PRIZE_SHARES)
+      let prizeAmount = Number(process.env.POST_BLOG_PRIZE_AMOUNT_IN_FRW)
+
+      if (!["PROFFESSIONAL", "BUSINESS"].includes(ctx.user.role))
+        throw new ApolloError(
+          "Only proffessional and business accounts can request post prizes",
+          401
+        )
+
+      const userBlogs = await Blog.find({
+        $and: [{ user_id }, { prized: false }],
+      })
+      const userPosts = await Post.find({
+        $and: [{ user_id }, { prized: false }],
+      })
+
+      for (let blog of userBlogs) {
+        const blogLikeEvents = await Event.find({
+          $and: [{ parent_id: blog._id.toString() }, { event_type: "LIKE" }],
+        })
+        const blogShareEvents = await Event.find({
+          $and: [{ parent_id: blog._id.toString() }, { event_type: "SHARE" }],
+        })
+
+        if (
+          blogLikeEvents.length >= blogPrizeLikes &&
+          blogShareEvents.length >= blogPrizeShares
+        ) {
+          blogPrizeLikes = blogPrizeLikes === 0 ? 0.01 : blogPrizeLikes
+          blogPrizeShares = blogPrizeShares === 0 ? 0.01 : blogPrizeShares
+
+          let blogLikeFraction = blogLikeEvents.length / (blogPrizeLikes * 10)
+          let blogShareFraction =
+            blogShareEvents.length / (blogPrizeShares * 10)
+          let blogPrizeFraction = blogLikeFraction + blogShareFraction
+
+          await new Prize({
+            user_id,
+            prize_event: "BLOG_PRIZE",
+            prize_amount: prizeAmount + prizeAmount * blogPrizeFraction,
+            prize_amount_currency: "FRW",
+          }).save()
+
+          await Blog.updateOne(
+            { _id: blog._id },
+            {
+              $set: {
+                prized: true,
+              },
+            }
+          )
+        } else continue
+      }
+
+      for (let post of userPosts) {
+        const postLikeEvents = await Event.find({
+          $and: [{ parent_id: post._id.toString() }, { event_type: "LIKE" }],
+        })
+        const postViewEvents = await Event.find({
+          $and: [{ parent_id: post._id.toString() }, { event_type: "VIEW" }],
+        })
+        const postShareEvents = await Event.find({
+          $and: [{ parent_id: post._id.toString() }, { event_type: "SHARE" }],
+        })
+
+        if (
+          postLikeEvents.length >= postPrizeLikes &&
+          (postViewEvents.length >= postPrizeViews ||
+            postShareEvents.length >= postPrizeShares)
+        ) {
+          postPrizeLikes = postPrizeLikes === 0 ? 0.01 : postPrizeLikes
+          postPrizeShares = postPrizeShares === 0 ? 0.01 : postPrizeShares
+
+          let postLikeFraction = postLikeEvents.length / (postPrizeLikes * 10)
+          let postViewAndShareFraction =
+            postViewEvents.length / (postPrizeViews * 20)
+          let postPrizeFraction = postLikeFraction + postViewAndShareFraction
+
+          await new Prize({
+            user_id,
+            prize_event: "POST_PRIZE",
+            prize_amount: prizeAmount + prizeAmount * postPrizeFraction,
+            prize_amount_currency: "FRW",
+          }).save()
+
+          await Post.updateOne(
+            { _id: post._id.toString() },
+            {
+              $set: {
+                prized: true,
+              },
+            }
+          )
+        } else continue
+      }
+
+      const allPrizes = await Prize.find({ user_id }).sort({ _id: -1 })
+
+      return {
+        code: 200,
+        success: true,
+        message: "Prizes set successfully",
+        prizes: allPrizes.map((prize) => prizeData(prize)),
       }
     } catch (err) {
       generateServerError(err)

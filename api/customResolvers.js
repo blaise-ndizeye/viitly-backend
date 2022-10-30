@@ -40,25 +40,25 @@ let retrieveHelpers = {
   async getNLikes(parentId) {
     const likes = await Event.find({
       $and: [{ parent_id: parentId }, { event_type: "LIKE" }],
-    })
+    }).sort({ _id: -1 })
     return likes.length
   },
   async getNShares(parentId) {
     const shares = await Event.find({
       $and: [{ parent_id: parentId }, { event_type: "SHARE" }],
-    })
+    }).sort({ _id: -1 })
     return shares.length
   },
   async getNViews(parentId) {
     const views = await Event.find({
       $and: [{ parent_id: parentId }, { event_type: "VIEW" }],
-    })
+    }).sort({ _id: -1 })
     return views.length
   },
   async getLikers(parentId) {
     const likes = await Event.find({
       $and: [{ parent_id: parentId }, { event_type: "LIKE" }],
-    })
+    }).sort({ _id: -1 })
     const likers = []
     for (let like of likes) {
       let liker = await User.findOne({ _id: like.user_id })
@@ -69,7 +69,7 @@ let retrieveHelpers = {
   async getViewers(parentId) {
     const views = await Event.find({
       $and: [{ parent_id: parentId }, { event_type: "VIEW" }],
-    })
+    }).sort({ _id: -1 })
     const viewers = []
     for (let view of views) {
       let viewer = await User.findOne({ _id: view.user_id })
@@ -80,7 +80,7 @@ let retrieveHelpers = {
   async getWhoShares(parentId) {
     const shares = await Event.find({
       $and: [{ parent_id: parentId }, { event_type: "SHARE" }],
-    })
+    }).sort({ _id: -1 })
     const whoShares = []
     for (let share of shares) {
       let whom = await User.findOne({ _id: share.user_id })

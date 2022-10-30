@@ -67,6 +67,7 @@ const eventMutations = {
 
       switch (event_type) {
         case "SHARE":
+          break
         case "VIEW":
         case "LIKE":
           const eventExists = await Event.findOne({
@@ -74,31 +75,28 @@ const eventMutations = {
             parent_id: parentObj?._id,
             event_type,
           })
-          if (eventExists)
-            throw new ApolloError("Event has been already set", 400)
-
-          if (
-            parentObj?.body !== "" &&
-            (event_type === "VIEW" || event_type === "SHARE")
-          )
-            throw new ApolloError(
-              "LIKE events are only allowed for comments",
-              400
+          if (!eventExists) {
+            if (
+              parentObj?.body !== "" &&
+              (event_type === "VIEW" || event_type === "SHARE")
             )
-          await new Event({
-            user_id,
-            parent_id: parentObj?._id,
-            event_type,
-          }).save()
-          if (event_type === "LIKE") {
-            await new Notification({
-              notification_type: "LIKE",
-              ref_object: parentObj._id.toString(),
-              specified_user: parentObj?.role
-                ? parentObj._id.toString()
-                : parentObj.user_id,
-              body: "You have gained a new like",
+              break
+
+            await new Event({
+              user_id,
+              parent_id: parentObj?._id,
+              event_type,
             }).save()
+            if (event_type === "LIKE") {
+              await new Notification({
+                notification_type: "LIKE",
+                ref_object: parentObj._id.toString(),
+                specified_user: parentObj?.role
+                  ? parentObj._id.toString()
+                  : parentObj.user_id,
+                body: "You have gained a new like",
+              }).save()
+            }
           }
           break
         case "DISLIKE":
@@ -117,7 +115,9 @@ const eventMutations = {
       return {
         code: 200,
         success: true,
-        message: `${event_type} set successfully`,
+        message: `${
+          event_type === "SHARE" ? "EVENT" : event_type
+        } set successfully`,
       }
     } catch (err) {
       generateServerError(err)

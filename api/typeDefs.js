@@ -167,7 +167,6 @@ const typeDefs = gql`
     price_currency: PriceCurrency!
     availability: ProductAvailability!
     description: String!
-    prized: Boolean!
     nLikes: Int!
     nComments: Int!
     nShares: Int!
@@ -353,6 +352,13 @@ const typeDefs = gql`
     success: Boolean!
     message: String!
     wallet: Wallet!
+  }
+
+  type PrizeResponse implements MutationResponse {
+    code: Int!
+    success: Boolean!
+    message: String!
+    prizes: [Prize!]!
   }
 
   input UserInput {
@@ -621,6 +627,7 @@ const typeDefs = gql`
       user_id: ID!
       reported_content_id: ID!
     ): DeleteDataResponse!
+    RequestPostBlogPrizes(user_id: ID!): PrizeResponse!
   }
 `
 
