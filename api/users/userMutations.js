@@ -1256,7 +1256,9 @@ const userMutations = {
 
           let postLikeFraction = postLikeEvents.length / (postPrizeLikes * 10)
           let postViewAndShareFraction =
-            postViewEvents.length / (postPrizeViews * 20)
+            postViewEvents.length > postShareEvents.length
+              ? postViewEvents.length / (postPrizeViews * 20)
+              : postShareEvents.length / (postPrizeShares * 8)
           let postPrizeFraction = postLikeFraction + postViewAndShareFraction
 
           await new Prize({
