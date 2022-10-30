@@ -493,11 +493,6 @@ const typeDefs = gql`
   input SwitchToProInputs {
     user_id: ID!
     wallet_id: ID!
-    province: String!
-    district: String!
-    market_description: String
-    latitude: String
-    longitude: String
   }
 
   input SwitchToBusinessInputs {
@@ -506,6 +501,11 @@ const typeDefs = gql`
     blogs_to_offer: Int!
     posts_to_offer: Int!
     products_to_offer: Int!
+    province: String!
+    district: String!
+    market_description: String
+    latitude: String
+    longitude: String
   }
 
   input UpdateLocationInput {

@@ -753,15 +753,7 @@ const userMutations = {
   },
   async SwitchToProAccount(_, { inputs }, ctx, ___) {
     try {
-      const {
-        user_id,
-        wallet_id,
-        province,
-        district,
-        market_description,
-        latitude = "",
-        longitude = "",
-      } = inputs
+      const { user_id, wallet_id } = inputs
 
       isAuthenticated(ctx)
       isValidUser(ctx.user, user_id)
@@ -776,26 +768,11 @@ const userMutations = {
       const walletExists = await Wallet.findOne({ _id: wallet_id })
       if (!walletExists) throw new ApolloError("Wallet not found", 404)
 
-      if (province.length < 3 || district.length < 3)
-        throw new ApolloError(
-          "Province and sector must have at least 3 characters",
-          400
-        )
-
       const { errorMessage, generatedTransaction } = await makePayment(
         walletExists,
         user_id
       )
       if (errorMessage) throw new ApolloError(errorMessage, 400)
-
-      await new Location({
-        user_id,
-        province,
-        district,
-        market_description,
-        latitude,
-        longitude,
-      }).save()
 
       await new Transaction({
         service_provider_gen_id: generatedTransaction.id,
@@ -914,12 +891,20 @@ const userMutations = {
         blogs_to_offer = 0,
         posts_to_offer = 0,
         products_to_offer = 0,
+        province,
+        district,
+        market_description,
+        latitude = "",
+        longitude = "",
       } = inputs
 
       isAuthenticated(ctx)
       isValidUser(ctx.user, user_id)
       isAccountVerified(ctx.user)
       isAdmin(ctx.user)
+
+      if (!receptient_id || receptient_id.length < 5)
+        throw new ApolloError("Receptient Id:=> receptient_id is required", 400)
 
       const receptientExists = await User.findOne({ _id: receptient_id })
       if (!receptientExists)
@@ -928,8 +913,22 @@ const userMutations = {
       if (receptientExists.role === "BUSINESS")
         throw new ApolloError("Account is already a Business account", 400)
 
-      const userScope = await UploadScope.findOne({ user_id: receptient_id })
+      if (province.length < 3 || district.length < 3)
+        throw new ApolloError(
+          "Province and sector must have at least 3 characters",
+          400
+        )
 
+      await new Location({
+        user_id: receptient_id,
+        province,
+        district,
+        market_description,
+        latitude,
+        longitude,
+      }).save()
+
+      const userScope = await UploadScope.findOne({ user_id: receptient_id })
       await UploadScope.updateOne(
         { user_id: receptient_id },
         {
