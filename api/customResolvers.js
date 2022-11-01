@@ -260,7 +260,7 @@ const customResolvers = {
     async transactions(parent) {
       const transactionList = await Transaction.find({
         user_id: parent.user_id,
-      })
+      }).sort({ _id: -1 })
       return transactionList.map((transaction) => transactionData(transaction))
     },
     async location(parent) {

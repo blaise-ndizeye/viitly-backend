@@ -36,7 +36,7 @@ const { problemData } = require("../../helpers/problemHelpers")
 const mailTransporter = require("../../utils/mail/send")
 const { getRandomNumber } = require("../../helpers/customHelpers")
 const { walletData } = require("../../helpers/walletHelpers")
-const { makePayment } = require("../../helpers/paymentHelpers")
+const { makePayment, offerPayment } = require("../../helpers/paymentHelpers")
 const { prizeData } = require("../../helpers/productHelpers")
 const { verifyTaggedUsers } = require("../../helpers/tagHelpers")
 
@@ -1358,6 +1358,70 @@ const userMutations = {
         code: 200,
         success: true,
         message: `${contentType.toLowerCase()} shared successfully`,
+      }
+    } catch (err) {
+      generateServerError(err)
+    }
+  },
+  async RequestPrizePayment(_, { user_id, prize_id }, ctx, ___) {
+    try {
+      const numberOfProductPrizes = Number(process.env.NUMBER_OF_PRODUCT_PRIZES)
+
+      isAuthenticated(ctx)
+      isValidUser(ctx.user, user_id)
+      isAccountVerified(ctx.user)
+
+      if (!prize_id || prize_id?.length < 1)
+        throw new ApolloError("Prize id:=> prize_id is required", 400)
+
+      const prizeExists = await Prize.findOne({
+        $and: [{ user_id }, { _id: prize_id }],
+      })
+      if (!prizeExists) throw new ApolloError("Requested prize not found", 404)
+
+      const productPrizes = await Prize.find({
+        $and: [{ user_id }, { prize_event: "ACCEPT_CC" }],
+      })
+      if (
+        prizeExists.prize_event === "ACCEPT_CC" &&
+        productPrizes.length < numberOfProductPrizes
+      )
+        throw new ApolloError(
+          `You must have at least ${numberOfProductPrizes} product prizes to get prized for accepted coin-code product`,
+          400
+        )
+
+      const { errorMessage, generatedTransaction } = await offerPayment(
+        {
+          amount: prizeExists.prize_amount - prizeExists.prize_amount * 0.1,
+          currency: prizeExists.prize_amount_currency,
+        },
+        user_id
+      )
+      if (errorMessage) throw new ApolloError(errorMessage, 400)
+
+      await new Transaction({
+        service_provider_gen_id: generatedTransaction.id,
+        user_id,
+        amount_paid: prizeExists.prize_amount - prizeExists.prize_amount * 0.1,
+        currency_used: prizeExists.prize_amount_currency,
+        description: "Receiving the prize",
+        transaction_role: "PRIZING",
+      }).save()
+
+      await Prize.updateOne(
+        { user_id },
+        {
+          $set: {
+            prized: true,
+          },
+        }
+      )
+
+      return {
+        code: 200,
+        success: true,
+        message: "Prize set and paid successfully",
       }
     } catch (err) {
       generateServerError(err)
