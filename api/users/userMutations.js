@@ -13,6 +13,7 @@ const Post = require("../../models/Post")
 const Product = require("../../models/Product")
 const Prize = require("../../models/Prize")
 const Event = require("../../models/Event")
+const Message = require("../../models/Message")
 const ReportedContent = require("../../models/ReportedContent")
 const {
   registerUserValidation,
@@ -37,6 +38,7 @@ const { getRandomNumber } = require("../../helpers/customHelpers")
 const { walletData } = require("../../helpers/walletHelpers")
 const { makePayment } = require("../../helpers/paymentHelpers")
 const { prizeData } = require("../../helpers/productHelpers")
+const { verifyTaggedUsers } = require("../../helpers/tagHelpers")
 
 const userMutations = {
   async RegisterUser(_, args, __, ___) {
@@ -1286,6 +1288,76 @@ const userMutations = {
         success: true,
         message: "Prizes set successfully",
         prizes: allPrizes.map((prize) => prizeData(prize)),
+      }
+    } catch (err) {
+      generateServerError(err)
+    }
+  },
+  async ShareContent(_, { inputs }, ctx, ___) {
+    try {
+      const { user_id, content_id, share_to = [] } = inputs
+
+      isAuthenticated(ctx)
+      isValidUser(ctx.user, user_id)
+      isAccountVerified(ctx.user)
+
+      if (!content_id || content_id.length < 5)
+        throw new ApolloError("Content Id:=> content_id is required", 400)
+
+      if (share_to.length < 1)
+        throw new ApolloError("Receptients are required", 400)
+
+      if (share_to.includes(user_id))
+        throw new ApolloError("You can not share item to yourself", 400)
+
+      const pr1 = Blog.findOne({ _id: content_id })
+      const pr2 = Post.findOne({ _id: content_id })
+      const pr3 = Product.findOne({ _id: content_id })
+
+      const [isBlog, isPost, isProduct] = await Promise.all([pr1, pr2, pr3])
+
+      if (!isBlog && !isPost && !isProduct)
+        throw new ApolloError("Reported content doesn't exist", 404)
+
+      let contentFound = null
+      let contentType = ""
+
+      if (isBlog) {
+        contentFound = isBlog
+        contentType = "BLOG"
+      }
+      if (isPost) {
+        contentFound = isPost
+        contentType = "POST"
+      }
+      if (isProduct) {
+        contentFound = isProduct
+        contentType = "PRODUCT"
+      }
+
+      const { tagError, validTaggedUsers } = await verifyTaggedUsers(share_to)
+      if (tagError) throw new ApolloError(tagError, 400)
+
+      await new Event({
+        user_id,
+        parent_id: contentFound?._id,
+        event_type: "SHARE",
+      }).save()
+
+      for (let taggedUser of validTaggedUsers) {
+        await new Message({
+          from: user_id,
+          to: taggedUser,
+          text: `You have been shared with this ${contentType.toLowerCase()}`,
+          refer_type: contentType,
+          refer_item: contentFound?._id.toString(),
+        }).save()
+      }
+
+      return {
+        code: 200,
+        success: true,
+        message: `${contentType.toLowerCase()} shared successfully`,
       }
     } catch (err) {
       generateServerError(err)

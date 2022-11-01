@@ -67,7 +67,6 @@ const eventMutations = {
 
       switch (event_type) {
         case "SHARE":
-          break
         case "VIEW":
         case "LIKE":
           const eventExists = await Event.findOne({
@@ -115,9 +114,7 @@ const eventMutations = {
       return {
         code: 200,
         success: true,
-        message: `${
-          event_type === "SHARE" ? "EVENT" : event_type
-        } set successfully`,
+        message: `${event_type.toLowerCase()} set successfully`,
       }
     } catch (err) {
       generateServerError(err)

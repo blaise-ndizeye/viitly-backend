@@ -542,6 +542,12 @@ const typeDefs = gql`
     problem: String!
   }
 
+  input ShareContentInput {
+    user_id: ID!
+    content_id: ID!
+    share_to: [ID!]!
+  }
+
   type Query {
     hello: String!
   }
@@ -628,6 +634,7 @@ const typeDefs = gql`
       reported_content_id: ID!
     ): DeleteDataResponse!
     RequestPostBlogPrizes(user_id: ID!): PrizeResponse!
+    ShareContent(inputs: ShareContentInput!): DeleteDataResponse!
   }
 `
 
