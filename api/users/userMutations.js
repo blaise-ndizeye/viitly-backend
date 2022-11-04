@@ -16,6 +16,11 @@ const Event = require("../../models/Event")
 const Message = require("../../models/Message")
 const Following = require("../../models/Following")
 const ReportedContent = require("../../models/ReportedContent")
+const SavedProduct = require("../../models/SavedProduct")
+const Reviews = require("../../models/Reviews")
+const Comment = require("../../models/Comment")
+const CoinCodeProduct = require("../../models/CoinCodeProduct")
+const ArchivedAccount = require("../../models/ArchivedAccount")
 const {
   registerUserValidation,
   loginUserValidation,
@@ -161,6 +166,19 @@ const userMutations = {
 
       const passwordMatch = await bcrypt.compare(password, userExists.password)
       if (!passwordMatch) throw new ApolloError("Incorrect password", 400)
+
+      if (userExists.archived) {
+        await User.updateOne(
+          { _id: userExists._id },
+          {
+            $set: {
+              archived: false,
+            },
+          }
+        )
+
+        await ArchivedAccount.deleteOne({ user_id: userExists._id.toString() })
+      }
 
       const accessToken = await generateAccessToken(userExists)
 
@@ -1446,6 +1464,40 @@ const userMutations = {
         code: 200,
         success: true,
         message: "Prize set and paid successfully",
+      }
+    } catch (err) {
+      generateServerError(err)
+    }
+  },
+  async ArchiveAccount(_, { user_id }, ctx, ___) {
+    try {
+      let toDay = new Date()
+
+      isAuthenticated(ctx)
+      isValidUser(ctx.user, user_id)
+      isAccountVerified(ctx.user)
+
+      if (ctx.user.role === "ADMIN")
+        throw new ApolloError("Account can't be archived", 401)
+
+      await new ArchivedAccount({
+        user_id,
+        deleteAt: toDay.setMonth(toDay.getMonth() + 1),
+      }).save()
+
+      await User.updateOne(
+        { _id: user_id },
+        {
+          $set: {
+            archived: true,
+          },
+        }
+      )
+
+      return {
+        code: 200,
+        success: true,
+        message: "Unless you login, the account will be deleted after 1 month",
       }
     } catch (err) {
       generateServerError(err)

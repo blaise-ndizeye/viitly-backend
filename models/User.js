@@ -56,6 +56,10 @@ const UserSchema = new Schema({
     type: Boolean,
     default: false,
   },
+  archived: {
+    type: Boolean,
+    default: false,
+  },
   verification_code: {
     type: String,
     default: "",

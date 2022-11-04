@@ -636,6 +636,8 @@ const typeDefs = gql`
     RequestPostBlogPrizes(user_id: ID!): PrizeResponse!
     ShareContent(inputs: ShareContentInput!): DeleteDataResponse!
     RequestPrizePayment(user_id: ID!, prize_id: ID!): DeleteDataResponse!
+    ArchiveAccount(user_id: ID!): DeleteDataResponse!
+    DeleteAccount(user_id: ID!, receptient_id: ID!): DeleteDataResponse!
   }
 `
 
