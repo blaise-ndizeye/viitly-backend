@@ -14,6 +14,7 @@ const Product = require("../../models/Product")
 const Prize = require("../../models/Prize")
 const Event = require("../../models/Event")
 const Message = require("../../models/Message")
+const Following = require("../../models/Following")
 const ReportedContent = require("../../models/ReportedContent")
 const {
   registerUserValidation,
@@ -1175,6 +1176,10 @@ const userMutations = {
   },
   async RequestPostBlogPrizes(_, { user_id }, ctx, ___) {
     try {
+      const numberOfFollowerPrizes = Number(
+        process.env.NUMBER_OF_FOLLOWER_PRIZES
+      )
+
       isAuthenticated(ctx)
       isValidUser(ctx.user, user_id)
       isAccountVerified(ctx.user)
@@ -1190,6 +1195,25 @@ const userMutations = {
         throw new ApolloError(
           "Only proffessional and business accounts can request post prizes",
           401
+        )
+
+      const userFollowers = await Following.find({
+        $or: [
+          { user_id },
+          {
+            $and: [
+              {
+                follower_id: user_id,
+              },
+              { accepted: true },
+            ],
+          },
+        ],
+      })
+      if (userFollowers.length < numberOfFollowerPrizes)
+        throw new ApolloError(
+          `You must have at least ${numberOfFollowerPrizes} followers`,
+          400
         )
 
       const userBlogs = await Blog.find({
