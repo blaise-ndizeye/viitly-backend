@@ -132,17 +132,19 @@ let retrieveHelpers = {
       (notification) => !notification.deleted_for.includes(parent.user_id)
     )
   },
+  async getUserData(user_id) {
+    const user = await User.findById(user_id)
+    return userData(user)
+  },
 }
 
 const customResolvers = {
   Review: {
     async from(parent) {
-      const user = await User.findById(parent.from)
-      return userData(user)
+      return await retrieveHelpers.getUserData(parent.from)
     },
     async to(parent) {
-      const user = await User.findById(parent.to)
-      return userData(user)
+      return await retrieveHelpers.getUserData(parent.to)
     },
   },
   User: {
@@ -294,8 +296,7 @@ const customResolvers = {
   },
   Post: {
     async owner(parent) {
-      const user = await User.findById(parent.owner)
-      return userData(user)
+      return await retrieveHelpers.getUserData(parent.owner)
     },
     async tagged_users(parent) {
       const users = await User.find({ _id: { $in: parent.tagged_users } })
@@ -326,8 +327,7 @@ const customResolvers = {
   },
   Blog: {
     async owner(parent) {
-      const user = await User.findById(parent.owner)
-      return userData(user)
+      return await retrieveHelpers.getUserData(parent.owner)
     },
     async tagged_users(parent) {
       const users = await User.find({ _id: { $in: parent.tagged_users } })
@@ -352,8 +352,7 @@ const customResolvers = {
   },
   Product: {
     async owner(parent) {
-      const user = await User.findById(parent.owner)
-      return userData(user)
+      return await retrieveHelpers.getUserData(parent.owner)
     },
     async comments(parent) {
       const commentList = await Comment.find({ to: parent.product_id })
@@ -428,8 +427,7 @@ const customResolvers = {
   },
   Comment: {
     async from(parent) {
-      const user = await User.findById(parent.from)
-      return userData(user)
+      return await retrieveHelpers.getUserData(parent.from)
     },
     async to({ to }) {
       const { commentDestName, commentDestObj } = await getCommentDestination(
@@ -493,8 +491,7 @@ const customResolvers = {
   },
   Reply: {
     async from(parent) {
-      const user = await User.findById(parent.from)
-      return userData(user)
+      return await retrieveHelpers.getUserData(parent.from)
     },
     async nLikes(parent) {
       return await retrieveHelpers.getNLikes(parent.reply_id)
@@ -505,22 +502,18 @@ const customResolvers = {
   },
   Follower: {
     async follower(parent) {
-      const user = await User.findById(parent.follower)
-      return userData(user)
+      return await retrieveHelpers.getUserData(parent.follower)
     },
     async user(parent) {
-      const user = await User.findById(parent.user)
-      return userData(user)
+      return await retrieveHelpers.getUserData(parent.user)
     },
   },
   Message: {
     async from(parent) {
-      const user = await User.findById(parent.from)
-      return userData(user)
+      return await retrieveHelpers.getUserData(parent.from)
     },
     async to(parent) {
-      const user = await User.findById(parent.to)
-      return userData(user)
+      return await retrieveHelpers.getUserData(parent.to)
     },
     async refer_item(parent) {
       if (parent.refer_type === "PRODUCT" && parent.refer_item !== "") {
@@ -551,8 +544,7 @@ const customResolvers = {
   },
   ReportedProblem: {
     async reporter(parent) {
-      const user = await User.findById(parent.reporter)
-      return userData(user)
+      return await retrieveHelpers.getUserData(parent.reporter)
     },
   },
   Transaction: {
@@ -560,14 +552,12 @@ const customResolvers = {
       const transaction = await Transaction.findOne({
         _id: parent.transaction_id,
       })
-      const user = await User.findOne({ _id: transaction.user_id })
-      return userData(user)
+      return await retrieveHelpers.getUserData(transaction.user_id)
     },
   },
   Prize: {
     async owner(parent) {
-      const user = await User.findOne({ _id: parent.owner })
-      return userData(user)
+      return await retrieveHelpers.getUserData(parent.owner)
     },
   },
   RequestedProduct: {
@@ -576,14 +566,12 @@ const customResolvers = {
       return productData(requestedProduct)
     },
     async requested_by(parent) {
-      const user = await User.findOne({ _id: parent.requested_by })
-      return userData(user)
+      return await retrieveHelpers.getUserData(parent.requested_by)
     },
   },
   ReportedContent: {
     async reported_by(parent) {
-      const user = await User.findOne({ _id: parent.reported_by })
-      return userData(user)
+      return await retrieveHelpers.getUserData(parent.reported_by)
     },
     async content(parent) {
       const pr1 = Blog.findOne({ _id: parent.content })
