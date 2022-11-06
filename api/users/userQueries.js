@@ -4,7 +4,6 @@ const ReportedProblems = require("../../models/ReportedProblems")
 const Transaction = require("../../models/Transaction")
 const Wallet = require("../../models/Wallet")
 const Blog = require("../../models/Blog")
-const Post = require("../../models/Post")
 const Product = require("../../models/Product")
 const Prize = require("../../models/Prize")
 const Message = require("../../models/Message")
@@ -28,7 +27,7 @@ const userQueries = {
       isAccountVerified(ctx.user)
       isAdmin(ctx.user)
 
-      let allUsers = await User.find()
+      let allUsers = await User.find().sort({ _id: -1 })
       allUsers = allUsers.filter((user) => user._id.toString() !== user_id)
 
       return allUsers.map((user) => userData(user))

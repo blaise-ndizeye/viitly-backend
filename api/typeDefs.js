@@ -549,8 +549,9 @@ const typeDefs = gql`
   }
 
   type Query {
-    hello: String!
+    Hello: String!
     GetAllUsers(user_id: ID!): [User!]!
+    GetAllPosts(user_id: ID!): [Post!]!
   }
 
   type Mutation {
