@@ -6,7 +6,7 @@ const {
   isAdmin,
   isAuthenticated,
   isAccountVerified,
-  isPayingUser,
+  isBusinessPerson,
   isValidUser,
 } = require("../shield")
 const { productData } = require("../../helpers/productHelpers")
@@ -31,7 +31,7 @@ const productQueries = {
       isAuthenticated(ctx)
       isValidUser(ctx.user, user_id)
       isAccountVerified(ctx.user)
-      isPayingUser(ctx.user)
+      isBusinessPerson(ctx.user)
 
       const productExists = await Product.findOne({
         $and: [{ _id: product_id }, { user_id }],
