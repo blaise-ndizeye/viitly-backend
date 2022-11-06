@@ -33,6 +33,19 @@ const userQueries = {
       generateServerError(err)
     }
   },
+  async GetUserData(_, { user_id }, ctx, ___) {
+    try {
+      isAuthenticated(ctx)
+      isValidUser(ctx.user, user_id)
+      isAccountVerified(ctx.user)
+
+      const user = await User.findOne({ _id: user_id })
+
+      return userData(user)
+    } catch (err) {
+      generateServerError(err)
+    }
+  },
 }
 
 module.exports = userQueries
