@@ -1,3 +1,5 @@
+const { ApolloError } = require("apollo-server-errors")
+
 const Blog = require("../../models/Blog")
 const { generateServerError } = require("../../helpers/errorHelpers")
 const {
@@ -20,6 +22,23 @@ const blogQueries = {
       let allBlogs = await Blog.find().sort({ _id: -1 })
 
       return allBlogs.map((blog) => blogData(blog))
+    } catch (err) {
+      generateServerError(err)
+    }
+  },
+  async GetBlogData(_, { user_id, blog_id }, ctx, ___) {
+    try {
+      isAuthenticated(ctx)
+      isValidUser(ctx.user, user_id)
+      isAccountVerified(ctx.user)
+      isPayingUser(ctx.user)
+
+      const blogExists = await Blog.findOne({
+        $and: [{ _id: blog_id }, { user_id }],
+      })
+      if (!blogExists) throw new ApolloError("Blog not found", 404)
+
+      return blogData(blogExists)
     } catch (err) {
       generateServerError(err)
     }
