@@ -561,6 +561,7 @@ const typeDefs = gql`
     GetNewAccessToken(user_id: ID!): String!
     GetAllReportedProblems(user_id: ID!): [ReportedProblem!]!
     GetAllReportedContents(user_id: ID!): [ReportedContent!]!
+    GetBusinessRequestedProducts(user_id: ID): [RequestedProduct!]!
   }
 
   type Mutation {
