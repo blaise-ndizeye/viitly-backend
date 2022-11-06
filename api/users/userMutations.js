@@ -1503,6 +1503,192 @@ const userMutations = {
       generateServerError(err)
     }
   },
+  async DeleteAccount(_, { user_id, receptient_id }, ctx, ___) {
+    try {
+      let toDay = new Date()
+
+      isAuthenticated(ctx)
+      isValidUser(ctx.user, user_id)
+      isAccountVerified(ctx.user)
+      isAdmin(ctx.user)
+
+      const archivedAccountExists = await ArchivedAccount.findOne({
+        user_id: receptient_id,
+      })
+      if (!archivedAccountExists)
+        throw new ApolloError("No such archived account found", 404)
+
+      const receptientExists = await User.findOne({ _id: receptient_id })
+      if (!receptientExists)
+        throw new ApolloError("Receptient account not found", 404)
+
+      const deleteDate = new Date(archivedAccountExists.deleteAt)
+      const archiveDate = new Date(archivedAccountExists.archivedAt)
+
+      if (
+        !(
+          deleteDate.getMonth() === toDay.getMonth() &&
+          (deleteDate.getFullYear() === toDay.getFullYear() ||
+            (deleteDate.getMonth() === 1 &&
+              deleteDate.getFullYear() === archiveDate.getFullYear() + 1))
+        )
+      ) {
+        throw new ApolloError(
+          "Delete time for the account is not yet reached",
+          400
+        )
+      }
+
+      //* Deleting the replies for the coments
+      const userComments = await Comment.find({ user_id: receptient_id })
+      for (let userComment of userComments) {
+        await Comment.deleteMany({ to: userComment._id.toString() })
+      }
+
+      //* Decreasing the number of followers and followings of the users following the account to be deleted
+      const userFollowers = await Following.find({ user_id: receptient_id })
+      for (let userFollower of userFollowers) {
+        const followingUser = await User.findOne({
+          _id: userFollower.follower_id,
+        })
+
+        if (userFollower.accepted) {
+          await User.updateOne(
+            { _id: followingUser._id.toString() },
+            {
+              $set: {
+                nFollowers: followingUser.nFollowers - 1,
+              },
+            }
+          )
+        } else {
+          await User.updateOne(
+            { _id: userFollower.follower_id },
+            {
+              $set: {
+                nFollowings: followingUser.nFollowings - 1,
+              },
+            }
+          )
+        }
+      }
+
+      //* Deleting notifications and video or image files related the users products, blogs, posts and reported-contents
+      const userBlogs = await Blog.find({ user_id: receptient_id })
+      for (let userBlog of userBlogs) {
+        await Notification.deleteMany({ ref_object: userBlog._id.toString() })
+
+        if (userBlog.blog_media?.file_name !== "") {
+          deleteUploadedFile(userBlog.blog_media.file_name)
+        }
+      }
+
+      const userPosts = await Post.find({ user_id: receptient_id })
+      for (let userPost of userPosts) {
+        await Notification.deleteMany({ ref_object: userPost._id.toString() })
+
+        for (let post_media of userPost.post_media) {
+          deleteUploadedFile(post_media.file_name)
+        }
+      }
+
+      const userProducts = await Product.find({ user_id: receptient_id })
+      for (let userProduct of userProducts) {
+        await Notification.deleteMany({
+          ref_object: userProduct._id.toString(),
+        })
+
+        for (let product_media of userProduct.product_media) {
+          deleteUploadedFile(product_media.file_name)
+        }
+      }
+
+      const reportedContents = await ReportedContent.find({
+        user_id: receptient_id,
+      })
+      for (let reportedContent of reportedContents) {
+        await Notification.deleteMany({
+          ref_object: reportedContent._id.toString(),
+        })
+      }
+
+      //* Decrease the number of reviews sent by this user to other accounts
+      const sentReviews = await Reviews.find({ from: receptient_id })
+      for (let sentReview of sentReviews) {
+        const reviewReceiver = await User.findOne({ _id: sentReview.to })
+        await User.updateOne(
+          { _id: reviewReceiver._id },
+          {
+            $set: {
+              nReviews: reviewReceiver.nReviews - 1,
+            },
+          }
+        )
+      }
+
+      if (receptientExists.avatar) {
+        deleteUploadedFile(receptientExists.avatar)
+      }
+
+      const pr1 = Blog.deleteMany({ user_id: receptient_id })
+      const pr2 = CoinCodeProduct.deleteMany({ user_id: receptient_id })
+      const pr3 = Comment.deleteMany({ user_id: receptient_id })
+      const pr4 = Event.deleteMany({
+        $or: [{ user_id: receptient_id }, { parent_id: receptient_id }],
+      })
+      const pr5 = Following.deleteMany({
+        $or: [{ user_id: receptient_id }, { follower_id: receptient_id }],
+      })
+      const pr6 = Location.deleteOne({ user_id: receptient_id })
+      const pr7 = Message.deleteMany({
+        $or: [{ from: receptient_id }, { to: receptient_id }],
+      })
+      const pr8 = Notification.deleteMany({ specified_user: receptient_id })
+      const pr9 = Post.deleteMany({ user_id: receptient_id })
+      const pr10 = Prize.deleteMany({ user_id: receptient_id })
+      const pr11 = Product.deleteMany({ user_id: receptient_id })
+      const pr12 = ReportedContent.deleteMany({ user_id: receptient_id })
+      const pr13 = ReportedProblems.deleteMany({ user_id: receptient_id })
+      const pr14 = Reviews.deleteMany({
+        $or: [{ from: receptient_id }, { to: receptient_id }],
+      })
+      const pr15 = SavedProduct.deleteMany({ user_id: receptient_id })
+      const pr16 = Transaction.deleteMany({ user_id: receptient_id })
+      const pr17 = UploadScope.deleteMany({ user_id: receptient_id })
+      const pr18 = ArchivedAccount.deleteOne({ user_id: receptient_id })
+      const pr19 = User.deleteOne({ _id: receptient_id })
+
+      await Promise.all([
+        pr1,
+        pr2,
+        pr3,
+        pr4,
+        pr5,
+        pr6,
+        pr7,
+        pr8,
+        pr9,
+        pr10,
+        pr11,
+        pr12,
+        pr13,
+        pr14,
+        pr15,
+        pr16,
+        pr17,
+        pr18,
+        pr19,
+      ])
+
+      return {
+        code: 200,
+        success: true,
+        message: "Account deleted successfully",
+      }
+    } catch (err) {
+      generateServerError(err)
+    }
+  },
 }
 
 module.exports = userMutations
