@@ -285,6 +285,12 @@ const typeDefs = gql`
     reported_by: User!
   }
 
+  type ArchivedAccount {
+    archivedAt: String!
+    deleteAt: String!
+    account: User!
+  }
+
   interface MutationResponse {
     code: Int!
     success: Boolean!
@@ -562,6 +568,7 @@ const typeDefs = gql`
     GetAllReportedProblems(user_id: ID!): [ReportedProblem!]!
     GetAllReportedContents(user_id: ID!): [ReportedContent!]!
     GetBusinessRequestedProducts(user_id: ID): [RequestedProduct!]!
+    GetAllArchivedAccounts(user_id: ID!): [ArchivedAccount!]!
   }
 
   type Mutation {

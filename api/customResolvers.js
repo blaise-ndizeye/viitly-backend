@@ -600,6 +600,11 @@ const customResolvers = {
       }
     },
   },
+  ArchivedAccount: {
+    async account(parent) {
+      return await retrieveHelpers.getUserData(parent.account)
+    },
+  },
 }
 
 module.exports = customResolvers

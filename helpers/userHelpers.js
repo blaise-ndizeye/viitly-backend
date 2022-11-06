@@ -48,4 +48,11 @@ module.exports = {
       longitude: data.longitude,
     }
   },
+  archivedAccountData(data) {
+    return {
+      account: data.user_id,
+      archivedAt: data.archivedAt.toISOString(),
+      deleteAt: data.deleteAt.toISOString(),
+    }
+  },
 }
