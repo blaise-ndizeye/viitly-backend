@@ -1070,8 +1070,11 @@ const userMutations = {
       if (!content_id || content_id.length < 5)
         throw new ApolloError("Content Id:=> content_id is required", 400)
 
-      if (!problem || problem.length < 5)
-        throw new ApolloError("Problem must be more descriptive", 400)
+      if (!problem || problem.length < 10)
+        throw new ApolloError(
+          "The problem must contain at least 10 characters and more descriptive",
+          400
+        )
 
       const pr1 = Blog.findOne({ _id: content_id })
       const pr2 = Post.findOne({ _id: content_id })

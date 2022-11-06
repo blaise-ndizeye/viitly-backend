@@ -260,9 +260,16 @@ const customResolvers = {
       return walletList.map((wallet) => walletData(wallet))
     },
     async transactions(parent) {
-      const transactionList = await Transaction.find({
-        user_id: parent.user_id,
-      }).sort({ _id: -1 })
+      let transactionList = []
+
+      if (parent.role === "ADMIN") {
+        transactionList = await Transaction.find().sort({ _id: -1 })
+      } else {
+        transactionList = await Transaction.find({
+          user_id: parent.user_id,
+        }).sort({ _id: -1 })
+      }
+
       return transactionList.map((transaction) => transactionData(transaction))
     },
     async location(parent) {

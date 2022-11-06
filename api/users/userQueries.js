@@ -1,6 +1,6 @@
 const User = require("../../models/User")
 const ReportedProblems = require("../../models/ReportedProblems")
-const Transaction = require("../../models/Transaction")
+const ReportedContent = require("../../models/ReportedContent")
 const Prize = require("../../models/Prize")
 const Message = require("../../models/Message")
 const ArchivedAccount = require("../../models/ArchivedAccount")
@@ -13,7 +13,10 @@ const {
   isValidUser,
 } = require("../shield")
 const { userData, generateAccessToken } = require("../../helpers/userHelpers")
-const { problemData } = require("../../helpers/problemHelpers")
+const {
+  problemData,
+  reportedContentData,
+} = require("../../helpers/problemHelpers")
 
 const userQueries = {
   async GetAllUsers(_, { user_id }, ctx, ___) {
@@ -68,6 +71,20 @@ const userQueries = {
       const allProblems = await ReportedProblems.find().sort({ _id: -1 })
 
       return allProblems.map((problem) => problemData(problem))
+    } catch (err) {
+      generateServerError(err)
+    }
+  },
+  async GetAllReportedContents(_, { user_id }, ctx, ___) {
+    try {
+      isAuthenticated(ctx)
+      isValidUser(ctx.user, user_id)
+      isAccountVerified(ctx.user)
+      isAdmin(ctx.user)
+
+      const allReportedContents = await ReportedContent.find().sort({ _id: -1 })
+
+      return allReportedContents.map((content) => reportedContentData(content))
     } catch (err) {
       generateServerError(err)
     }

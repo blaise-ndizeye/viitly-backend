@@ -560,6 +560,7 @@ const typeDefs = gql`
     GetAllBlogs(user_id: ID!): [Blog!]!
     GetNewAccessToken(user_id: ID!): String!
     GetAllReportedProblems(user_id: ID!): [ReportedProblem!]!
+    GetAllReportedContents(user_id: ID!): [ReportedContent!]!
   }
 
   type Mutation {
