@@ -550,8 +550,14 @@ const typeDefs = gql`
 
   type Query {
     Hello: String!
+    GetUserData(user_id: ID!): User!
     GetAllUsers(user_id: ID!): [User!]!
+    GetPostData(user_id: ID!, post_id: ID!): Post!
     GetAllPosts(user_id: ID!): [Post!]!
+    GetProductData(user_id: ID!, product_id: ID!): Product!
+    GetAllProducts(user_id: ID!): [Product!]!
+    GetBlogData(user_id: ID!, blog_id: ID!): Blog!
+    GetAllBlogs(user_id: ID!): [Blog!]!
   }
 
   type Mutation {
