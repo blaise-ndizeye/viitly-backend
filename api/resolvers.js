@@ -1,6 +1,7 @@
 const { GraphQLUpload } = require("graphql-upload")
 
 const blogMutations = require("./blogs/blogMutations")
+const blogQueries = require("./blogs/blogQueries")
 const commentMutations = require("./comments/commentMutation")
 const customResolvers = require("./customResolvers")
 const eventMutations = require("./events/eventMutations")
@@ -21,6 +22,7 @@ const resolvers = {
     ...userQueries,
     ...postQueries,
     ...productQueries,
+    ...blogQueries,
   },
   Mutation: {
     ...blogMutations,
