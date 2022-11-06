@@ -46,6 +46,20 @@ const userQueries = {
       generateServerError(err)
     }
   },
+  async GetNewAccessToken(_, { user_id }, ctx, ___) {
+    try {
+      isAuthenticated(ctx)
+      isValidUser(ctx.user, user_id)
+      isAccountVerified(ctx.user)
+
+      const user = await User.findOne({ _id: user_id })
+      const newAccessToken = await generateAccessToken(user)
+
+      return newAccessToken
+    } catch (err) {
+      generateServerError(err)
+    }
+  },
 }
 
 module.exports = userQueries
