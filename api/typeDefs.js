@@ -550,6 +550,7 @@ const typeDefs = gql`
 
   type Query {
     hello: String!
+    GetAllUsers(user_id: ID!): [User!]!
   }
 
   type Mutation {

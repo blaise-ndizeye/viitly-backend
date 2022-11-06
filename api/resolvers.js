@@ -10,11 +10,13 @@ const postMutations = require("./posts/postMutations")
 const productMutations = require("./products/productMutations")
 const reviewMutations = require("./reviews/reviewsMutations")
 const userMutations = require("./users/userMutations")
+const userQueries = require("./users/userQueries")
 
 const resolvers = {
   ...customResolvers,
   Query: {
     hello: () => "hello there",
+    ...userQueries,
   },
   Mutation: {
     ...blogMutations,
