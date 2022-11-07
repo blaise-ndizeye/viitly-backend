@@ -570,6 +570,7 @@ const typeDefs = gql`
     GetBusinessRequestedProducts(user_id: ID): [RequestedProduct!]!
     GetAllArchivedAccounts(user_id: ID!): [ArchivedAccount!]!
     GetAllPendingPrizes(user_id: ID!): [Prize!]!
+    GetChatMessages(user_id: ID!, receptient_id: ID!): [Message!]!
   }
 
   type Mutation {

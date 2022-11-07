@@ -7,6 +7,7 @@ const customResolvers = require("./customResolvers")
 const eventMutations = require("./events/eventMutations")
 const followMutations = require("./follow/followMutations")
 const messageMutations = require("./messages/messageMutations")
+const messageQueries = require("./messages/messageQueries")
 const postMutations = require("./posts/postMutations")
 const postQueries = require("./posts/postQueries")
 const productMutations = require("./products/productMutations")
@@ -23,6 +24,7 @@ const resolvers = {
     ...postQueries,
     ...productQueries,
     ...blogQueries,
+    ...messageQueries,
   },
   Mutation: {
     ...blogMutations,

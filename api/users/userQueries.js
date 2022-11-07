@@ -2,7 +2,6 @@ const User = require("../../models/User")
 const ReportedProblems = require("../../models/ReportedProblems")
 const ReportedContent = require("../../models/ReportedContent")
 const Prize = require("../../models/Prize")
-const Message = require("../../models/Message")
 const ArchivedAccount = require("../../models/ArchivedAccount")
 const { generateServerError } = require("../../helpers/errorHelpers")
 const {
