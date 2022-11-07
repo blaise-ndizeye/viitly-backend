@@ -569,6 +569,7 @@ const typeDefs = gql`
     GetAllReportedContents(user_id: ID!): [ReportedContent!]!
     GetBusinessRequestedProducts(user_id: ID): [RequestedProduct!]!
     GetAllArchivedAccounts(user_id: ID!): [ArchivedAccount!]!
+    GetAllPendingPrizes(user_id: ID!): [Prize!]!
   }
 
   type Mutation {

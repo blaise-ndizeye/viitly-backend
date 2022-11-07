@@ -21,6 +21,7 @@ const {
   problemData,
   reportedContentData,
 } = require("../../helpers/problemHelpers")
+const { prizeData } = require("../../helpers/productHelpers")
 
 const userQueries = {
   async GetAllUsers(_, { user_id }, ctx, ___) {
@@ -103,6 +104,20 @@ const userQueries = {
       const allArchivedAccounts = await ArchivedAccount.find().sort({ _id: -1 })
 
       return allArchivedAccounts.map((account) => archivedAccountData(account))
+    } catch (err) {
+      generateServerError(err)
+    }
+  },
+  async GetAllPendingPrizes(_, { user_id }, ctx, ___) {
+    try {
+      isAuthenticated(ctx)
+      isValidUser(ctx.user, user_id)
+      isAccountVerified(ctx.user)
+      isAdmin(ctx.user)
+
+      const allPrizes = await Prize.find({ prized: false }).sort({ _id: 1 })
+
+      return allPrizes.map((prize) => prizeData(prize))
     } catch (err) {
       generateServerError(err)
     }
