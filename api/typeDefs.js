@@ -50,6 +50,8 @@ const typeDefs = gql`
 
   union CommentResponseObject = Comment | Reply
 
+  union SearchItems = Product | Post | Blog | User | Transaction
+
   union ReferNotificationObject =
       Product
     | Post
@@ -289,6 +291,13 @@ const typeDefs = gql`
     archivedAt: String!
     deleteAt: String!
     account: User!
+  }
+
+  type SearchResult {
+    code: Int!
+    success: Boolean
+    resultCount: Int!
+    results: [SearchItems!]!
   }
 
   interface MutationResponse {
@@ -571,6 +580,8 @@ const typeDefs = gql`
     GetAllArchivedAccounts(user_id: ID!): [ArchivedAccount!]!
     GetAllPendingPrizes(user_id: ID!): [Prize!]!
     GetChatMessages(user_id: ID!, receptient_id: ID!): [Message!]!
+    GetFeed(user_id: ID!): [ReferItem!]!
+    Search(searchText: String!, filters: [String]!): SearchResult!
   }
 
   type Mutation {
