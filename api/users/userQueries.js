@@ -306,11 +306,6 @@ const userQueries = {
         accountsFound.push(user)
       }
 
-      // Get the resulted accounts excluding the current user's account
-      accountsFound = accountsFound.filter(
-        (account) => account._id.toString() !== user_id
-      )
-
       let showBlogs = filters.length === 0 || filters.includes("BLOG")
       let showPosts = filters.length === 0 || filters.includes("POST")
       let showProducts = filters.length === 0 || filters.includes("PRODUCT")
