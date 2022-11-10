@@ -1,5 +1,4 @@
 const mongoose = require("mongoose")
-const mongoosastic = require("mongoosastic")
 const { Schema } = mongoose
 
 const productSchema = new Schema({
@@ -10,22 +9,18 @@ const productSchema = new Schema({
   title: {
     type: String,
     required: true,
-    es_indexed: true,
   },
   category: {
     type: String,
     required: true,
-    es_indexed: true,
   },
   price: {
     type: Number,
     required: true,
-    es_indexed: true,
   },
   price_strategy: {
     type: String,
     required: true,
-    es_indexed: true,
     default: "NEGOTIATE",
     enum: ["FIXED", "NEGOTIATE"],
   },
@@ -37,14 +32,12 @@ const productSchema = new Schema({
   availability: {
     type: String,
     required: true,
-    es_indexed: true,
     default: "SALE",
     enum: ["SALE", "RENT"],
   },
   description: {
     type: String,
     required: true,
-    es_indexed: true,
   },
   blocked: {
     type: Boolean,
@@ -65,7 +58,5 @@ const productSchema = new Schema({
     },
   ],
 })
-
-productSchema.plugin(mongoosastic)
 
 module.exports = mongoose.model("Product", productSchema)

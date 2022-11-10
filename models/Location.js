@@ -1,5 +1,4 @@
 const mongoose = require("mongoose")
-const mongoosastic = require("mongoosastic")
 const { Schema } = mongoose
 
 const locationSchema = new Schema({
@@ -10,17 +9,14 @@ const locationSchema = new Schema({
   province: {
     type: String,
     required: true,
-    es_indexed: true,
   },
   district: {
     type: String,
     required: true,
-    es_indexed: true,
   },
   market_description: {
     type: String,
     default: "",
-    es_indexed: true,
   },
   latitude: {
     type: String,
@@ -31,7 +27,5 @@ const locationSchema = new Schema({
     default: "",
   },
 })
-
-locationSchema.plugin(mongoosastic)
 
 module.exports = mongoose.model("Location", locationSchema)

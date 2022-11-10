@@ -1,5 +1,4 @@
 const mongoose = require("mongoose")
-const mongoosastic = require("mongoosastic")
 const { Schema } = mongoose
 
 const BlogSchema = new Schema({
@@ -9,11 +8,11 @@ const BlogSchema = new Schema({
   },
   blog_title: {
     type: String,
-    es_indexed: true,
+    required: true,
   },
   blog_content: {
     type: String,
-    es_indexed: true,
+    required: true,
   },
   blog_media: {
     file_format: String,
@@ -37,7 +36,5 @@ const BlogSchema = new Schema({
   },
   tagged_users: [{ type: String }],
 })
-
-BlogSchema.plugin(mongoosastic)
 
 module.exports = mongoose.model("Blog", BlogSchema)

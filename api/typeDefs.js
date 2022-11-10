@@ -37,6 +37,14 @@ const typeDefs = gql`
     DISLIKE
   }
 
+  enum SearchFilter {
+    PRODUCT
+    POST
+    BLOG
+    ACCOUNT
+    TRANSACTION
+  }
+
   enum Currency {
     FRW
     USD
@@ -294,10 +302,16 @@ const typeDefs = gql`
   }
 
   type SearchResult {
-    code: Int!
-    success: Boolean
-    resultCount: Int!
-    results: [SearchItems!]!
+    nBlogs: Int!
+    nPosts: Int!
+    nProducts: Int!
+    nTransactions: Int!
+    nAccounts: Int!
+    blogs: [Blog!]!
+    posts: [Post!]!
+    products: [Product!]!
+    transactions: [Transaction!]!
+    accounts: [User!]!
   }
 
   interface MutationResponse {
@@ -563,6 +577,12 @@ const typeDefs = gql`
     share_to: [ID!]!
   }
 
+  input SearchInput {
+    user_id: ID!
+    searchText: String!
+    filters: [SearchFilter]!
+  }
+
   type Query {
     Hello: String!
     GetUserData(user_id: ID!): User!
@@ -581,7 +601,7 @@ const typeDefs = gql`
     GetAllPendingPrizes(user_id: ID!): [Prize!]!
     GetChatMessages(user_id: ID!, receptient_id: ID!): [Message!]!
     GetFeed(user_id: ID!): [ReferItem!]!
-    Search(searchText: String!, filters: [String]!): SearchResult!
+    Search(inputs: SearchInput!): SearchResult!
   }
 
   type Mutation {

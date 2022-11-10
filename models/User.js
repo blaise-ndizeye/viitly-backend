@@ -1,5 +1,4 @@
 const mongoose = require("mongoose")
-const mongoosastic = require("mongoosastic")
 const Schema = mongoose.Schema
 
 const UserSchema = new Schema({
@@ -10,27 +9,22 @@ const UserSchema = new Schema({
   name: {
     type: String,
     required: true,
-    es_indexed: true,
   },
   user_name: {
     type: String,
     required: true,
-    es_indexed: true,
   },
   email: {
     type: String,
     required: true,
-    es_indexed: true,
   },
   phone: {
     type: String,
     required: true,
-    es_indexed: true,
   },
   whatsapp: {
     type: String,
     required: true,
-    es_indexed: true,
   },
   nFollowers: {
     type: Number,
@@ -73,7 +67,5 @@ const UserSchema = new Schema({
     default: Date.now,
   },
 })
-
-UserSchema.plugin(mongoosastic)
 
 module.exports = mongoose.model("User", UserSchema)
