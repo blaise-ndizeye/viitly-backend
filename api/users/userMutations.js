@@ -543,29 +543,55 @@ const userMutations = {
       generateServerError(err)
     }
   },
-  async MarkNotificationAsRead(_, { user_id, notification_id }, ctx, ___) {
+  async MarkNotificationsAsRead(
+    _,
+    { user_id, notification_ids = [] },
+    ctx,
+    ___
+  ) {
     try {
       isAuthenticated(ctx)
       isValidUser(ctx.user, user_id)
 
-      if (!notification_id || notification_id.length < 5)
+      if (notification_ids.length === 0)
         throw new ApolloError(
-          "Notification Id [notification_id] is required",
+          "Notification Ids [notification_id] are required required",
           400
         )
 
-      const notificationExist = await Notification.findById(notification_id)
-      if (!notificationExist)
-        throw new ApolloError("Notification doesn't exist", 400)
+      for (let notification_id of notification_ids) {
+        const notificationExist = await Notification.findOne({
+          $and: [
+            { _id: notification_id },
+            {
+              $or: [
+                { specified_user: user_id },
+                {
+                  notification_type: {
+                    $in: ["ALL", "PROFFESSIONAL", "BUSINESS"],
+                  },
+                },
+              ],
+            },
+          ],
+        })
+        if (!notificationExist)
+          throw new ApolloError(
+            `Notification ${notification_id} doesn't exist`,
+            400
+          )
+      }
 
-      await Notification.updateOne(
-        { _id: notificationExist._id },
-        {
-          $push: {
-            seen_by: user_id,
-          },
-        }
-      )
+      for (let notification_id of notification_ids) {
+        await Notification.updateOne(
+          { _id: notification_id },
+          {
+            $push: {
+              seen_by: user_id,
+            },
+          }
+        )
+      }
 
       return {
         code: 200,

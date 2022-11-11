@@ -653,15 +653,12 @@ const typeDefs = gql`
     DeleteReportedProblem(user_id: ID!, problem_id: ID!): DeleteDataResponse!
     UpdateUserAvatar(user_id: ID!, avatar: Upload!): LogUserResponse!
     UpdateUserCredentials(inputs: UpdateUserInput!): LogUserResponse!
-    VerifyAccount(
-      user_id: String!
-      verification_code: String!
-    ): DeleteDataResponse!
+    VerifyAccount(user_id: ID!, verification_code: String!): DeleteDataResponse!
     RequestNewVerificationCode(user_id: ID!): DeleteDataResponse!
     CommitEvent(inputs: CommitEventInput!): DeleteDataResponse!
-    MarkNotificationAsRead(
+    MarkNotificationsAsRead(
       user_id: ID!
-      notification_id: ID!
+      notification_ids: [ID!]!
     ): DeleteDataResponse!
     DeleteNotification(user_id: ID!, notification_id: ID!): DeleteDataResponse!
     CreateWallet(inputs: CreateWalletInput!): WalletResponse!

@@ -164,10 +164,14 @@ const userQueries = {
             // when the user have been followed by other user
 
             const productList1 = await Product.find({
-              user_id: follower.follower_id,
+              $and: [{ user_id: follower.follower_id }, { blocked: false }],
             })
-            const postList1 = await Post.find({ user_id: follower.follower_id })
-            const blogList1 = await Blog.find({ user_id: follower.follower_id })
+            const postList1 = await Post.find({
+              $and: [{ user_id: follower.follower_id }, { blocked: false }],
+            })
+            const blogList1 = await Blog.find({
+              $and: [{ user_id: follower.follower_id }, { blocked: false }],
+            })
 
             followerProducts = [...productList1]
             followerPosts = [...postList1]
@@ -176,10 +180,14 @@ const userQueries = {
             // When the user have followed other user
 
             const productList2 = await Product.find({
-              user_id: follower.user_id,
+              $and: [{ user_id: follower.user_id }, { blocked: false }],
             })
-            const postList2 = await Post.find({ user_id: follower.user_id })
-            const blogList2 = await Blog.find({ user_id: follower.user_id })
+            const postList2 = await Post.find({
+              $and: [{ user_id: follower.user_id }, { blocked: false }],
+            })
+            const blogList2 = await Blog.find({
+              $and: [{ user_id: follower.user_id }, { blocked: false }],
+            })
 
             followingProducts = [...productList2]
             followingPosts = [...postList2]
@@ -244,22 +252,37 @@ const userQueries = {
         throw new ApolloError("Search text is required", 400)
 
       const pr1 = Blog.find({
-        $or: [
-          { blog_title: { $regex: searchText, $options: "i" } },
-          { blog_content: { $regex: searchText, $options: "i" } },
+        $and: [
+          { blocked: false },
+          {
+            $or: [
+              { blog_title: { $regex: searchText, $options: "i" } },
+              { blog_content: { $regex: searchText, $options: "i" } },
+            ],
+          },
         ],
       })
       const pr2 = Post.find({
-        description: { $regex: searchText, $options: "i" },
+        $and: [
+          { blocked: false },
+          {
+            description: { $regex: searchText, $options: "i" },
+          },
+        ],
       })
       const pr3 = Product.find({
-        $or: [
-          { title: { $regex: searchText, $options: "i" } },
-          { category: { $regex: searchText, $options: "i" } },
-          { price_strategy: { $regex: searchText, $options: "i" } },
-          { price_currency: { $regex: searchText, $options: "i" } },
-          { availability: { $regex: searchText, $options: "i" } },
-          { description: { $regex: searchText, $options: "i" } },
+        $and: [
+          { blocked: false },
+          {
+            $or: [
+              { title: { $regex: searchText, $options: "i" } },
+              { category: { $regex: searchText, $options: "i" } },
+              { price_strategy: { $regex: searchText, $options: "i" } },
+              { price_currency: { $regex: searchText, $options: "i" } },
+              { availability: { $regex: searchText, $options: "i" } },
+              { description: { $regex: searchText, $options: "i" } },
+            ],
+          },
         ],
       })
       const pr4 = User.find({
