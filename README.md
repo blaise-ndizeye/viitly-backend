@@ -2296,3 +2296,25 @@ mutation ($user_id: ID!, $blog_id: ID!) {
   }
 }
 ```
+
+> ### BoostResources
+
+This mutation is used to boost resources once their limit reach to zero; The user will make payment of the resources based on the wallet he/she choose to go with.
+
+> > **Apollo-Require-Preflight header is not required**
+
+```graphql
+mutation ($user_id: ID!, $wallet_id: ID!) {
+  BoostResources(user_id: $user_id, wallet_id: $wallet_id) {
+    code
+    success
+    message
+    accessToken
+    user {
+      user_id
+      user_name
+      # ...User Object Data ...
+    }
+  }
+}
+```
