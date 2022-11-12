@@ -28,8 +28,7 @@
     <li><a href="#admin-specific-mutations">Admin Specific Mutations</a></li>
     <li><a href="#admin-and-business-queries">Admin and Business Queries</a></li>
     <li><a href="#admin-and-business-mutations">Admin and Business Mutations</a></li>
-    <li><a href="#business-specific-queries">Business Specific Queries</a></li>
-    <li><a href="#business-specific-mutations">Business Specific Mutations</a></li>
+    <li><a href="#business-and-proffessional-mutations">Business and Proffessional Mutations</a></li>
     <li><a href="#admin-business-and-proffessional-queries">Admin, Business and Proffessional Queries</a></li>
     <li><a href="#admin-business-and-proffessional-mutations">Admin, Business and Proffessional Mutations</a></li>
     <li><a href="#proffessional-specific-queries">Proffessional Specific Queries</a></li>
@@ -1904,7 +1903,7 @@ mutation ($inputs: UploadProductInput!, $productMedia: [Upload!]!) {
 
 This mutation is used to update Product Data excluding the files (images and videos) for the product.
 
-**No Apollo-Require-Preflight header required**
+**Apollo-Require-Preflight header not required**
 
 > > Mutation variables
 
@@ -1976,11 +1975,40 @@ mutation ($user_id: ID!, $product_id: ID!) {
 }
 ```
 
+> ### AcceptCoinCodeProductRequest
+
+This mutation is used to accept coin-code request for the product and this will be considered as the transaction of buying that specific product and when the owner sells on the price which is different with the set price he/she must first update the price of that product because the prize to offer to the one who is buying it calculated according to the price of that product. </br>
+
+**Apollo-Require-Preflight header not required**
+
+> > #### Mutation variables
+
+```json
+{
+  "inputs": {
+    "coinCode": "", // coin-code sent to the one who requested the product
+    "product_id": "", // id of the product which was requested
+    "receptient_id": "", // id of the user who requested it
+    "user_id": ""
+  }
+}
+```
+
+```graphql
+mutation ($inputs: AcceptCoinCodeProductInput!) {
+  AcceptCoinCodeProductRequest(inputs: $inputs) {
+    code
+    success
+    message
+  }
+}
+```
+
 > ### DeclineCoinCodeProductRequest
 
 This mutation is used to decline the request for coin-code sent by the user requesting that product.
 
-**No Apollo-Require-Preflight header required**
+**Apollo-Require-Preflight header not required**
 
 > > #### Mutation variables
 
@@ -2004,9 +2032,29 @@ mutation ($inputs: DeclineCoinCodeProductInput!) {
 }
 ```
 
-## Business Specific Queries
+## Business and Proffessional Mutations
 
-## Business Specific Mutations
+These mutations are only accessible by **BUSINESS** and **PROFFESSIONAL** accounts.
+
+**Authorization header required** for all these mutations </br>
+
+> ### RequestPostBlogPrizes
+
+This mutation is used to request for prizes of certain posts and blogs which have met the requirements for them to be prized.
+
+```graphql
+mutation ($user_id: ID!) {
+  RequestPostBlogPrizes(user_id: $user_id) {
+    code
+    success
+    message
+    prizes {
+      prize_id
+      # ...Prize Object Data ...
+    }
+  }
+}
+```
 
 ## Admin, Business and Proffessional Queries
 
