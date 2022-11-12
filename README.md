@@ -1,8 +1,8 @@
 # Wiitify API Service
 
-**GraphQL** based API Service for querying and manipulating data in the wiitify store/database.
+**GraphQL** based API Service for manipulating data in the wiitify store/database.
 
-**Wiitify** is an marketing platform with the aim of connecting people with their product, blogs and post desires which help the to earn income while using the platform in different ways **<u>for example:</u>** _Getting discount on the products after confirming their requested coin-code by the product owner. User will be prized after confirming his/her coin-code product requests for at least `numberOfProductPrizes` set in `.env` file_
+> **Wiitify** is an marketing platform with the aim of connecting people with their product, blogs and post desires which help them to earn income while using the platform in different ways **<u>for example:</u>** _Getting discount on the products after confirming their requested coin-code by the product owner where user will be prized after confirming his/her coin-code product requests for at least `numberOfProductPrizes` set in `.env` file and other many ways_
 
 #### It is composed with **Four access layers**
 
@@ -106,13 +106,16 @@ npm run dev
 ## Special Requirements for Requests
 
 Except `Hello` Query all other queries and mutations require authorization header and other header key for mutations which modifies the files like uploading and deleting files to prevent `Cross-Site-Request-Forgery(CSRF) attack`.</br>
-The following headers are required
+
+#### The following headers are required
 
 ```
 Authorization: Bearer ***token***
 
 Apollo-Require-Preflight: true
 ```
+
+> When you provide the Authorization header and still get the CSRF error immediately add the Apollo-Require-Preflight header.
 
 ## Object Types
 
