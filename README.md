@@ -1768,6 +1768,38 @@ mutation ($user_id: ID!, $problem_id: ID!) {
 }
 ```
 
+> ### SwitchToAdminAccount
+
+This mutation is used to switch the user to admin role.
+
+```graphql
+# receptient_id is the id of the user to be switched to admin role
+
+mutation ($user_id: ID!, $receptient_id: ID!) {
+  SwitchToAdminAccount(user_id: $user_id, receptient_id: $receptient_id) {
+    code
+    success
+    message
+  }
+}
+```
+
+> ### SetAccount
+
+This mutation is used to **BLOCK** and **UNBLOCK** other accounts and it must be used carefully because one admin can block other admin.
+
+```graphql
+# set can be BLOCK or UNBLOCK
+
+mutation ($user_id: ID!, $receptient_id: ID!, $set: SetStatus!) {
+  SetAccount(user_id: $user_id, receptient_id: $receptient_id, set: $set) {
+    code
+    success
+    message
+  }
+}
+```
+
 ## Business Specific Queries
 
 ## Business Specific Mutations
