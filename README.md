@@ -1476,7 +1476,9 @@ mutation ($inputs: ReportContentInput!) {
 
 > ### ReportProblem
 
-This mutation is used to report certain problem for example the problem about the functionality of user's account when some stuff work in unexpected way then the user can report the problem using this mutation.
+This mutation is used to report certain problem for example the problem about the functionality of user's account when some stuff work in unexpected way then the user can report the problem using this mutation. </br>
+
+_By this mutation the user whose account is blocked can log is as usual but if he/she recieves an error saying that account is blocked he/she may have access to report that problem using this mutation_
 
 **Authorization header required**
 

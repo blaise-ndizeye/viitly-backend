@@ -50,6 +50,11 @@ const typeDefs = gql`
     USD
   }
 
+  enum SetStatus {
+    BLOCK
+    UNBLOCK
+  }
+
   scalar Upload
 
   union CommentSource = Product | Post | Blog | Comment
@@ -688,6 +693,11 @@ const typeDefs = gql`
     ArchiveAccount(user_id: ID!): DeleteDataResponse!
     DeleteAccount(user_id: ID!, receptient_id: ID!): DeleteDataResponse!
     SwitchToAdminAccount(user_id: ID!, receptient_id: ID!): DeleteDataResponse!
+    SetAccount(
+      user_id: ID!
+      receptient_id: ID!
+      set: SetStatus!
+    ): DeleteDataResponse!
   }
 `
 

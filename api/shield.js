@@ -16,6 +16,8 @@ module.exports = {
       throw new ApolloError("Not authorized", 401)
   },
   isAccountVerified(user) {
+    if (user.blocked) throw new ApolloError("Account is blocked", 401)
+
     if (!user.verified)
       throw new ApolloError("Please first verify your account", 401)
   },

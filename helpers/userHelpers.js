@@ -15,6 +15,7 @@ module.exports = {
       nReviews: data.nReviews,
       role: data.role,
       verified: data.verified,
+      blocked: data.blocked,
       createdAt: data.createdAt.toISOString(),
     }
   },

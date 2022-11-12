@@ -197,7 +197,6 @@ const userMutations = {
     try {
       isAuthenticated(ctx)
       isValidUser(ctx.user, user_id)
-      isAccountVerified(ctx.user)
 
       if (!body || body.length < 10)
         throw new ApolloError(
@@ -1746,6 +1745,52 @@ const userMutations = {
         code: 200,
         success: true,
         message: `${receptientExists.user_name} switched to admin role successfully`,
+      }
+    } catch (err) {
+      generateServerError(err)
+    }
+  },
+  async SetAccount(_, { user_id, receptient_id, set }, ctx, ___) {
+    try {
+      isAuthenticated(ctx)
+      isValidUser(ctx.user, user_id)
+      isAccountVerified(ctx.user)
+      isAdmin(ctx.user)
+
+      if (!receptient_id || receptient_id.length < 5)
+        throw new ApolloError("Receptient Id:=> receptient_id is required", 400)
+
+      const receptientExists = await User.findOne({ _id: receptient_id })
+      if (!receptientExists)
+        throw new ApolloError("Receptient doesn't exist", 404)
+
+      if (set === "BLOCK") {
+        await User.updateOne(
+          { _id: receptientExists._id },
+          {
+            $set: {
+              blocked: true,
+            },
+          }
+        )
+      } else {
+        await User.updateOne(
+          { _id: receptientExists._id },
+          {
+            $set: {
+              blocked: false,
+            },
+          }
+        )
+      }
+
+      return {
+        code: 200,
+        success: true,
+        message:
+          set === "BLOCK"
+            ? `${receptientExists.user_name} blocked successfully`
+            : `${receptientExists.user_name} unblocked successfully`,
       }
     } catch (err) {
       generateServerError(err)
