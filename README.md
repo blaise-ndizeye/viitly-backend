@@ -15,8 +15,6 @@
 
 ## API Content Sections
 
-> There are some queries which must be combined to operate one function meaning that the should be called from the client one following another for example _Updating the product where updating user avatar and updating user credentials must be used together._
-
 <ul>
     <li><a href="#set-environment-variables">Set environment variables</a></li>
     <li><a href="#install-dependencies-and-start-development-server">Install dependencies and start development server</a></li>
