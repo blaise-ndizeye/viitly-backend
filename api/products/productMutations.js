@@ -365,6 +365,7 @@ const productMutations = {
   },
   async AcceptCoinCodeProductRequest(_, { inputs }, ctx, ___) {
     try {
+      const numberOfProductPrizes = Number(process.env.NUMBER_OF_PRODUCT_PRIZES)
       const { user_id, product_id, receptient_id, coinCode } = inputs
 
       isAuthenticated(ctx)
@@ -402,11 +403,16 @@ const productMutations = {
         body: `You have been prized for the requested product with coin-code: ${coinCodeProductExist.coin_code}`,
       }).save()
 
+      const coinCodePrizes = await Prize.find({
+        $and: [{ user_id: receptient_id }, { prize_event: "ACCEPT_CC" }],
+      })
+
       await new Prize({
         user_id: coinCodeProductExist.user_id,
         prize_event: "ACCEPT_CC",
         prize_amount: productExists.price * 0.05,
         prize_amount_currency: productExists.price_currency,
+        prized: coinCodePrizes.length >= numberOfProductPrizes ? false : true,
       }).save()
 
       await CoinCodeProduct.deleteOne({ _id: coinCodeProductExist._id })

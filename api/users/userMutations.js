@@ -1444,6 +1444,9 @@ const userMutations = {
       })
       if (!prizeExists) throw new ApolloError("Requested prize not found", 404)
 
+      if (prizeExists.prized)
+        throw new ApolloError("Requested prize payment is already prized", 400)
+
       const productPrizes = await Prize.find({
         $and: [{ user_id }, { prize_event: "ACCEPT_CC" }],
       })

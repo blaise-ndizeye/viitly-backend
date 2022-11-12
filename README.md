@@ -1480,7 +1480,7 @@ mutation ($user_id: ID!, $product_id: ID!) {
 
 > ### RequestPrizePayment
 
-This mutation is used to request the prize payment for the coin-code acceptance prizes will be prized if the user has at least `numberOfProductPrizes` which is set in `.env` file.
+This mutation is used to request the payment for certain prizes earned by the user. If the type of the prize is earned based on acceptance of coin-code for the product the it will be offered when the user has at least `numberOfProductPrizes` accepted coin-code product requests inorder to get that prize payment.
 
 **Authorization header is required**
 
@@ -2026,7 +2026,7 @@ mutation ($user_id: ID!, $product_id: ID!) {
 
 > ### AcceptCoinCodeProductRequest
 
-This mutation is used to accept coin-code request for the product and this will be considered as the transaction of buying that specific product and when the owner sells on the price which is different with the set price he/she must first update the price of that product because the prize to offer to the one who is buying it calculated according to the price of that product. </br>
+This mutation is used to accept coin-code request for the product and this will be considered as the transaction of buying that specific product and when the owner sells on the price which is different with the set price he/she must first update the price of that product because the prize to offer to the one who is buying it calculated according to the price of that product. For the user requesting the prize if he/she has not completed `numberOfProductPrizes` coin-code accepted requests then the the prize will be marked as prized until it reaches to that number where the prize will be marked as unprized so as he/she can request real money for that prize.</br>
 
 **Apollo-Require-Preflight header is not required**
 
