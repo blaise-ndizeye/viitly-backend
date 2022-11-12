@@ -974,6 +974,23 @@ mutation ($user_id: ID!) {
 }
 ```
 
+> ### ForgotPassword
+
+This mutation is used when the user forgets his/her password and it will then be used to reset the account's password and the password will be sent to the user's email but this will happen in **production** then in development the new password will be `WFY202020`.
+
+**Authorization header is not required**
+
+```graphql
+# **credential** can be email, phone number, whatsapp number or username
+mutation ($credential: String!) {
+  ForgotPassword(credential: $credential) {
+    code
+    success
+    message
+  }
+}
+```
+
 > ### ModifyUserBio
 
 This mutation is used to update the profile bio for the user.

@@ -700,6 +700,7 @@ const typeDefs = gql`
       set: SetStatus!
     ): DeleteDataResponse!
     ModifyUserBio(user_id: ID!, bio: String!): DeleteDataResponse!
+    ForgotPassword(credential: String!): DeleteDataResponse!
   }
 `
 

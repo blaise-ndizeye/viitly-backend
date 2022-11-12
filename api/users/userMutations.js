@@ -1823,6 +1823,56 @@ const userMutations = {
       generateServerError(err)
     }
   },
+  async ForgotPassword(_, { credential }, __, ___) {
+    try {
+      const userExists = await User.findOne({
+        $or: [
+          { user_name: credential.toLowerCase() },
+          { phone: credential },
+          { email: credential },
+          { whatsapp: credential },
+        ],
+      })
+      if (!userExists)
+        throw new ApolloError("Invalid account credentials.", 400)
+
+      let generatedCode = getRandomNumber(150000, 989999)
+
+      const salt = await bcrypt.genSalt(10)
+      let newPassword =
+        process.env.NODE_ENV === "production"
+          ? `WFY${generatedCode}`
+          : "WFY202020"
+      const hashedPassword = await bcrypt.hash(newPassword, salt)
+
+      if (process.env.NODE_ENV === "production") {
+        await mailTransporter({
+          hostUser: process.env.HOST_EMAIL,
+          hostUserPassword: process.env.HOST_EMAIL_PASSWORD,
+          to: [userExists.email],
+          subject: "Welcome again to your Wiitify account",
+          bodyText: `${newPassword} is your new password. Feel free to update it after you login.`,
+        })
+      }
+
+      await User.updateOne(
+        { _id: userExists._id },
+        {
+          $set: {
+            password: hashedPassword,
+          },
+        }
+      )
+
+      return {
+        code: 200,
+        success: true,
+        message: "Your password reset is sent to your email.",
+      }
+    } catch (err) {
+      generateServerError(err)
+    }
+  },
 }
 
 module.exports = userMutations
