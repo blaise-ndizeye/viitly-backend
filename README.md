@@ -30,7 +30,6 @@
     <li><a href="#admin-and-business-queries">Admin and Business Queries</a></li>
     <li><a href="#admin-and-business-mutations">Admin and Business Mutations</a></li>
     <li><a href="#business-and-proffessional-mutations">Business and Proffessional Mutations</a></li>
-    <li><a href="#admin-business-and-proffessional-queries">Admin, Business and Proffessional Queries</a></li>
     <li><a href="#admin-business-and-proffessional-mutations">Admin, Business and Proffessional Mutations</a></li>
 </ul>
 
@@ -2052,10 +2051,6 @@ mutation ($user_id: ID!) {
   }
 }
 ```
-
-## Admin, Business and Proffessional Queries
-
-These queries are only accessible by **ADMIN**, **BUSINESS** and **PROFFESSIONAL** users.
 
 ## Admin, Business and Proffessional Mutations
 
