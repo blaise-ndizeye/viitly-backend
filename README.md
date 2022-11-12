@@ -680,13 +680,13 @@ File {
 
 ## General Queries
 
-These queries can be accessed in all layers identified above, others are accessed in only two layers, others acccessible in all layers except personal account layer.
+These queries are accessible in all access layers (**PERSONAL, BUSINESS, PROFFESSIONAL and ADMIN**).
 
 > ### Hello
 
 This is query is used to get the greetings from the server.</br>
 
-**No authorization header required**
+**Authorization header is not required**
 
 ```graphql
 query {
@@ -700,7 +700,7 @@ This query is responsible of getting data in feed for the user and data are diff
 
 _The blocked conent will not be displayed on any user's feed_
 
-**Authorization header required**
+**Authorization header is required**
 
 ```graphql
 query ($user_id: ID!) {
@@ -726,7 +726,7 @@ query ($user_id: ID!) {
 
 This query is used to get the information about the current user.
 
-**Authorization header required**
+**Authorization header is required**
 
 ```graphql
 query ($user_id: ID!) {
@@ -742,7 +742,7 @@ query ($user_id: ID!) {
 
 This query is used to get the information about the product that belongs to the user.
 
-**Authorization header required**
+**Authorization header is required**
 
 ```graphql
 query ($user_id: ID!, $product_id: ID!) {
@@ -756,7 +756,7 @@ query ($user_id: ID!, $product_id: ID!) {
 
 This query is used to get the information about the post that belongs to the user.
 
-**Authorization header required**
+**Authorization header is required**
 
 ```graphql
 query ($user_id: ID!, $post_id: ID!) {
@@ -770,7 +770,7 @@ query ($user_id: ID!, $post_id: ID!) {
 
 This query is used to get the information about the blog that belongs to the user.
 
-**Authorization header required**
+**Authorization header is required**
 
 ```graphql
 query ($user_id: ID!, $blog_id: ID!) {
@@ -784,7 +784,7 @@ query ($user_id: ID!, $blog_id: ID!) {
 
 This query is used to search for items which matches with the search text provided and it searches in Users, Posts, Products, Blogs and Transactions but the user can get only the data he/she wants using the filter array
 
-**Authorization header required**
+**Authorization header is required**
 
 > > #### Query variables
 
@@ -844,7 +844,7 @@ query ($inputs: SearchInput!) {
 
 This query is used to get new access token for the user.
 
-**Authorization header required**
+**Authorization header is required**
 
 ```graphql
 query ($user_id: ID!) {
@@ -856,7 +856,7 @@ query ($user_id: ID!) {
 
 This query is used to get the chat messages for user who provided the user_id with the one whose id is provided as receptient_id.
 
-**Authorization header required**
+**Authorization header is required**
 
 ```graphql
 query ($user_id: ID!, $receptient_id: ID!) {
@@ -877,7 +877,7 @@ This mutation is used to log in the user in the system by providing the access t
 
 _When the user deletes his/her account then the account will be archived and unless the user logs in the account it will be deleted after one month_
 
-**No Authorization header required**
+**Authorization header is not required**
 
 ```graphql
 # **credential** can be username, phone number, whatsapp number or email
@@ -901,8 +901,8 @@ mutation ($credential: String!, $password: String!) {
 
 This mutation is used to register new user and by default the account will get PERSONAL access layer permissions. The account will not be verified therefore the code will be sent to the user's email but in development the code to be used to verify account is **101010**; then the user will directly be logged in by providing the access token.</br>
 
-**No Authorization header required** </br>
-**Apollo-Require-Preflight header required**
+**Authorization header is not required** </br>
+**Apollo-Require-Preflight header is required**
 
 > > #### Mutation variables
 
@@ -942,7 +942,7 @@ mutation ($inputs: UserInput!, $avatar: Upload) {
 
 This mutation is used to verify user account and in develpoment **101010** is used as the verification code.
 
-**Authorization header required**
+**Authorization header is required**
 
 ```graphql
 mutation ($user_id: ID!, $verification_code: String!) {
@@ -960,7 +960,7 @@ This mutation is used to request new verification code in case there is a networ
 
 _This feature is only accessible in **Production**._
 
-**Authorization header required**
+**Authorization header is required**
 
 ```graphql
 mutation ($user_id: ID!) {
@@ -976,7 +976,7 @@ mutation ($user_id: ID!) {
 
 This mutation is used to send the review to other user and this is helpful to know more information of the user.
 
-**Authorization header required**
+**Authorization header is required**
 
 > > #### Mutation variables
 
@@ -1009,7 +1009,7 @@ mutation ($inputs: ReviewInput!) {
 
 This mutation is used to update the previously sent review by the user.
 
-**Authorization header required**
+**Authorization header is required**
 
 > > #### Mutation variables
 
@@ -1042,7 +1042,7 @@ mutation ($inputs: UpdateReviewInput!) {
 
 This mutation is used to delete the previously sent review.
 
-**Authorization header required**
+**Authorization header is required**
 
 ```graphql
 mutation ($user_id: ID!, $review_id: ID!) {
@@ -1058,8 +1058,8 @@ mutation ($user_id: ID!, $review_id: ID!) {
 
 This mutation is used to update or upload profile image of the user.
 
-**Authorization header required** </br>
-**Apollo-Require-Preflight header required**
+**Authorization header is required** </br>
+**Apollo-Require-Preflight header is required**
 
 ```graphql
 # avatar is the file to upload and must be a valid image
@@ -1082,7 +1082,7 @@ mutation ($user_id: ID!, $avatar: Upload!) {
 
 This mutation is used to update the credentials or account information of the user.
 
-**Authorization header required**
+**Authorization header is required**
 
 > > #### Mutation variables
 
@@ -1120,7 +1120,7 @@ mutation ($inputs: UpdateUserInput!) {
 
 This mutation is used to **Like, Share, view, and Dislike** the content however **Share** event type will be set only after sharing the item on other platforms then it must be not sent until that feature is implemented in the front-end and in the backend and for sharing content to other users `ShareContent` mutation will be used. The **Dislike** event must be sent on the previously liked item only.
 
-**Authorization header required**
+**Authorization header is required**
 
 > > #### Mutation variables
 
@@ -1148,7 +1148,7 @@ mutation ($inputs: CommitEventInput!) {
 
 This mutation is used to share the content to different users.
 
-**Authorization header required**
+**Authorization header is required**
 
 > > #### Mutation variables
 
@@ -1174,7 +1174,7 @@ mutation ($inputs: ShareContentInput!) {
 
 > ### SendComment
 
-**Authorization header required**
+**Authorization header is required**
 
 > > #### Mutation variables
 
@@ -1215,7 +1215,7 @@ mutation ($inputs: SendCommentInput!) {
 
 This mutation is used to update the previously sent commment on certain product.
 
-**Authorization header required**
+**Authorization header is required**
 
 > > #### Mutation variables
 
@@ -1256,7 +1256,7 @@ This mutation is used used to delete previously sent comment.</br>
 
 _The one who sent the comment is the one only who can delete it_.
 
-**Authorization header required**
+**Authorization header is required**
 
 ```graphql
 mutation ($user_id: ID!, $comment_id: ID!) {
@@ -1272,7 +1272,7 @@ mutation ($user_id: ID!, $comment_id: ID!) {
 
 This mutation is used to delete the nitification sent to the user. the deletable notification for the user are those specified to his/her id otherwise there is no access to delete that notification for example if the `notification_type` is set to **ALL, BUSINESS, PROFFESSIONAL** meaning that if the type of notification is generalized to all users then it will not be deletable only **ADMIN can Delete it**.
 
-**Authorization header required**
+**Authorization header is required**
 
 ```graphql
 mutation ($user_id: ID!, $notification_id: ID!) {
@@ -1288,7 +1288,7 @@ mutation ($user_id: ID!, $notification_id: ID!) {
 
 This mutation is used to mark the notification as read for and must be called for the specified user only when the user opens the notifications page.
 
-**Authorization header required**
+**Authorization header is required**
 
 ```graphql
 mutation ($user_id: ID!, $notification_ids: [ID!]!) {
@@ -1307,7 +1307,7 @@ mutation ($user_id: ID!, $notification_ids: [ID!]!) {
 
 This message is used to send the message between the users and once the user can refer the object on which the message is related to. It depends on the design of the frotend whether the user can search and choose the id of the content to refer to or just adds it from a certain content detail page therefore it depends on the design.
 
-**Authorization header required**
+**Authorization header is required**
 
 > > #### Mutation variables
 
@@ -1336,7 +1336,7 @@ mutation ($inputs: SendMessageInput!) {
 
 This mutation is used to delete previously sent message. When the user deletes message when the reciever didn't read it then it will be deleted permanently; If the sender deletes the message while the receiver have already read it the `deleted_for_sender`property of the message will be set to **true**; If the receiver deletes the message while the sender didn't delete it the `deleted_for_receiver` property of the message will be set to true and vice versa.. When one side deletes the message while the other side has also already deleted it then the message will be deleted permanently.
 
-**Authorization header required**
+**Authorization header is required**
 
 ```graphql
 mutation ($user_id: ID!, $message_id: ID!) {
@@ -1352,7 +1352,7 @@ mutation ($user_id: ID!, $message_id: ID!) {
 
 This mutation is used to mark the message as seen and must be called at the side of the message receiver only when the user opens the chat box.
 
-**Authorization header required**
+**Authorization header is required**
 
 ```graphql
 mutation ($user_id: ID!, $message_id: ID!) {
@@ -1368,7 +1368,7 @@ mutation ($user_id: ID!, $message_id: ID!) {
 
 This mutation is used to send follow request to another user; When the request is sent to the requested user his/her followers will be increased directly increasing the number of followings for the current user.
 
-**Authorization header required**
+**Authorization header is required**
 
 ```graphql
 mutation ($user_id: ID!, $requested_user_id: ID!) {
@@ -1384,7 +1384,7 @@ mutation ($user_id: ID!, $requested_user_id: ID!) {
 
 This mutation is used to accept follow request sent by the other user; When the request is accepted it will increase the followers of the requested user and decreases also his/her followings.
 
-**Authorization header required**
+**Authorization header is required**
 
 ```graphql
 mutation ($user_id: ID!, $follower_id) {
@@ -1400,7 +1400,7 @@ mutation ($user_id: ID!, $follower_id) {
 
 This mutation is used to unfollow the account that the current user has requested the follow request or already is his/her follower.
 
-**Authorization header required**
+**Authorization header is required**
 
 ```graphql
 mutation ($user_id: ID!, $follower_id: ID!) {
@@ -1416,7 +1416,7 @@ mutation ($user_id: ID!, $follower_id: ID!) {
 
 This mutation is used to save the product so as to help the user to request the **coin-code** for that product.
 
-**Authorization header required**
+**Authorization header is required**
 
 ```graphql
 mutation ($user_id: ID!, $product_id: ID!) {
@@ -1432,7 +1432,7 @@ mutation ($user_id: ID!, $product_id: ID!) {
 
 This mutation is used to delete the previously saved product.
 
-**Authorization header required**
+**Authorization header is required**
 
 ```graphql
 mutation ($user_id: ID!, $product_id: ID!) {
@@ -1448,7 +1448,7 @@ mutation ($user_id: ID!, $product_id: ID!) {
 
 This mutation is used to request the coin-code for the saved product so that the user can get prizes and this is considered as transaction for the owner of the product because the coin-code product must be accepted when the user actually buys that product. And after the request rhe user will get the notification containing the coin-code for the product.
 
-**Authorization header required**
+**Authorization header is required**
 
 ```graphql
 mutation ($user_id: ID!, $product_id: ID!) {
@@ -1464,7 +1464,7 @@ mutation ($user_id: ID!, $product_id: ID!) {
 
 This mutation is used to request the prize payment for the coin-code acceptance prizes will be prized if the user has at least `numberOfProductPrizes` which is set in `.env` file.
 
-**Authorization header required**
+**Authorization header is required**
 
 ```graphql
 mutation ($user_id: ID!, $prize_id: ID!) {
@@ -1480,7 +1480,7 @@ mutation ($user_id: ID!, $prize_id: ID!) {
 
 This mutation is used to report inappropriate content, _<u>For example</u>_ when the product is harmful to the user or the post/blog contains bad stuffs to the environment then the user can report it and the admin will verify it and when he found that is bad stuff it will be blocked.
 
-**Authorization header required**
+**Authorization header is required**
 
 > > #### Mutation variables
 
@@ -1510,7 +1510,7 @@ This mutation is used to report certain problem for example the problem about th
 
 _By this mutation the user whose account is blocked can log is as usual but if he/she recieves an error saying that account is blocked he/she may have access to report that problem using this mutation_
 
-**Authorization header required**
+**Authorization header is required**
 
 ```graphql
 mutation ($user_id: ID!, $body: String!) {
@@ -1530,7 +1530,7 @@ mutation ($user_id: ID!, $body: String!) {
 
 This mutation is used to archive account for the user if he/she request to delete his/her account it will be archived and unless the user login again in that account in the following month it will be deleted after one month.
 
-**Authorization header required**
+**Authorization header is required**
 
 ```graphql
 mutation ($user_id: ID!) {
@@ -1542,11 +1542,47 @@ mutation ($user_id: ID!) {
 }
 ```
 
+## Personal Specific Mutations
+
+These mutations are only accessible by **PERSONAL** account only
+
+> > **Authorization header required for these mutations**
+
+> ### SwitchToProAccount
+
+This mutation is used to switch PERSONAL account to PROFFESSIONAL account; By this mutation there will be payment process to take place in the background.
+
+> > #### Mutation variables
+
+```json
+{
+  "inputs": {
+    "user_id": "",
+    "wallet_id": "" // The wallet to be used to get the amount of money to be paid by the user
+  }
+}
+```
+
+```graphql
+mutation ($inputs: SwitchToProInputs!) {
+  SwitchToProAccount(inputs: $inputs) {
+    code
+    success
+    message
+    accessToken
+    user {
+      user_id
+      user_name
+    }
+  }
+}
+```
+
 ## Admin Specific Queries
 
 These queries are only accessible to the admin. When other user tries to access it will get **not authorized** error response message.
 
-> > **Authorization header required** for all these queries.
+> > **Authorization header is required** for all these queries.
 
 > ### GetAllProducts
 
@@ -1662,7 +1698,7 @@ query ($user_id: ID!) {
 
 These mutations are only accessed by admin user.
 
-> > **Authorization header required** for all these mutations.
+> > **Authorization header is required** for all these mutations.
 
 > ### BlockReportedContent
 
@@ -1834,7 +1870,7 @@ mutation ($user_id: ID!, $receptient_id: ID!, $set: SetStatus!) {
 
 These queries are only accessible by **ADMIN** and **BUSINESS** users. </br>
 
-**Authorization header required** for all these queries </br>
+> > **Authorization header required** for all these queries </br>
 
 > ### GetBusinessRequestedProducts
 
@@ -1854,8 +1890,7 @@ query ($user_id: ID!) {
 
 These mutations are only accessible by **ADMIN** and **BUSINESS** users.
 
-**Authorization header required** for all these mutations </br>
-**Apollo-Require-Preflight header required** for all these mutations which tends to modify the uploaded files (images and videos)
+> > **Authorization header is required** for all these mutations </br> **Apollo-Require-Preflight header is required** for all these mutations which tends to modify the uploaded files (images and videos)
 
 > ### UploadProduct
 
@@ -1899,7 +1934,7 @@ mutation ($inputs: UploadProductInput!, $productMedia: [Upload!]!) {
 
 This mutation is used to update Product Data excluding the files (images and videos) for the product.
 
-**Apollo-Require-Preflight header not required**
+**Apollo-Require-Preflight header is not required**
 
 > > Mutation variables
 
@@ -1975,7 +2010,7 @@ mutation ($user_id: ID!, $product_id: ID!) {
 
 This mutation is used to accept coin-code request for the product and this will be considered as the transaction of buying that specific product and when the owner sells on the price which is different with the set price he/she must first update the price of that product because the prize to offer to the one who is buying it calculated according to the price of that product. </br>
 
-**Apollo-Require-Preflight header not required**
+**Apollo-Require-Preflight header is not required**
 
 > > #### Mutation variables
 
@@ -2004,7 +2039,7 @@ mutation ($inputs: AcceptCoinCodeProductInput!) {
 
 This mutation is used to decline the request for coin-code sent by the user requesting that product.
 
-**Apollo-Require-Preflight header not required**
+**Apollo-Require-Preflight header is not required**
 
 > > #### Mutation variables
 
@@ -2032,7 +2067,7 @@ mutation ($inputs: DeclineCoinCodeProductInput!) {
 
 These mutations are only accessible by **BUSINESS** and **PROFFESSIONAL** accounts.
 
-**Authorization header required** for all these mutations </br>
+> > **Authorization header is required** for all these mutations </br>
 
 > ### RequestPostBlogPrizes
 
@@ -2056,8 +2091,7 @@ mutation ($user_id: ID!) {
 
 These mutations are only accessible by **ADMIN**, **BUSINESS** and **PROFFESSIONAL** users. </br>
 
-**Authorization header required** for all these mutations </br>
-**Apollo-Require-Preflight header required** for all these mutations which tends to modify the uploaded files (images and videos)
+> > **Authorization header is required** for all these mutations </br> **Apollo-Require-Preflight header is required** for all these mutations which tends to modify the uploaded files (images and videos)
 
 > ### UploadPost
 
@@ -2259,38 +2293,6 @@ mutation ($user_id: ID!, $blog_id: ID!) {
     code
     success
     message
-  }
-}
-```
-
-## Personal Specific Mutations
-
-> ### SwitchToProAccount
-
-This mutation is used to switch PERSONAL account to PROFFESSIONAL account; By this mutation there will be payment process to take place in the background.
-
-> > #### Mutation variables
-
-```json
-{
-  "inputs": {
-    "user_id": "",
-    "wallet_id": "" // The wallet to be used to get the amount of money to be paid by the user
-  }
-}
-```
-
-```graphql
-mutation ($inputs: SwitchToProInputs!) {
-  SwitchToProAccount(inputs: $inputs) {
-    code
-    success
-    message
-    accessToken
-    user {
-      user_id
-      user_name
-    }
   }
 }
 ```
