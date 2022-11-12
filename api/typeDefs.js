@@ -687,6 +687,7 @@ const typeDefs = gql`
     RequestPrizePayment(user_id: ID!, prize_id: ID!): DeleteDataResponse!
     ArchiveAccount(user_id: ID!): DeleteDataResponse!
     DeleteAccount(user_id: ID!, receptient_id: ID!): DeleteDataResponse!
+    SwitchToAdminAccount(user_id: ID!, receptient_id: ID!): DeleteDataResponse!
   }
 `
 

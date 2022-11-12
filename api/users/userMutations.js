@@ -1713,6 +1713,44 @@ const userMutations = {
       generateServerError(err)
     }
   },
+  async SwitchToAdminAccount(_, { user_id, receptient_id }, ctx, ___) {
+    try {
+      isAuthenticated(ctx)
+      isValidUser(ctx.user, user_id)
+      isAccountVerified(ctx.user)
+      isAdmin(ctx.user)
+
+      if (!receptient_id || receptient_id.length < 5)
+        throw new ApolloError("Receptient Id:=> receptient_id is required", 400)
+
+      const receptientExists = await User.findOne({ _id: receptient_id })
+      if (!receptientExists)
+        throw new ApolloError("Receptient doesn't exist", 404)
+
+      if (receptientExists.role === "ADMIN")
+        throw new ApolloError(
+          `${receptientExists.user_name} is already an admin`,
+          400
+        )
+
+      await User.updateOne(
+        { _id: receptientExists._id },
+        {
+          $set: {
+            role: "ADMIN",
+          },
+        }
+      )
+
+      return {
+        code: 200,
+        success: true,
+        message: `${receptientExists.user_name} switched to admin role successfully`,
+      }
+    } catch (err) {
+      generateServerError(err)
+    }
+  },
 }
 
 module.exports = userMutations
