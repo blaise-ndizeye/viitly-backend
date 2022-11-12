@@ -129,6 +129,7 @@ The following are different object types used in this api which are used to gque
     email
     phone
     whatsapp
+    bio
     nFollowers
     nFollowings
     nBlogs
@@ -965,6 +966,22 @@ _This feature is only accessible in **Production**._
 ```graphql
 mutation ($user_id: ID!) {
   RequestNewVerificationCode(user_id: $user_id) {
+    code
+    success
+    message
+  }
+}
+```
+
+> ### ModifyUserBio
+
+This mutation is used to update the profile bio for the user.
+
+**Authorization header is required**
+
+```graphql
+mutation ($user_id: ID!, $bio: String!) {
+  ModifyUserBio(user_id: $user_id, bio: $bio) {
     code
     success
     message
@@ -2097,7 +2114,7 @@ These mutations are only accessible by **ADMIN**, **BUSINESS** and **PROFFESSION
 
 This mutation is used to upload the post to wiitify store and this will decrease the the `posts_upload_limit` for the user uploading it.<br/>
 
-> > Mutation variables
+> > #### Mutation variables
 
 ```json
 {
@@ -2236,6 +2253,8 @@ mutation ($inputs: BlogInput!, $blogMedia: Upload) {
 
 This mutation is used to update the information about the blog apart from the associated image.
 
+**Apollo-Require-Preflight header is not required**
+
 > > #### Mutation variables
 
 ```json
@@ -2301,7 +2320,7 @@ mutation ($user_id: ID!, $blog_id: ID!) {
 
 This mutation is used to boost resources once their limit reach to zero; The user will make payment of the resources based on the wallet he/she choose to go with.
 
-> > **Apollo-Require-Preflight header is not required**
+**Apollo-Require-Preflight header is not required**
 
 ```graphql
 mutation ($user_id: ID!, $wallet_id: ID!) {

@@ -82,6 +82,7 @@ const typeDefs = gql`
     email: String!
     phone: String!
     whatsapp: String!
+    bio: String!
     nFollowers: Int!
     nFollowings: Int!
     nBlogs: Int!
@@ -698,6 +699,7 @@ const typeDefs = gql`
       receptient_id: ID!
       set: SetStatus!
     ): DeleteDataResponse!
+    ModifyUserBio(user_id: ID!, bio: String!): DeleteDataResponse!
   }
 `
 

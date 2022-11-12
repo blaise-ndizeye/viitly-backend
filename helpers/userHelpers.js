@@ -10,6 +10,7 @@ module.exports = {
       phone: data.phone,
       email: data.email,
       whatsapp: data.whatsapp,
+      bio: data.bio,
       nFollowers: data.nFollowers,
       nFollowings: data.nFollowings,
       nReviews: data.nReviews,

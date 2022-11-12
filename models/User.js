@@ -26,6 +26,10 @@ const UserSchema = new Schema({
     type: String,
     required: true,
   },
+  bio: {
+    type: String,
+    default: "",
+  },
   nFollowers: {
     type: Number,
     required: true,

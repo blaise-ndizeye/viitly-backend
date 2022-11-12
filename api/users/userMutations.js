@@ -1796,6 +1796,30 @@ const userMutations = {
       generateServerError(err)
     }
   },
+  async ModifyUserBio(_, { user_id, bio }, ctx, ___) {
+    try {
+      isAuthenticated(ctx)
+      isValidUser(ctx.user, user_id)
+      isAccountVerified(ctx.user)
+
+      await User.updateOne(
+        { _id: user_id },
+        {
+          $set: {
+            bio,
+          },
+        }
+      )
+
+      return {
+        code: 200,
+        success: true,
+        message: "Bio updated successfully",
+      }
+    } catch (err) {
+      generateServerError(err)
+    }
+  },
 }
 
 module.exports = userMutations
