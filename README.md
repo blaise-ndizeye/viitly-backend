@@ -1512,7 +1512,7 @@ mutation ($user_id: ID!) {
 
 ## Admin Specific Queries
 
-These queries are only accessibke to the admin. When other user tries to access it will get **not authorized** error response message.
+These queries are only accessible to the admin. When other user tries to access it will get **not authorized** error response message.
 
 > > **Authorization header required** for all these queries.
 
@@ -1627,6 +1627,144 @@ query ($user_id: ID!) {
 ```
 
 ## Admin Specific Mutations
+
+These mutations are only accessed by admin user.
+
+> > **Authorization header required** for all these mutations.
+
+> ### BlockReportedContent
+
+This mutation is used to block the reported content when found that it is inappropriate then it will be prevented from being displayed on any other user's feed.
+
+```graphql
+mutation ($user_id: ID!, $reported_content_id: ID!) {
+  BlockReportedContent(
+    user_id: $user_id
+    reported_content_id: $reported_content_id
+  ) {
+    code
+    success
+    message
+  }
+}
+```
+
+> ### CreateWallet
+
+This mutation is used to create wallet to be used by different users to make some payment s on the platform for example for boosting resources or switching accounts.</br>
+
+_Admin mut be careful when providing the scopes for the wallets because it will be displayed in that user's scope only and if the scope is not **BUSINESS** then the number of products to offer must be set to zero_.
+
+> > #### Mutation variables
+
+```json
+{
+  "inputs": {
+    "blogs_to_offer": 1, // Integer
+    "currency": "FRW", // FRW or USD
+    "posts_to_offer": 1, // Integer
+    "price": 10000, // Number depending on the currency
+    "products_to_offer": 1, // Number
+    "scope": "", // BUSINESS, PROFFESSIONAL, PERSONAL OR ALL
+    "user_id": ""
+  }
+}
+```
+
+```graphql
+mutation ($inputs: CreateWalletInput!) {
+  CreateWallet(inputs: $inputs) {
+    code
+    success
+    message
+    wallet {
+      wallet_id
+      # ...Wallet Object Data ...
+    }
+  }
+}
+```
+
+> ### UpdateWallet
+
+This mutation is used to update the previously set wallet.
+
+> > #### Mutation variables
+
+```json
+{
+  "inputs": {
+    "blogs_to_offer": 1, // Integer
+    "currency": "FRW", // FRW or USD
+    "posts_to_offer": 1, // Integer
+    "price": 10000, // Number depending on the currency
+    "products_to_offer": 1, // Number
+    "scope": "", // BUSINESS, PROFFESSIONAL, PERSONAL OR ALL
+    "user_id": "",
+    "wallet_id": ""
+  }
+}
+```
+
+```graphql
+mutation ($inputs: UpdateWalletInput!) {
+  UpdateWallet(inputs: $inputs) {
+    code
+    success
+    message
+    wallet {
+      wallet_id
+      # ...Wallet Object Data ...
+    }
+  }
+}
+```
+
+> ### DeleteWallet
+
+This mutation is used to delete the previously set wallet
+
+```graphql
+mutation ($user_id: ID!, $wallet_id: ID!) {
+  DeleteWallet(user_id: $user_id, wallet_id: $wallet_id) {
+    code
+    success
+    message
+  }
+}
+```
+
+> ### ToggleProblemSolvedMark
+
+This mutation is used to toggle the reported problem as solved or not and it helps to keep track of reported problems rather than deleting them.
+
+```graphql
+mutation ($user_id: ID!, $problem_id: ID!) {
+  ToggleProblemSolvedMark(user_id: $user_id, problem_id: $problem_id) {
+    code
+    success
+    message
+    reported_problem {
+      problem_id
+      # ...ReportedProblem Object Data ...
+    }
+  }
+}
+```
+
+> ### DeleteReportedProblem
+
+This mutation is used to delete previously reported problem by users. It is recommended to delete it after making sure that it is solved.
+
+```graphql
+mutation ($user_id: ID!, $problem_id: ID!) {
+  DeleteReportedProblem(user_id: $user_id, problem_id: $problem_id) {
+    code
+    success
+    message
+  }
+}
+```
 
 ## Business Specific Queries
 

@@ -199,11 +199,6 @@ const userMutations = {
       isValidUser(ctx.user, user_id)
       isAccountVerified(ctx.user)
 
-      if (ctx.user.role === "ADMIN")
-        throw new ApolloError(
-          "Problems can be reported by users which are not admins",
-          400
-        )
       if (!body || body.length < 10)
         throw new ApolloError(
           "The problem must contain at least 10 characters and more descriptive",
