@@ -982,6 +982,7 @@ This mutation is used when the user forgets his/her password and it will then be
 
 ```graphql
 # **credential** can be email, phone number, whatsapp number or username
+
 mutation ($credential: String!) {
   ForgotPassword(credential: $credential) {
     code
