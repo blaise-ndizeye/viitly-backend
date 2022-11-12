@@ -1512,6 +1512,120 @@ mutation ($user_id: ID!) {
 
 ## Admin Specific Queries
 
+These queries are only accessibke to the admin. When other user tries to access it will get **not authorized** error response message.
+
+> > **Authorization header required** for all these queries.
+
+> ### GetAllProducts
+
+This query is used to get all products registered in the system.
+
+```graphql
+query ($user_id: ID!) {
+  GetAllProducts(user_id: $user_id) {
+    product_id
+    # ...Product Object Data ...
+  }
+}
+```
+
+> ### GetAllPosts
+
+This query is used to get all posts registered in the system.
+
+```graphql
+query ($user_id: ID!) {
+  GetAllPosts(user_id: $user_id) {
+    post_id
+    # ...Post Object Data ...
+  }
+}
+```
+
+> ### GetAllBlogs
+
+This query is used to get all blogs regstered in the system.
+
+```graphql
+query ($user_id: ID!) {
+  GetAllBlogs(user_id: $user_id) {
+    blog_id
+    # ...Blog Bject Data...
+  }
+}
+```
+
+> ### GetAllUsers
+
+This mutation is used to get all users registered in the system.
+
+```graphql
+query ($user_id: ID!) {
+  GetAllUsers(user_id: $user_id) {
+    user_id
+    user_name
+    # ...User Object Data ...
+  }
+}
+```
+
+> ### GetAllPendingPrizes
+
+This mutation is used to get all prizes which are not paid yet meaning which the used has got but not yet requested for payment.
+
+```graphql
+query ($user_id: ID!) {
+  GetAllPendingPrizes(user_id: $user_id) {
+    prize_id
+    prize_event
+    prize_amount
+    # ...Prize Object Data..
+  }
+}
+```
+
+> ### GetAllArchivedAccounts
+
+This mutation is used to keep track of all archived accounts so that when 30 days are passed still archived then the admin can delete it.
+
+```graphql
+query ($user_id: ID!) {
+  GetAllArchivedAccounts(user_id: $user_id) {
+    archivedAt
+    deleteAt
+    # ...ArchivedAccount Object Data ...
+  }
+}
+```
+
+> ### GetAllReportedContents
+
+This mutation is used to get all contents reported by users.
+
+```graphql
+query ($user_id: ID!) {
+  GetAllReportedContents(user_id: $user_id) {
+    reported_content_id
+    problem
+    reportedAt
+    # ...ReportedContent Object Data ...
+  }
+}
+```
+
+> ### GetAllReportedProblems
+
+This mutation is used to get all problems reported by users.
+
+```graphql
+query ($user_id: ID!) {
+  GetAllReportedProblems(user_id: $user_id) {
+    problem_id
+    #...ReportedProblem Object Data...
+  }
+}
+```
+
 ## Admin Specific Mutations
 
 ## Business Specific Queries

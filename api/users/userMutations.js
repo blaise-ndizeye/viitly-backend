@@ -1556,7 +1556,7 @@ const userMutations = {
 
       if (
         !(
-          deleteDate.getMonth() === toDay.getMonth() &&
+          deleteDate.getMonth() <= toDay.getMonth() &&
           (deleteDate.getFullYear() === toDay.getFullYear() ||
             (deleteDate.getMonth() === 1 &&
               deleteDate.getFullYear() === archiveDate.getFullYear() + 1))
