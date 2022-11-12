@@ -615,7 +615,7 @@ const typeDefs = gql`
     SendReview(inputs: ReviewInput!): ReviewResponse!
     UpdateReview(inputs: UpdateReviewInput!): ReviewResponse!
     DeleteReview(user_id: ID!, review_id: ID!): DeleteDataResponse!
-    UploadPost(inputs: PostInput!, postMedia: [Upload!]): PostResponse!
+    UploadPost(inputs: PostInput!, postMedia: [Upload!]!): PostResponse!
     DeletePost(user_id: ID!, post_id: ID!): DeleteDataResponse!
     UpdatePostText(inputs: UpdatePostTextInput!): PostResponse!
     UpdatePostMedia(

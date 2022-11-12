@@ -24,6 +24,7 @@
     <li><a href="#object-types">Object Types</a></li>
     <li><a href="#general-queries">General Queries</a></li>
     <li><a href="#general-mutations">General Mutations</a></li>
+    <li><a href="#personal-specific-mutations">Personal Specific Mutations</a></li>
     <li><a href="#admin-specific-queries">Admin Specific Queries</a></li>
     <li><a href="#admin-specific-mutations">Admin Specific Mutations</a></li>
     <li><a href="#admin-and-business-queries">Admin and Business Queries</a></li>
@@ -31,10 +32,6 @@
     <li><a href="#business-and-proffessional-mutations">Business and Proffessional Mutations</a></li>
     <li><a href="#admin-business-and-proffessional-queries">Admin, Business and Proffessional Queries</a></li>
     <li><a href="#admin-business-and-proffessional-mutations">Admin, Business and Proffessional Mutations</a></li>
-    <li><a href="#proffessional-specific-queries">Proffessional Specific Queries</a></li>
-    <li><a href="#proffessional-specific-mutations">Proffessional Specific Mutations</a></li>
-    <li><a href="#personal-specific-queries">Personal Specific Queries</a></li>
-    <li><a href="#personal-specific-mutations">Personal Specific Mutations</a></li>
 </ul>
 
 ### Set environment variables
@@ -1863,7 +1860,7 @@ These mutations are only accessible by **ADMIN** and **BUSINESS** users.
 
 > ### UploadProduct
 
-This mutation is used to upload the product to wiitify store and this decrease the the `products_upload_limit`.<br/>
+This mutation is used to upload the product to wiitify store and this will decrease the the `products_upload_limit` for the user uploading it.<br/>
 
 > > #### Mutation variables
 
@@ -2062,13 +2059,214 @@ These queries are only accessible by **ADMIN**, **BUSINESS** and **PROFFESSIONAL
 
 ## Admin, Business and Proffessional Mutations
 
-These mutations are only accessible by **ADMIN**, **BUSINESS** and **PROFFESSIONAL** users.
+These mutations are only accessible by **ADMIN**, **BUSINESS** and **PROFFESSIONAL** users. </br>
 
-## Proffessional Specific Queries
+**Authorization header required** for all these mutations </br>
+**Apollo-Require-Preflight header required** for all these mutations which tends to modify the uploaded files (images and videos)
 
-## Proffessional Specific Mutations
+> ### UploadPost
 
-## Personal Specific Queries
+This mutation is used to upload the post to wiitify store and this will decrease the the `posts_upload_limit` for the user uploading it.<br/>
+
+> > Mutation variables
+
+```json
+{
+  "inputs": {
+    "user_id": "",
+    "description": "",
+    "tagged_users": ["User Ids"]
+  }
+  // postMedia array is required and must contain valid image or video files
+}
+```
+
+```graphql
+mutation ($inputs: PostInput!, $postMedia: [Upload!]!) {
+  UploadPost(inputs: $inputs, postMedia: $postMedia) {
+    code
+    success
+    message
+    post {
+      post_id
+      # ...Post Object Data ...
+    }
+  }
+}
+```
+
+> ### UpdatePostText
+
+This mutation is used to update the information about the post apart from the image or video files for the post. </br>
+
+**Apollo-Require-Preflight header not required**
+
+> > #### Mutation variables
+
+```json
+{
+  "inputs": {
+    "description": "",
+    "post_id": "",
+    "user_id": ""
+  }
+}
+```
+
+```graphql
+mutation ($inputs: UpdatePostTextInput!) {
+  UpdatePostText(inputs: $inputs) {
+    code
+    success
+    message
+    post {
+      post_id
+      # ...Post Object Data ...
+    }
+  }
+}
+```
+
+> ### UpdatePostMedia
+
+This mutation is used to update the post image or video filesfor the user.
+
+> > #### Mutation variables
+
+```json
+{
+  "inputs": {
+    "post_id": "",
+    "user_id": ""
+  }
+  // The postMedia array is required containing the valid image or video files
+}
+```
+
+```graphql
+mutation ($inputs: UpdatePostMediaInput!, $postMedia: [Upload!]!) {
+  UpdatePostMedia(inputs: $inputs, postMedia: $postMedia) {
+    code
+    success
+    message
+    post {
+      post_id
+      # ...Post Object Data ...
+    }
+  }
+}
+```
+
+> ### DeletePost
+
+This mutation is used to delete previously uploaded post and it will not take effect on `blogs_upload_limit` for the user.
+
+```graphql
+mutation ($user_id: ID!, $post_id: ID!) {
+  DeletePost(user_id: $user_id, post_id: $post_id) {
+    code
+    success
+    message
+  }
+}
+```
+
+> ### UploadBlog
+
+This mutation is used to upload the blog to wiitify store and this will decrease the the `blogs_upload_limit` for the user uploading it.<br/>
+
+> > #### Mutation variables
+
+```json
+{
+  "inputs": {
+    "user_id": "",
+    "blog_title": "",
+    "blog_content": "",
+    "tagged_users": ["User Ids"]
+  }
+  // blogMedia must contain valid image file only but it is not required
+}
+```
+
+```graphql
+mutation ($inputs: BlogInput!, $blogMedia: Upload) {
+  UploadBlog(inputs: $inputs, blogMedia: $blogMedia) {
+    code
+    success
+    message
+    blog {
+      blog_id
+      # ...Blog Object Data ...
+    }
+  }
+}
+```
+
+> ### UpdateBlogText
+
+This mutation is used to update the information about the blog apart from the associated image.
+
+> > #### Mutation variables
+
+```json
+{
+  "inputs": {
+    "blog_content": "",
+    "blog_id": "",
+    "blog_title": "",
+    "user_id": ""
+  }
+}
+```
+
+```graphql
+mutation ($inputs: UpdateBlogTextInput!) {
+  UpdateBlogText(inputs: $inputs) {
+    code
+    success
+    message
+    blog {
+      blog_id
+      # ...Blog Object Data ...
+    }
+  }
+}
+```
+
+> ### UpdateBlogMedia
+
+This mutation is used to update the image file associate with the blog to be updated.
+
+```graphql
+# **blogMedia** must be a valid image file
+
+mutation ($user_id: ID!, $blog_id: ID!, $blogMedia: Upload!) {
+  UpdateBlogMedia(user_id: $user_id, blog_id: $blog_id, blogMedia: $blogMedia) {
+    code
+    success
+    message
+    blog {
+      blog_id
+      # ...Blog Object Data ...
+    }
+  }
+}
+```
+
+> ### DeleteBlog
+
+This mutation is used to delete the previously uploaded blog and this will not take effect on `blogs_upload_limit` for the user.
+
+```graphql
+mutation ($user_id: ID!, $blog_id: ID!) {
+  DeleteBlog(user_id: $user_id, blog_id: $blog_id) {
+    code
+    success
+    message
+  }
+}
+```
 
 ## Personal Specific Mutations
 
