@@ -472,7 +472,7 @@ const typeDefs = gql`
     description: String!
   }
 
-  input UploadProductTextInput {
+  input UpdateProductTextInput {
     product_id: ID!
     user_id: ID!
     title: String!
@@ -639,7 +639,7 @@ const typeDefs = gql`
       product_id: ID!
       productMedia: [Upload!]!
     ): ProductResponse!
-    UpdateProductText(inputs: UploadProductTextInput): ProductResponse!
+    UpdateProductText(inputs: UpdateProductTextInput!): ProductResponse!
     DeleteProduct(user_id: ID!, product_id: ID!): DeleteDataResponse!
     SendComment(inputs: SendCommentInput!): CommentResponse!
     DeleteComment(user_id: ID!, comment_id: ID!): DeleteDataResponse!

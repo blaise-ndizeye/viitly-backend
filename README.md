@@ -26,8 +26,12 @@
     <li><a href="#general-mutations">General Mutations</a></li>
     <li><a href="#admin-specific-queries">Admin Specific Queries</a></li>
     <li><a href="#admin-specific-mutations">Admin Specific Mutations</a></li>
+    <li><a href="#admin-and-business-queries">Admin and Business Queries</a></li>
+    <li><a href="#admin-and-business-mutations">Admin and Business Mutations</a></li>
     <li><a href="#business-specific-queries">Business Specific Queries</a></li>
     <li><a href="#business-specific-mutations">Business Specific Mutations</a></li>
+    <li><a href="#admin-business-and-proffessional-queries">Admin, Business and Proffessional Queries</a></li>
+    <li><a href="#admin-business-and-proffessional-mutations">Admin, Business and Proffessional Mutations</a></li>
     <li><a href="#proffessional-specific-queries">Proffessional Specific Queries</a></li>
     <li><a href="#proffessional-specific-mutations">Proffessional Specific Mutations</a></li>
     <li><a href="#personal-specific-queries">Personal Specific Queries</a></li>
@@ -607,6 +611,19 @@ File {
 > ### ArchivedAccount Object Type
 
 ```graphql
+ ArchivedAccount {
+    archivedAt
+    deleteAt
+    account {
+      user_id
+      # ...User Object Data ...
+    }
+  }
+```
+
+> ### ReportedContent Object Type
+
+```graphql
  ReportedContent {
     reported_content_id
     problem
@@ -935,6 +952,24 @@ This mutation is used to verify user account and in develpoment **101010** is us
 ```graphql
 mutation ($user_id: ID!, $verification_code: String!) {
   VerifyAccount(user_id: $user_id, verification_code: $verification_code) {
+    code
+    success
+    message
+  }
+}
+```
+
+> ### RequestNewVerificationCode
+
+This mutation is used to request new verification code in case there is a network problem which prevents the user from getting the code to his/her email. <br/>
+
+_This feature is only accessible in **Production**._
+
+**Authorization header required**
+
+```graphql
+mutation ($user_id: ID!) {
+  RequestNewVerificationCode(user_id: $user_id) {
     code
     success
     message
@@ -1800,9 +1835,186 @@ mutation ($user_id: ID!, $receptient_id: ID!, $set: SetStatus!) {
 }
 ```
 
+## Admin and Business Queries
+
+These queries are only accessible by **ADMIN** and **BUSINESS** users. </br>
+
+**Authorization header required** for all these queries </br>
+
+> ### GetBusinessRequestedProducts
+
+This query is used to get all products of the business or admin account which are requested for coin-codes by other users and these are considered as the products which are about to be bought by those users who requested them.
+
+```graphql
+query ($user_id: ID!) {
+  GetBusinessRequestedProducts(user_id: $user_id) {
+    request_id
+    requestedAt
+    # ...RequestedProduct Object Data ...
+  }
+}
+```
+
+## Admin and Business Mutations
+
+These mutations are only accessible by **ADMIN** and **BUSINESS** users.
+
+**Authorization header required** for all these mutations </br>
+**Apollo-Require-Preflight header required** for all these mutations which tends to modify the uploaded files (images and videos)
+
+> ### UploadProduct
+
+This mutation is used to upload the product to wiitify store and this decrease the the `products_upload_limit`.<br/>
+
+> > #### Mutation variables
+
+**Allowed Categories:** _clothing, electronic, art, house, furniture, vehicle, jewerly, fashion, game, kitchen, service, movie_.
+
+```json
+{
+  "inputs": {
+    "availability": "", // SALE or RENT
+    "category": "",
+    "description": "",
+    "price": 100.0, // Floating point number
+    "price_currency": "FRW", // FRW or USD
+    "price_strategy": "", // FIXED or NEGOTIATE
+    "title": "",
+    "user_id": ""
+  }
+  // **productMedia** array must contain valid images and videos and it is required
+}
+```
+
+```graphql
+mutation ($inputs: UploadProductInput!, $productMedia: [Upload!]!) {
+  UploadProduct(inputs: $inputs, productMedia: $productMedia) {
+    code
+    success
+    message
+    product {
+      product_id
+      # ...Product Object Data ...
+    }
+  }
+}
+```
+
+> ### UpdateProductText
+
+This mutation is used to update Product Data excluding the files (images and videos) for the product.
+
+**No Apollo-Require-Preflight header required**
+
+> > Mutation variables
+
+```json
+{
+  "inputs": {
+    "availability": "", // SALE or RENT
+    "category": "", // Only accepted categories mentioned in the UploadProduct section
+    "description": "",
+    "price": 100.0, // Floating point number
+    "price_currency": "FRW", // FRW or USD
+    "price_strategy": "", // FIXED or NEGOTIATE
+    "title": "",
+    "user_id": "",
+    "product_id": ""
+  }
+}
+```
+
+```graphql
+mutation ($inputs: UpdateProductTextInput!) {
+  UpdateProductText(inputs: $inputs) {
+    code
+    success
+    message
+    product {
+      product_id
+      # ...Product Object Data...
+    }
+  }
+}
+```
+
+> ### UpdateProductMedia
+
+This mutation is used to update the files (images and videos) of the product.
+
+```graphql
+# **ProductMedia** must contain image or video files
+
+mutation ($user_id: ID!, $product_id: ID!, $productMedia: [Upload!]!) {
+  UpdateProductMedia(
+    user_id: $user_id
+    product_id: $product_id
+    productMedia: $productMedia
+  ) {
+    code
+    success
+    message
+    product {
+      product_id
+      # ...Product Object Data..
+    }
+  }
+}
+```
+
+> ### DeleteProduct
+
+This mutation is used to delete the previously uploaded product. Once deleted it will take no effect on the `products_upload_limit`.
+
+```graphql
+mutation ($user_id: ID!, $product_id: ID!) {
+  DeleteProduct(user_id: $user_id, product_id: $product_id) {
+    code
+    success
+    message
+  }
+}
+```
+
+> ### DeclineCoinCodeProductRequest
+
+This mutation is used to decline the request for coin-code sent by the user requesting that product.
+
+**No Apollo-Require-Preflight header required**
+
+> > #### Mutation variables
+
+```json
+{
+  "inputs": {
+    "product_id": "", // id of the product which was requested
+    "receptient_id": "", // id of the user who requested it
+    "user_id": ""
+  }
+}
+```
+
+```graphql
+mutation ($inputs: DeclineCoinCodeProductInput!) {
+  DeclineCoinCodeProductRequest(inputs: $inputs) {
+    code
+    success
+    message
+  }
+}
+```
+
 ## Business Specific Queries
 
 ## Business Specific Mutations
+
+## Admin, Business and Proffessional Queries
+
+These queries are only accessible by **ADMIN**, **BUSINESS** and **PROFFESSIONAL** users.
+
+## Admin, Business and Proffessional Mutations
+
+These mutations are only accessible by **ADMIN**, **BUSINESS** and **PROFFESSIONAL** users.
 
 ## Proffessional Specific Queries
 
@@ -1816,7 +2028,7 @@ mutation ($user_id: ID!, $receptient_id: ID!, $set: SetStatus!) {
 
 This mutation is used to switch PERSONAL account to PROFFESSIONAL account; By this mutation there will be payment process to take place in the background.
 
-> > ### Mutation variables
+> > #### Mutation variables
 
 ```json
 {
