@@ -546,7 +546,7 @@ File {
   }
 ```
 
-> ### Wallet Object Type
+> #### Wallet Object Type
 
 ```graphql
  Wallet {
@@ -561,7 +561,7 @@ File {
   }
 ```
 
-> ### Location Object Type
+> #### Location Object Type
 
 ```graphql
  Location {
@@ -573,7 +573,7 @@ File {
   }
 ```
 
-> ### Transaction Object type
+> #### Transaction Object type
 
 ```graphql
  Transaction {
@@ -591,7 +591,7 @@ File {
   }
 ```
 
-> ### Prize Object Type
+> #### Prize Object Type
 
 ```graphql
  Prize {
@@ -608,7 +608,7 @@ File {
   }
 ```
 
-> ### ArchivedAccount Object Type
+> #### ArchivedAccount Object Type
 
 ```graphql
  ArchivedAccount {
@@ -621,7 +621,7 @@ File {
   }
 ```
 
-> ### ReportedContent Object Type
+> #### ReportedContent Object Type
 
 ```graphql
  ReportedContent {
@@ -651,7 +651,7 @@ File {
   }
 ```
 
-> ### SearchResult Object Type
+> #### SearchResult Object Type
 
 ```graphql
  SearchResult {
