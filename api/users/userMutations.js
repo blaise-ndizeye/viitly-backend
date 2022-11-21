@@ -45,6 +45,7 @@ const { walletData } = require("../../helpers/walletHelpers")
 const { makePayment, offerPayment } = require("../../helpers/paymentHelpers")
 const { prizeData } = require("../../helpers/productHelpers")
 const { verifyTaggedUsers } = require("../../helpers/tagHelpers")
+const constants = require("../../utils/constansts")
 
 const userMutations = {
   async RegisterUser(_, args, __, ___) {
@@ -118,7 +119,7 @@ const userMutations = {
           hostUser: process.env.HOST_EMAIL,
           hostUserPassword: process.env.HOST_EMAIL_PASSWORD,
           to: [email],
-          subject: "Welcome to your Wiitify account",
+          subject: `Welcome to your ${constants.app_name} account`,
           bodyText: `${generatedCode} is your account verification code.`,
         })
 
@@ -448,6 +449,12 @@ const userMutations = {
         throw new ApolloError("Verification code has six characters", 400)
 
       const user = await User.findOne({ _id: user_id })
+
+      if (user.verified)
+        throw new ApolloError(
+          `${user.user_name}'s account is already verified`,
+          400
+        )
 
       if (
         user.verification_code === "" &&
@@ -857,7 +864,7 @@ const userMutations = {
       return {
         code: 200,
         success: true,
-        message: "Account switched to Proffessional",
+        message: "Account switched to Proffessional successfully",
         accessToken,
         user: userData(updatedUser),
       }
@@ -1234,7 +1241,7 @@ const userMutations = {
 
       if (!["PROFFESSIONAL", "BUSINESS"].includes(ctx.user.role))
         throw new ApolloError(
-          "Only proffessional and business accounts can request post prizes",
+          "Only proffessional and business accounts can request post and blog prizes",
           401
         )
 
@@ -1850,7 +1857,7 @@ const userMutations = {
           hostUser: process.env.HOST_EMAIL,
           hostUserPassword: process.env.HOST_EMAIL_PASSWORD,
           to: [userExists.email],
-          subject: "Welcome again to your Wiitify account",
+          subject: `${constants.app_name} Account Reset Password`,
           bodyText: `${newPassword} is your new password. Feel free to update it after you login.`,
         })
       }
@@ -1868,6 +1875,55 @@ const userMutations = {
         code: 200,
         success: true,
         message: "Your password reset is sent to your email.",
+      }
+    } catch (err) {
+      generateServerError(err)
+    }
+  },
+  async SwitchToProAccountByCCProducts(_, { user_id }, ctx, ___) {
+    try {
+      const switchToProMustCCProducts = Number(
+        process.env.SWITCH_TO_PRO_MUST_CCPRODUCTS
+      )
+
+      isAuthenticated(ctx)
+      isValidUser(ctx.user, user_id)
+      isAccountVerified(ctx.user)
+
+      if (ctx.user.role !== "PERSONAL")
+        throw new ApolloError("Only personal accounts are allowed", 401)
+
+      const userConfirmedPrizes = await Prize.find({
+        $and: [{ user_id }, { prize_event: "ACCEPT_CC" }],
+      })
+      if (userConfirmedPrizes.length < switchToProMustCCProducts)
+        throw new ApolloError(
+          `You must have at least ${switchToProMustCCProducts} confirmed coin-code products`
+        )
+
+      await User.updateOne(
+        { _id: user_id },
+        {
+          $set: {
+            role: "PROFFESSIONAL",
+          },
+        }
+      )
+
+      await UploadScope.updateOne(
+        { user_id },
+        {
+          $set: {
+            blogs_available: 2,
+            posts_available: 2,
+          },
+        }
+      )
+
+      return {
+        code: 200,
+        success: true,
+        message: `${ctx.user?.email}'s account switched to professional successfully`,
       }
     } catch (err) {
       generateServerError(err)

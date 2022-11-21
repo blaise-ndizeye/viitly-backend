@@ -351,7 +351,7 @@ const productMutations = {
         notification_type: "REQUEST_CC",
         ref_object: productFound._id.toString(),
         specified_user: productFound.user_id,
-        body: "You have new product sale suggestion with coin-code",
+        body: "You have new product request suggestion with coin-code",
       }).save()
 
       return {
@@ -380,7 +380,7 @@ const productMutations = {
         throw new ApolloError("Receptient Id: receptient_id is required", 400)
 
       const productExists = await Product.findOne({
-        $and: [{ user_id }, { product_id }],
+        $and: [{ user_id }, { _id: product_id }],
       })
       if (!productExists) throw new ApolloError("Product not found", 404)
 
@@ -391,7 +391,7 @@ const productMutations = {
         ],
       })
       if (!coinCodeProductExist)
-        throw new ApolloError("Requested coin-coded product not found", 400)
+        throw new ApolloError("Requested coin-code product not found", 400)
 
       if (coinCodeProductExist.coin_code !== coinCode)
         throw new ApolloError("Invalid Coin-Code", 400)
@@ -422,7 +422,7 @@ const productMutations = {
         user_id,
         amount_paid: productExists.price * 0.05,
         currency_used: productExists.price_currency,
-        description: "Sell the product",
+        description: "Prize offered due to the product sold",
         transaction_role: "SELL",
       }).save()
 
@@ -451,7 +451,7 @@ const productMutations = {
         throw new ApolloError("Receptient Id: receptient_id is required", 400)
 
       const productExists = await Product.findOne({
-        $and: [{ user_id }, { product_id }],
+        $and: [{ user_id }, { _id: product_id }],
       })
       if (!productExists) throw new ApolloError("Product not found", 404)
 

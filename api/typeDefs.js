@@ -275,7 +275,7 @@ const typeDefs = gql`
   type Transaction {
     transaction_id: ID!
     provider_trans_id: ID!
-    amount_paid: Int!
+    amount_paid: Float!
     currency_used: String!
     description: String!
     transaction_role: String!
@@ -287,7 +287,7 @@ const typeDefs = gql`
     prize_id: ID!
     owner: User!
     prize_event: String!
-    prize_amount: Int!
+    prize_amount: Float!
     prize_amount_currency: String!
     prized: Boolean!
     prizedAt: String!
@@ -701,6 +701,7 @@ const typeDefs = gql`
     ): DeleteDataResponse!
     ModifyUserBio(user_id: ID!, bio: String!): DeleteDataResponse!
     ForgotPassword(credential: String!): DeleteDataResponse!
+    SwitchToProAccountByCCProducts(user_id: ID!): DeleteDataResponse!
   }
 `
 

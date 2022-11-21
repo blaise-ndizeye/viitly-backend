@@ -71,6 +71,9 @@ POST_BLOG_PRIZE_AMOUNT_IN_FRW = 3000 # Standard amount of money in Rwandan franc
 NUMBER_OF_PRODUCT_PRIZES = 2 # Number of confirmation of coin-code in which the user must have to start gaining income for his confirmed products
 
 NUMBER_OF_FOLLOWER_PRIZES = 2 # Number of followers the proffesional user must have to start being prized
+
+SWITCH_TO_PRO_MUST_CCPRODUCTS = 1 # Number of confirmed coin-code products the personal user must have to switch to proffessional account
+
 ```
 
 ## Install dependencies and start development server
@@ -942,7 +945,7 @@ mutation ($inputs: UserInput!, $avatar: Upload) {
 
 > ### VerifyAccount
 
-This mutation is used to verify user account and in develpoment **101010** is used as the verification code.
+This mutation is used to verify user account and in develpoment **101010** is used as the verification code otherwise the code required is gotten from current user's email.
 
 **Authorization header is required**
 
@@ -1610,6 +1613,20 @@ mutation ($inputs: SwitchToProInputs!) {
       user_id
       user_name
     }
+  }
+}
+```
+
+### SwitchToProAccountByCCProducts
+
+This mutation is used for **PERSONAL** accounts to switch that accounts to **PROFESSIONL** ones depending `SWITCH_TO_PRO_MUST_CCPRODUCTS` number of confirmed coin-code products set in `.env` file.
+
+```graphql
+mutation ($user_id: ID!) {
+  SwitchToProAccountByCCProducts(user_id: $user_id) {
+    code
+    success
+    message
   }
 }
 ```
