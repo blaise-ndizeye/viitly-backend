@@ -14,11 +14,11 @@ router.get("/watch/:videoId", (req, res) => {
       __dirname,
       `../public/uploads/${req.params.videoId}`
     )
-    const videoType = exactVideoPath.split(".")[-1]
+    const videoType = exactVideoPath.split(".")[1]
 
     const videoSize = fs.statSync(exactVideoPath).size
 
-    const CHUNK_SIZE = 10 ** 12
+    const CHUNK_SIZE = 10 ** 5
     const start = Number(range.replace(/\D/g, ""))
     const end = Math.min(start + CHUNK_SIZE, videoSize - 1)
 
