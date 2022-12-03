@@ -19,6 +19,8 @@ async function startApolloServer() {
   app.use(graphqlUploadExpress({ maxFileSize: 25000000000 })) // 25MB of size
   app.use(express.static("public/uploads"))
 
+  app.use("/wfy-media", require("./media"))
+
   const httpServer = http.createServer(app)
 
   const server = new ApolloServer({
