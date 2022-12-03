@@ -104,6 +104,8 @@ _For npm users_
 npm run dev
 ```
 
+> The graphql requests will be served at `https://domain-host.com/api` route with **POST** HTTP method.
+
 ## Special Requirements for Requests
 
 Except `Hello` Query all other queries and mutations require authorization header and other header key for mutations which modifies the files like uploading and deleting files to prevent `Cross-Site-Request-Forgery(CSRF) attack`.</br>
