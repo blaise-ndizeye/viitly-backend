@@ -37,8 +37,11 @@ module.exports = {
       blocked: product.blocked,
       createdAt: product.createdAt.toISOString(),
       product_media: product.product_media?.map((media) => ({
-        file_name: `${process.env.BASE_URL}/${media.file_name}`,
         file_format: media.file_format,
+        file_name:
+          media?.file_format === "image"
+            ? `${process.env.BASE_URL}/wfy-media/${media?.file_name}`
+            : `${process.env.BASE_URL}/wfy-media/watch?videoId=${media?.file_name}`,
       })),
     }
   },

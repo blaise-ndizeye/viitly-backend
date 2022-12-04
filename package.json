@@ -1,5 +1,5 @@
 {
-  "name": "bemate-backend",
+  "name": "wiitify-backend",
   "version": "1.0.0",
   "description": "An api for the app connecting the buyers and sellers to talk how to sell about their product",
   "main": "server.js",
@@ -16,12 +16,15 @@
     "bcryptjs": "^2.4.3",
     "dotenv": "^16.0.1",
     "express": "^4.18.1",
+    "express-sharp": "^4.2.41",
     "graphql": "^16.5.0",
     "graphql-upload": "13.0.0",
     "jsonwebtoken": "^8.5.1",
     "mongoose": "^6.5.2",
     "nodemailer": "^6.8.0",
-    "nodemon": "^2.0.20",
     "yup": "^0.32.11"
+  },
+  "devDependencies": {
+    "nodemon": "^2.0.20"
   }
 }

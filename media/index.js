@@ -1,18 +1,34 @@
-const router = require("express").Router()
 const path = require("path")
 const fs = require("fs")
+const router = require("express").Router()
+const { expressSharp, FsAdapter } = require("express-sharp")
 
-router.get("/watch/:videoId", (req, res) => {
+router.use(
+  "/",
+  expressSharp({
+    imageAdapter: new FsAdapter(path.join(__dirname, "../public/uploads")),
+  })
+)
+
+router.get("/watch", (req, res) => {
   try {
     const range = req.headers.range
     if (!range)
-      res
+      return res
         .status(400)
         .json({ success: false, message: "Range Header is required" })
 
+    if (!req.query?.videoId)
+      return res
+        .status(400)
+        .json({
+          success: false,
+          message: "videoId query parameter is required",
+        })
+
     const exactVideoPath = path.join(
       __dirname,
-      `../public/uploads/${req.params.videoId}`
+      `../public/uploads/${req.query?.videoId}`
     )
     const videoType = exactVideoPath.split(".")[1]
 
@@ -35,14 +51,8 @@ router.get("/watch/:videoId", (req, res) => {
     const videoStream = fs.createReadStream(exactVideoPath, { start, end })
     videoStream.pipe(res)
   } catch (err) {
-    console.error(`${err?.message?.split(",")[0]}:=> ${req.params.videoId}`)
+    console.error(`${err?.message?.split(",")[0]}:=> ${req.query?.videoId}`)
   }
-})
-
-router.get("/image/:imageId", (req, res) => {
-  console.log(req.params.imageId)
-
-  res.send("Image serving")
 })
 
 module.exports = router

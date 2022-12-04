@@ -1,12 +1,13 @@
+require("dotenv").config()
+
+const express = require("express")
+const http = require("http")
 const { ApolloServer } = require("apollo-server-express")
 const {
   ApolloServerPluginDrainHttpServer,
   ApolloServerPluginLandingPageLocalDefault,
 } = require("apollo-server-core")
 const { graphqlUploadExpress } = require("graphql-upload")
-const express = require("express")
-const http = require("http")
-require("dotenv").config()
 
 const typeDefs = require("./api/typeDefs")
 const resolvers = require("./api/resolvers")
@@ -17,8 +18,6 @@ async function startApolloServer() {
   const app = express()
 
   app.use(graphqlUploadExpress({ maxFileSize: 25000000000 })) // 25MB of size
-  app.use(express.static("public/uploads"))
-
   app.use("/wfy-media", require("./media"))
 
   const httpServer = http.createServer(app)

@@ -14,7 +14,10 @@ module.exports = {
       tagged_users: data.tagged_users,
       post_media: data.post_media?.map((media) => ({
         file_format: media.file_format,
-        file_name: `${process.env.BASE_URL}/${media.file_name}`,
+        file_name:
+          media?.file_format === "image"
+            ? `${process.env.BASE_URL}/wfy-media/${media?.file_name}`
+            : `${process.env.BASE_URL}/wfy-media/watch?videoId=${media?.file_name}`,
       })),
     }
   },

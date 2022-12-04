@@ -4,7 +4,9 @@ module.exports = {
   userData(data) {
     return {
       user_id: data._id.toString(),
-      avatar: data.avatar ? `${process.env.BASE_URL}/${data.avatar}` : "",
+      avatar: data.avatar
+        ? `${process.env.BASE_URL}/wfy-media/${data.avatar}`
+        : "",
       name: data.name,
       user_name: data.user_name,
       phone: data.phone,
