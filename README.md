@@ -68,11 +68,11 @@ POST_PRIZE_SHARES = 50 # Number of shares the post must have to be prized
 
 POST_BLOG_PRIZE_AMOUNT_IN_FRW = 3000 # Standard amount of money in Rwandan francs to be based on when prizing items in the system and varies according to increase of above defaults for the user
 
-NUMBER_OF_PRODUCT_PRIZES = 2 # Number of confirmation of coin-code in which the user must have to start gaining income for his confirmed products
+NUMBER_OF_PRODUCT_PRIZES = 20 # Number of confirmation of coin-code in which the user must have to start gaining income for his confirmed products
 
-NUMBER_OF_FOLLOWER_PRIZES = 2 # Number of followers the proffesional user must have to start being prized
+NUMBER_OF_FOLLOWER_PRIZES = 100 # Number of followers the proffesional user must have to start being prized
 
-SWITCH_TO_PRO_MUST_CCPRODUCTS = 1 # Number of confirmed coin-code products the personal user must have to switch to proffessional account
+SWITCH_TO_PRO_MUST_CCPRODUCTS = 40 # Number of confirmed coin-code products the personal user must have to switch to proffessional account
 
 ```
 
@@ -103,6 +103,8 @@ _For npm users_
 ```terminal
 npm run dev
 ```
+
+> The graphql requests will be served at `https://domain-host.com/api` route with **POST** HTTP method.
 
 ## Special Requirements for Requests
 
