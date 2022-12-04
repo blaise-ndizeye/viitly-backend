@@ -120,6 +120,34 @@ Apollo-Require-Preflight: true
 
 > When you provide the Authorization header and still get the CSRF error immediately add the Apollo-Require-Preflight header.
 
+**When requesting the images it is possible to manipulate the images by appending the query parameters to the image url (after _?_ in the image url) because they are powered by sharp module.**
+
+_Currently the following transformations can be applied to images._
+
+<u>For example</u>: `https://example.com/view-images/image.jpg?w=400&h=400&f=webp&q=80&p`
+
+| Client option name | Query parameter name | Description                                                                                                                                                                                                                                                      |
+| :----------------- | :------------------- | :--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| quality            | q                    | Quality is a number between 1 and 100 (see [sharp docs](https://sharp.pixelplumbing.com/en/stable/api-output/)).                                                                                                                                                 |
+| width              | w                    | The width of image in pixels                                                                                                                                                                                                                                     |
+| height             | h                    | The height of image in pixels                                                                                                                                                                                                                                    |
+| format             | f                    | Output image format. Valid values: every valid [sharp output format string](https://sharp.pixelplumbing.com/api-output#toformat), i.e. jpeg, gif, webp or raw.                                                                                                   |
+| progressive        | p                    | Only available for `jpeg` and `png` formats. Enable progressive scan by passing `true`.                                                                                                                                                                          |
+| crop               | c                    | Setting crop to `true` enables the [sharp cropping feature](https://sharp.pixelplumbing.com/api-resize#crop). **Note:** Both width and height params are neccessary for crop to work. Default is `false`.                                                        |
+| gravity            | g                    | When the crop option is activated you can specify the gravity of the cropping. Possible attributes of the optional gravity are `north`, `northeast`,` east`, `southeast`, `south`, `southwest`, `west`, `northwest`, `center` and `centre`. Default is `center`. |
+
+**When requesting the videos they are able to play only when they are passed to the HTML 5 Video Tag with the source element nested inside or any other Video module which supports video streaming because these videos are streamed from the server to ensure that there is efficient usage of memory and resources.**
+
+<u>For example:</u> Refer to following block of code.
+
+```html
+<video id="videoPlayer" width="650" muted="muted" controls autoplay>
+  <source
+    src="https://www.example.com/wfy-media/watch?videoId=WFYvideo9256291670086589682.mp4"
+  />
+</video>
+```
+
 ## Object Types
 
 The following are different object types used in this api which are used to gquery data from graphql and will be used in many graphql queries to be returned by them.
