@@ -40,7 +40,6 @@ const userQueries = {
       isAuthenticated(ctx)
       isValidUser(ctx.user, user_id)
       isAccountVerified(ctx.user)
-      isAdmin(ctx.user)
 
       let allUsers = await User.find().sort({ _id: -1 })
       allUsers = allUsers.filter((user) => user._id.toString() !== user_id)
@@ -50,13 +49,19 @@ const userQueries = {
       generateServerError(err)
     }
   },
-  async GetUserData(_, { user_id }, ctx, ___) {
+  async GetUserData(_, { user_id, receptient_id }, ctx, ___) {
     try {
       isAuthenticated(ctx)
       isValidUser(ctx.user, user_id)
       isAccountVerified(ctx.user)
 
-      const user = await User.findOne({ _id: user_id })
+      let user = null
+
+      if (receptient_id) {
+        user = await User.findOne({ _id: receptient_id })
+      } else {
+        user = await User.findOne({ _id: user_id })
+      }
 
       return userData(user)
     } catch (err) {

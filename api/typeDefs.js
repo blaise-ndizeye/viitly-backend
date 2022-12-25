@@ -591,7 +591,7 @@ const typeDefs = gql`
 
   type Query {
     Hello: String!
-    GetUserData(user_id: ID!): User!
+    GetUserData(user_id: ID!, receptient_id: ID): User!
     GetAllUsers(user_id: ID!): [User!]!
     GetPostData(user_id: ID!, post_id: ID!): Post!
     GetAllPosts(user_id: ID!): [Post!]!

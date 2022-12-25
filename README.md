@@ -764,11 +764,32 @@ This query is used to get the information about the current user.
 **Authorization header is required**
 
 ```graphql
-query ($user_id: ID!) {
-  GetUserData(user_id: $user_id) {
+# receptient_id is the optional is used when the operating user with user_id wants to get the info other user
+
+query ($user_id: ID!, $receptient_id: ID) {
+  GetUserData(user_id: $user_id, receptient_id: $receptient_id) {
     user_id
     user_name
     # ...User Object Data...
+  }
+}
+```
+
+> ### GetAllUsers
+
+This mutation is used to get all users registered in the system.
+
+**Authorization header is required**
+
+
+```graphql
+# The user_id is for the operating user
+
+query ($user_id: ID!) {
+  GetAllUsers(user_id: $user_id) {
+    user_id
+    user_name
+    # ...User Object Data ...
   }
 }
 ```
@@ -1702,20 +1723,6 @@ query ($user_id: ID!) {
   GetAllBlogs(user_id: $user_id) {
     blog_id
     # ...Blog Bject Data...
-  }
-}
-```
-
-> ### GetAllUsers
-
-This mutation is used to get all users registered in the system.
-
-```graphql
-query ($user_id: ID!) {
-  GetAllUsers(user_id: $user_id) {
-    user_id
-    user_name
-    # ...User Object Data ...
   }
 }
 ```
