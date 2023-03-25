@@ -35,11 +35,8 @@ const productQueries = {
       isAuthenticated(ctx)
       isValidUser(ctx.user, user_id)
       isAccountVerified(ctx.user)
-      isBusinessPerson(ctx.user)
 
-      const productExists = await Product.findOne({
-        $and: [{ _id: product_id }, { user_id }],
-      })
+      const productExists = await Product.findOne({ _id: product_id })
       if (!productExists) throw new ApolloError("Product not found", 404)
 
       return productData(productExists)

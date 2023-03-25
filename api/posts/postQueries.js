@@ -31,11 +31,8 @@ const postQueries = {
       isAuthenticated(ctx)
       isValidUser(ctx.user, user_id)
       isAccountVerified(ctx.user)
-      isPayingUser(ctx.user)
 
-      const postExists = await Post.findOne({
-        $and: [{ _id: post_id }, { user_id }],
-      })
+      const postExists = await Post.findOne({ _id: post_id })
       if (!postExists) throw new ApolloError("Post not found", 404)
 
       return postData(postExists)

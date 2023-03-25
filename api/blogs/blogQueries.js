@@ -31,11 +31,8 @@ const blogQueries = {
       isAuthenticated(ctx)
       isValidUser(ctx.user, user_id)
       isAccountVerified(ctx.user)
-      isPayingUser(ctx.user)
 
-      const blogExists = await Blog.findOne({
-        $and: [{ _id: blog_id }, { user_id }],
-      })
+      const blogExists = await Blog.findOne({ _id: blog_id })
       if (!blogExists) throw new ApolloError("Blog not found", 404)
 
       return blogData(blogExists)

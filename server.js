@@ -17,7 +17,7 @@ const contextHandler = require("./api/context")
 async function startApolloServer() {
   const app = express()
 
-  app.use(graphqlUploadExpress({ maxFileSize: 25000000000 })) // 25MB of size
+  app.use(graphqlUploadExpress())
   app.use("/wfy-media", require("./media"))
 
   const httpServer = http.createServer(app)
