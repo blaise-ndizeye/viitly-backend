@@ -1454,6 +1454,7 @@ const userMutations = {
       if (prizeExists.prized)
         throw new ApolloError("Requested prize payment is already prized", 400)
 
+      //  If the requested prize payment is based on Coin-Code Acceptance
       const productPrizes = await Prize.find({
         $and: [{ user_id }, { prize_event: "ACCEPT_CC" }],
       })
