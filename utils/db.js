@@ -6,6 +6,8 @@ const connectDB = async () => {
       ? process.env.DEV_DB_URL
       : process.env.PROD_DB_URL
 
+  mongoose.set("strictQuery", false)
+
   mongoose
     .connect(URL)
     .then(() => {

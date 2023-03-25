@@ -46,10 +46,10 @@ async function startApolloServer() {
 
   await connectDB()
 
-  await new Promise((resolve) =>
-    httpServer.listen({ port: process.env.PORT || 4000 }, resolve)
-  )
-  console.log("Server connection established successfully...")
+  const PORT = process.env.PORT || 4000
+
+  await new Promise((resolve) => httpServer.listen({ port: PORT }, resolve))
+  console.log(`Server connection established successfully at PORT ${PORT}...`)
 }
 
 startApolloServer()
