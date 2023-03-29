@@ -296,7 +296,6 @@ const userQueries = {
           { user_name: { $regex: searchText, $options: "i" } },
           { email: { $regex: searchText, $options: "i" } },
           { phone: { $regex: searchText, $options: "i" } },
-          { whatsapp: { $regex: searchText, $options: "i" } },
         ],
       })
       const pr5 = Transaction.find({
