@@ -70,7 +70,7 @@ const userMutations = {
       const phoneExists = User.findOne({ phone: data.phone })
       const emailExists = User.findOne({ email: data.email })
 
-      const [pr1, pr2, pr3, pr4] = await Promise.all([
+      const [pr1, pr2, pr3] = await Promise.all([
         userNameExists,
         phoneExists,
         emailExists,
@@ -78,7 +78,7 @@ const userMutations = {
 
       if (pr1) throw new ApolloError("Username is not available", 400)
       if (pr2) throw new ApolloError("Phone number is already registered", 400)
-      if (pr4) throw new ApolloError("Email is already registered", 400)
+      if (pr3) throw new ApolloError("Email is already registered", 400)
 
       const salt = await bcrypt.genSalt(10)
       const hashedPassword = await bcrypt.hash(data.password, salt)

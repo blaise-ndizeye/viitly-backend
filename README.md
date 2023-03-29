@@ -162,7 +162,6 @@ The following are different object types used in this api which are used to gque
     user_name
     email
     phone
-    whatsapp
     bio
     nFollowers
     nFollowings
@@ -781,7 +780,6 @@ This mutation is used to get all users registered in the system.
 
 **Authorization header is required**
 
-
 ```graphql
 # The user_id is for the operating user
 
@@ -936,7 +934,7 @@ _When the user deletes his/her account then the account will be archived and unl
 **Authorization header is not required**
 
 ```graphql
-# **credential** can be username, phone number, whatsapp number or email
+# **credential** can be username, phone number or email
 
 mutation ($credential: String!, $password: String!) {
   LoginUser(credential: $credential, password: $password) {
@@ -968,7 +966,6 @@ This mutation is used to register new user and by default the account will get P
     "name": "",
     "user_name": "",
     "phone": "",
-    "whatsapp": "",
     "email": "",
     "password": "",
     "confirm_password": ""
@@ -1035,7 +1032,7 @@ This mutation is used when the user forgets his/her password and it will then be
 **Authorization header is not required**
 
 ```graphql
-# **credential** can be email, phone number, whatsapp number or username
+# **credential** can be email, phone number or username
 
 mutation ($credential: String!) {
   ForgotPassword(credential: $credential) {
@@ -1185,8 +1182,7 @@ This mutation is used to update the credentials or account information of the us
     "password": "", // This is provided once the user wants to update his password otherwise pass an empty string
     "phone": "",
     "user_id": "",
-    "user_name": "",
-    "whatsapp": ""
+    "user_name": ""
   }
 }
 ```
