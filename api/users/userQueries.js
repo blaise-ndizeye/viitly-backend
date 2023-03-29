@@ -251,7 +251,6 @@ const userQueries = {
 
       isAuthenticated(ctx)
       isValidUser(ctx.user, user_id)
-      isAccountVerified(ctx.user)
 
       if (searchText.length === 0)
         throw new ApolloError("Search text is required", 400)
