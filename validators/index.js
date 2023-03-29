@@ -44,16 +44,6 @@ module.exports = {
           "Phone number must have at most 15 digits for international format"
         )
         .required("Phone number is required"),
-      whatsapp: Yup.string()
-        .min(
-          7,
-          "Whatsapp number must have at least 7 digits for international format"
-        )
-        .max(
-          15,
-          "Whatsapp number must have at most 15 digits for international format"
-        )
-        .required("Whatsapp number is required"),
       password: Yup.string()
         .min(6, "Password must have at least 6 characters")
         .required(),

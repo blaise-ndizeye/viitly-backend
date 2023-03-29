@@ -22,10 +22,6 @@ const UserSchema = new Schema({
     type: String,
     required: true,
   },
-  whatsapp: {
-    type: String,
-    required: true,
-  },
   bio: {
     type: String,
     default: "",

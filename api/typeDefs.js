@@ -81,7 +81,6 @@ const typeDefs = gql`
     user_name: String!
     email: String!
     phone: String!
-    whatsapp: String!
     bio: String!
     nFollowers: Int!
     nFollowings: Int!
@@ -400,7 +399,6 @@ const typeDefs = gql`
     name: String!
     user_name: String!
     phone: String!
-    whatsapp: String!
     email: String!
     password: String!
     confirm_password: String!
@@ -411,7 +409,6 @@ const typeDefs = gql`
     name: String!
     user_name: String!
     phone: String!
-    whatsapp: String!
     email: String!
     password: String
     old_password: String!

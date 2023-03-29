@@ -51,22 +51,13 @@ const userMutations = {
   async RegisterUser(_, args, __, ___) {
     try {
       const data = args.inputs
-      const {
-        name,
-        email,
-        user_name,
-        phone,
-        whatsapp,
-        password,
-        confirm_password,
-      } = data
+      const { name, email, user_name, phone, password, confirm_password } = data
 
       const { error } = await registerUserValidation({
         name,
         email,
         phone,
         user_name,
-        whatsapp,
         password,
         confirm_password,
       })
@@ -77,20 +68,16 @@ const userMutations = {
 
       const userNameExists = User.findOne({ user_name: data.user_name })
       const phoneExists = User.findOne({ phone: data.phone })
-      const whatsappExists = User.findOne({ whatsapp: data.whatsapp })
       const emailExists = User.findOne({ email: data.email })
 
       const [pr1, pr2, pr3, pr4] = await Promise.all([
         userNameExists,
         phoneExists,
-        whatsappExists,
         emailExists,
       ])
 
       if (pr1) throw new ApolloError("Username is not available", 400)
       if (pr2) throw new ApolloError("Phone number is already registered", 400)
-      if (pr3)
-        throw new ApolloError("Whatsapp number is already registered", 400)
       if (pr4) throw new ApolloError("Email is already registered", 400)
 
       const salt = await bcrypt.genSalt(10)
@@ -160,7 +147,6 @@ const userMutations = {
           { user_name: credential.toLowerCase() },
           { phone: credential },
           { email: credential },
-          { whatsapp: credential },
         ],
       })
       if (!userExists) throw new ApolloError("Account doesn't exist", 400)
@@ -349,7 +335,6 @@ const userMutations = {
         name,
         user_name,
         phone,
-        whatsapp,
         email,
         password = "",
         old_password,
@@ -365,7 +350,6 @@ const userMutations = {
         email,
         phone,
         user_name,
-        whatsapp,
         password: password !== "" ? password : "1234567",
         confirm_password: password !== "" ? password : "1234567",
       })
@@ -385,14 +369,6 @@ const userMutations = {
         })
         if (phoneExists)
           throw new ApolloError("Phone number is already registered", 400)
-      }
-
-      if (whatsapp !== userExists.whatsapp) {
-        const whatsappExists = await User.findOne({
-          whatsapp,
-        })
-        if (whatsappExists)
-          throw new ApolloError("Whatsapp number is already registered", 400)
       }
 
       if (email !== userExists.email) {
@@ -419,7 +395,6 @@ const userMutations = {
             name,
             email,
             user_name,
-            whatsapp,
             phone,
             password: password !== "" ? newHashedPassword : userExists.password,
           },
@@ -1838,7 +1813,6 @@ const userMutations = {
           { user_name: credential.toLowerCase() },
           { phone: credential },
           { email: credential },
-          { whatsapp: credential },
         ],
       })
       if (!userExists)
