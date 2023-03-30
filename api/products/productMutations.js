@@ -111,6 +111,12 @@ const productMutations = {
       })
       if (!productExist) throw new ApolloError("Product doesn't exist", 400)
 
+      if (
+        productExist.createdAt.toISOString() !==
+        productExist.updatedAt.toISOString()
+      )
+        throw new ApolloError("Product data can be updated only once", 401)
+
       const { categoryError } = validateCategory(category)
       if (categoryError) throw new ApolloError(categoryError, 400)
 
@@ -161,6 +167,12 @@ const productMutations = {
         $and: [{ _id: product_id }, { user_id }],
       })
       if (!productExist) throw new ApolloError("Product doesn't exist", 400)
+
+      if (
+        productExist.createdAt.toISOString() !==
+        productExist.updatedAt.toISOString()
+      )
+        throw new ApolloError("Product data can be updated only once", 401)
 
       const { error, uploadedFiles } = await uploadManyFiles(
         productMedia,

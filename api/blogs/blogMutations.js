@@ -169,6 +169,12 @@ const blogMutations = {
       })
       if (!blogExists) throw new ApolloError("Blog doesn't exist", 400)
 
+      if (
+        blogExists.createdAt.toISOString() !==
+        blogExists.updatedAt.toISOString()
+      )
+        throw new ApolloError("Blog data can be updated only once", 401)
+
       const { error } = await uploadBlogValidation({
         blog_title,
         blog_content,
@@ -210,6 +216,11 @@ const blogMutations = {
         $and: [{ _id: blog_id }, { user_id }],
       })
       if (!blogExist) throw new ApolloError("Blog doesn't exist", 400)
+
+      if (
+        blogExist.createdAt.toISOString() !== blogExist.updatedAt.toISOString()
+      )
+        throw new ApolloError("Blog data can be updated only one time", 401)
 
       const { error, fileName, fileFormat } = await uploadOneFile(
         blogMedia,

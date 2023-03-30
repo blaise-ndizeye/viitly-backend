@@ -167,6 +167,11 @@ const postMutations = {
       if (description.length === 0)
         throw new ApolloError("Description is required", 400)
 
+      if (
+        postExist.createdAt.toISOString() !== postExist.updatedAt.toISOString()
+      )
+        throw new ApolloError("Post data can be updated only once", 401)
+
       await Post.updateOne(
         { _id: postExist._id },
         {
@@ -201,6 +206,11 @@ const postMutations = {
         $and: [{ _id: post_id }, { user_id }],
       })
       if (!postExist) throw new ApolloError("Post doesn't exist", 400)
+
+      if (
+        postExist.createdAt.toISOString() !== postExist.updatedAt.toISOString()
+      )
+        throw new ApolloError("Post data can be updated only once", 401)
 
       const { error, uploadedFiles } = await uploadManyFiles(postMedia)
       if (error) throw new ApolloError(error, 400)

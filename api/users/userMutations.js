@@ -1016,6 +1016,7 @@ const userMutations = {
         const walletExists = await Wallet.findOne({ _id: wallet_id })
         if (!walletExists) throw new ApolloError("Wallet not found", 404)
 
+        //!TODO Add the way to choose payment systems and configure them to ease the payment system
         const { errorMessage, generatedTransaction } = await makePayment(
           walletExists,
           user_id

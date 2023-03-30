@@ -19,6 +19,7 @@ module.exports = {
       verified: data.verified,
       blocked: data.blocked,
       createdAt: data.createdAt.toISOString(),
+      updatedAt: data.updatedAt.toISOString(),
     }
   },
   async generateAccessToken(user = { _id: "" }) {

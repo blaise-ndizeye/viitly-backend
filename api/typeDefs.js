@@ -93,6 +93,7 @@ const typeDefs = gql`
     verified: Boolean!
     role: Role!
     createdAt: String!
+    updatedAt: String!
     blogs_upload_limit: Int!
     posts_upload_limit: Int!
     products_upload_limit: Int!
@@ -145,6 +146,7 @@ const typeDefs = gql`
     nShares: Int!
     nViews: Int!
     createdAt: String!
+    updatedAt: String!
     blocked: Boolean!
     liked_by: [User!]!
     viewed_by: [User!]!
@@ -168,6 +170,7 @@ const typeDefs = gql`
     liked_by: [User!]!
     shared_by: [User!]!
     createdAt: String!
+    updatedAt: String!
     tagged_users: [User!]!
     comments: [Comment!]!
   }
@@ -187,6 +190,7 @@ const typeDefs = gql`
     nShares: Int!
     nViews: Int!
     createdAt: String!
+    updatedAt: String!
     blocked: Boolean!
     liked_by: [User!]!
     shared_by: [User!]!

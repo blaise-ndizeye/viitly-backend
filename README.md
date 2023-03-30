@@ -1984,7 +1984,7 @@ This mutation is used to upload the product to wiitify store and this will decre
 
 > > #### Mutation variables
 
-**Allowed Categories:** _clothing, electronic, art, house, furniture, vehicle, jewerly, fashion, game, kitchen, service, movie_.
+**Allowed Categories:** _clothing, electronics, arts, houses, furnitures, vehicles, jewerly, fashion, games, kitchen, service, movies, gallery_.
 
 ```json
 {

@@ -1,16 +1,17 @@
 const categories = [
   "clothing",
-  "electronic",
-  "art",
-  "house",
-  "furniture",
-  "vehicle",
+  "electronics",
+  "arts",
+  "houses",
+  "furnitures",
+  "vehicles",
   "jewerly",
   "fashion",
-  "game",
+  "games",
   "kitchen",
   "service",
-  "movie",
+  "movies",
+  "gallery",
 ]
 
 module.exports = {
@@ -36,6 +37,7 @@ module.exports = {
       nComments: product.nComments,
       blocked: product.blocked,
       createdAt: product.createdAt.toISOString(),
+      updatedAt: product.updatedAt.toISOString(),
       product_media: product.product_media?.map((media) => ({
         file_format: media.file_format,
         file_name:
