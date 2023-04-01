@@ -79,7 +79,10 @@ const commentMutations = {
         specified_user: commentDestObj?.role
           ? commentDestObj._id.toString()
           : commentDestObj.user_id,
-        body: "You have gained a new comment on your content",
+        body:
+          commentDestName !== "Comment"
+            ? "You have gained a new comment on your content"
+            : "You have been replied on your comment",
       }).save()
 
       return {
