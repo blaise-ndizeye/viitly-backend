@@ -7,6 +7,7 @@ const notificationSchema = new Schema({
     required: true,
     enum: [
       "LIKE", // relate with specified_user
+      "COMMENT", // relate with specified_user
       "FOLLOW", //relate with specified_user
       "REQUEST_CC", // relate with specified_user
       "ACCEPT_CC", // relate with specified_user

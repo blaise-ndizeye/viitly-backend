@@ -93,7 +93,7 @@ const eventMutations = {
                 specified_user: parentObj?.role
                   ? parentObj._id.toString()
                   : parentObj.user_id,
-                body: "You have gained a new like",
+                body: "You have gained a new like on your content",
               }).save()
             }
           }

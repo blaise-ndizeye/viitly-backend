@@ -4,6 +4,7 @@ const Blog = require("../../models/Blog")
 const Comment = require("../../models/Comment")
 const Product = require("../../models/Product")
 const Post = require("../../models/Post")
+const Notification = require("../../models/Notification")
 const { isAuthenticated, isValidUser } = require("../shield")
 const { generateServerError } = require("../../helpers/errorHelpers")
 const {
@@ -71,6 +72,15 @@ const commentMutations = {
           }
         )
       }
+
+      await new Notification({
+        notification_type: "COMMENT",
+        ref_object: commentDestObj._id.toString(),
+        specified_user: commentDestObj?.role
+          ? commentDestObj._id.toString()
+          : commentDestObj.user_id,
+        body: "You have gained a new comment on your content",
+      }).save()
 
       return {
         code: 201,
