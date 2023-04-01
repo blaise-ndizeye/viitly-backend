@@ -1402,6 +1402,13 @@ const userMutations = {
         }).save()
       }
 
+      await new Notification({
+        notification_type: "SHARE",
+        ref_object: contentFound._id.toString(),
+        specified_user: contentFound.user_id,
+        body: "Your content has been shared",
+      }).save()
+
       return {
         code: 200,
         success: true,
