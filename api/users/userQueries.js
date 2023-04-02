@@ -11,12 +11,14 @@ const Location = require("../../models/Location")
 const Following = require("../../models/Following")
 const Transaction = require("../../models/Transaction")
 const ArchivedAccount = require("../../models/ArchivedAccount")
+const Wallet = require("../../models/Wallet")
+const UploadScope = require("../../models/UploadScope")
+const Message = require("../../models/Message")
 const { generateServerError } = require("../../helpers/errorHelpers")
 const {
   isAdmin,
   isAuthenticated,
   isAccountVerified,
-  isPayingUser,
   isValidUser,
 } = require("../shield")
 const {
@@ -32,7 +34,10 @@ const { prizeData, productData } = require("../../helpers/productHelpers")
 const { shuffleArray } = require("../../helpers/customHelpers")
 const { blogData } = require("../../helpers/blogHelpers")
 const { postData } = require("../../helpers/postHelpers")
-const { transactionData } = require("../../helpers/walletHelpers")
+const { transactionData, walletData } = require("../../helpers/walletHelpers")
+const { messageData } = require("../../helpers/messageHelpers")
+const { retrieveHelpers } = require("../customResolvers")
+const { notificationData } = require("../../helpers/notificationHelpers")
 
 const userQueries = {
   async GetAllUsers(_, { user_id }, ctx, ___) {
@@ -357,6 +362,135 @@ const userQueries = {
         transactions: showTransactions
           ? transactionsFound.map((trans) => transactionData(trans))
           : [],
+      }
+    } catch (err) {
+      generateServerError(err)
+    }
+  },
+  async GetAllTransactions(_, { user_id }, ctx, ___) {
+    try {
+      isAuthenticated(ctx)
+      isValidUser(ctx.user, user_id)
+      isAccountVerified(ctx.user)
+
+      let transactionList = []
+
+      if (ctx.user.role === "ADMIN") {
+        transactionList = await Transaction.find().sort({ _id: -1 })
+      } else {
+        transactionList = await Transaction.find({
+          user_id,
+        }).sort({ _id: -1 })
+      }
+
+      return transactionList.map((transaction) => transactionData(transaction))
+    } catch (err) {
+      generateServerError(err)
+    }
+  },
+  async GetWallets(_, { user_id }, ctx, ___) {
+    try {
+      isAuthenticated(ctx)
+      isValidUser(ctx.user, user_id)
+      isAccountVerified(ctx.user)
+
+      let walletList
+
+      switch (ctx.user.role) {
+        case "ADMIN":
+          walletList = await Wallet.find()
+          break
+        case "PERSONAL":
+          walletList = await Wallet.find({
+            $or: [{ scope: "ALL" }, { scope: "PERSONAL" }],
+          })
+          break
+        case "PROFFESSIONAL":
+          walletList = await Wallet.find({
+            $or: [{ scope: "ALL" }, { scope: "BUSINESS" }],
+          })
+          break
+        case "BUSINESS":
+          walletList = await Wallet.find({
+            $or: [{ scope: "ALL" }, { scope: "BUSINESS" }],
+          })
+          break
+        default:
+          walletList = []
+          break
+      }
+      return walletList.map((wallet) => walletData(wallet))
+    } catch (err) {
+      generateServerError(err)
+    }
+  },
+  async GetAllPrizes(_, { user_id }, ctx, ___) {
+    try {
+      isAuthenticated(ctx)
+      isValidUser(ctx.user, user_id)
+      isAccountVerified(ctx.user)
+
+      const allPrizes = await Prize.find({ user_id })
+      return allPrizes.map((prize) => prizeData(prize))
+    } catch (err) {
+      generateServerError(err)
+    }
+  },
+  async GetUserStatus(_, { user_id }, ctx, ___) {
+    try {
+      isAuthenticated(ctx)
+      isValidUser(ctx.user, user_id)
+      isAccountVerified(ctx.user)
+
+      const userScope = await UploadScope.findOne({ user_id })
+
+      const newMessages = await Message.find({
+        $and: [
+          { to: user_id },
+          { seen: false },
+          { deleted_for_receiver: false },
+        ],
+      })
+
+      const messagesList = await Message.find({
+        $or: [{ to: user_id }, { from: user_id }],
+      }).sort({ _id: -1 })
+
+      const userNotifications = await retrieveHelpers.getNotifications(ctx.user)
+
+      const blogs_upload_limit = userScope?.blogs_available
+        ? userScope.blogs_available
+        : 0
+
+      const posts_upload_limit = userScope?.posts_available
+        ? userScope.posts_available
+        : 0
+
+      const products_upload_limit = userScope?.products_available
+        ? userScope.products_available
+        : 0
+
+      const new_messages = newMessages.length
+
+      const messages = messagesList.map((message) => messageData(message))
+
+      const notifications = userNotifications.map((item) =>
+        notificationData(item)
+      )
+
+      const new_notifications = userNotifications.filter(
+        (notification) => !notification.seen_by.includes(user_id)
+      ).length
+
+      return {
+        blogs_upload_limit,
+        posts_upload_limit,
+        products_upload_limit,
+        new_notifications,
+        new_messages,
+        notifications,
+        messages,
+        verified: ctx.user?.verified,
       }
     } catch (err) {
       generateServerError(err)

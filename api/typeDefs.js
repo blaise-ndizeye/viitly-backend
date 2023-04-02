@@ -88,29 +88,27 @@ const typeDefs = gql`
     nPosts: Int!
     nProducts: Int!
     nReviews: Int!
-    new_messages: Int!
-    new_notifications: Int!
-    verified: Boolean!
     role: Role!
     createdAt: String!
     updatedAt: String!
-    blogs_upload_limit: Int!
-    posts_upload_limit: Int!
-    products_upload_limit: Int!
     followers: [Follower!]!
     followings: [Follower!]!
     reviews: [Review!]!
     blogs: [Blog!]!
     posts: [Post!]!
     products: [Product!]!
-    messages: [Message!]!
-    notifications: [Notification!]!
-    wallets: [Wallet!]!
     location: Location!
-    transactions: [Transaction!]!
-    saved_products: [Product!]!
-    requested_products: [RequestedProduct!]!
-    prizes: [Prize!]!
+  }
+
+  type UserStatus {
+    blogs_upload_limit: Int!
+    posts_upload_limit: Int!
+    products_upload_limit: Int!
+    new_messages: Int!
+    new_notifications: Int!
+    verified: Boolean!
+    notifications: [Notification!]!
+    messages: [Message!]!
   }
 
   type Follower {
@@ -609,6 +607,12 @@ const typeDefs = gql`
     GetChatMessages(user_id: ID!, receptient_id: ID!): [Message!]!
     GetFeed(user_id: ID!): [ReferItem!]!
     Search(inputs: SearchInput!): SearchResult!
+    GetAllTransactions(user_id: ID!): [Transaction!]!
+    GetWallets(user_id: ID!): [Wallet!]!
+    GetAllPrizes(user_id: ID!): [Prize!]!
+    GetSavedProducts(user_id: ID!): [Product!]!
+    GetRequestedProducts(user_id: ID!): [RequestedProduct!]!
+    GetUserStatus(user_id: ID!): UserStatus!
   }
 
   type Mutation {

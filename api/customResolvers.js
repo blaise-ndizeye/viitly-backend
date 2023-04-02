@@ -9,22 +9,14 @@ const Following = require("../models/Following")
 const UploadScope = require("../models/UploadScope")
 const Message = require("../models/Message")
 const Notification = require("../models/Notification")
-const SavedProduct = require("../models/SavedProduct")
-const Prize = require("../models/Prize")
-const Wallet = require("../models/Wallet")
 const Location = require("../models/Location")
 const Transaction = require("../models/Transaction")
-const CoinCodeProduct = require("../models/CoinCodeProduct")
 const ReportedContent = require("../models/ReportedContent")
 const { userData, locationData } = require("../helpers/userHelpers")
 const { reviewData } = require("../helpers/reviewHelpers")
 const { blogData } = require("../helpers/blogHelpers")
 const { postData } = require("../helpers/postHelpers")
-const {
-  productData,
-  prizeData,
-  requestedProductData,
-} = require("../helpers/productHelpers")
+const { productData } = require("../helpers/productHelpers")
 const { messageData } = require("../helpers/messageHelpers")
 const { notificationData } = require("../helpers/notificationHelpers")
 const {
@@ -33,7 +25,6 @@ const {
   replyData,
 } = require("../helpers/commentHelpers")
 const { followData } = require("../helpers/followHelpers")
-const { walletData, transactionData } = require("../helpers/walletHelpers")
 const { reportedContentData } = require("../helpers/problemHelpers")
 
 let retrieveHelpers = {
@@ -162,18 +153,6 @@ const customResolvers = {
       })
       return reviews.map((review) => reviewData(review))
     },
-    async blogs_upload_limit(parent) {
-      const userScope = await UploadScope.findOne({ user_id: parent.user_id })
-      return userScope?.blogs_available ? userScope.blogs_available : 0
-    },
-    async posts_upload_limit(parent) {
-      const userScope = await UploadScope.findOne({ user_id: parent.user_id })
-      return userScope?.posts_available ? userScope.posts_available : 0
-    },
-    async products_upload_limit(parent) {
-      const userScope = await UploadScope.findOne({ user_id: parent.user_id })
-      return userScope?.products_available ? userScope.products_available : 0
-    },
     async blogs(parent) {
       const blogList = await Blog.find({ user_id: parent.user_id })
       return blogList.map((blog) => blogData(blog))
@@ -201,23 +180,6 @@ const customResolvers = {
       })
       return followingsList.map((followinger) => followData(followinger))
     },
-    async messages(parent) {
-      const messagesList = await Message.find({
-        $or: [{ to: parent.user_id }, { from: parent.user_id }],
-      }).sort({ _id: -1 })
-
-      return messagesList.map((message) => messageData(message))
-    },
-    async new_messages(parent) {
-      const newMessages = await Message.find({
-        $and: [
-          { to: parent.user_id },
-          { seen: false },
-          { deleted_for_receiver: false },
-        ],
-      })
-      return newMessages.length
-    },
     async nBlogs(parent) {
       const blogList = await Blog.find({ user_id: parent.user_id })
       return blogList.length
@@ -230,83 +192,9 @@ const customResolvers = {
       const productList = await Product.find({ user_id: parent.user_id })
       return productList.length
     },
-    async notifications(parent) {
-      let allNotifications = await retrieveHelpers.getNotifications(parent)
-      return allNotifications.map((item) => notificationData(item))
-    },
-    async new_notifications(parent) {
-      const userNotifications = await retrieveHelpers.getNotifications(parent)
-      return userNotifications.filter(
-        (notification) => !notification.seen_by.includes(parent.user_id)
-      ).length
-    },
-    async wallets(parent) {
-      let walletList
-      switch (parent.role) {
-        case "ADMIN":
-          walletList = await Wallet.find()
-          break
-        case "PERSONAL":
-          walletList = await Wallet.find({
-            $or: [{ scope: "ALL" }, { scope: "PERSONAL" }],
-          })
-          break
-        case "PROFFESSIONAL":
-          walletList = await Wallet.find({
-            $or: [{ scope: "ALL" }, { scope: "BUSINESS" }],
-          })
-          break
-        case "BUSINESS":
-          walletList = await Wallet.find({
-            $or: [{ scope: "ALL" }, { scope: "BUSINESS" }],
-          })
-          break
-        default:
-          walletList = []
-          break
-      }
-      return walletList.map((wallet) => walletData(wallet))
-    },
-    async transactions(parent) {
-      let transactionList = []
-
-      if (parent.role === "ADMIN") {
-        transactionList = await Transaction.find().sort({ _id: -1 })
-      } else {
-        transactionList = await Transaction.find({
-          user_id: parent.user_id,
-        }).sort({ _id: -1 })
-      }
-
-      return transactionList.map((transaction) => transactionData(transaction))
-    },
     async location(parent) {
       const userLocation = await Location.findOne({ user_id: parent.user_id })
       return locationData(userLocation)
-    },
-    async saved_products(parent) {
-      const savedProducts = await SavedProduct.find({ user_id: parent.user_id })
-      let relatedProducts = []
-
-      for (let item of savedProducts) {
-        const product = await Product.findOne({ _id: item.product_id })
-        relatedProducts.push(product)
-      }
-
-      return relatedProducts.map((product) => productData(product))
-    },
-    async requested_products(parent) {
-      const coinCodeProducts = await CoinCodeProduct.find({
-        user_id: parent.user_id,
-      })
-
-      return coinCodeProducts.map((ccProduct) =>
-        requestedProductData(ccProduct)
-      )
-    },
-    async prizes(parent) {
-      const allPrizes = await Prize.find({ user_id: parent.user_id })
-      return allPrizes.map((prize) => prizeData(prize))
     },
   },
   Post: {
@@ -615,4 +503,4 @@ const customResolvers = {
   },
 }
 
-module.exports = customResolvers
+module.exports = { customResolvers, retrieveHelpers }

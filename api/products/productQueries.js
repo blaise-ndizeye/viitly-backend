@@ -2,6 +2,7 @@ const { ApolloError } = require("apollo-server-errors")
 
 const Product = require("../../models/Product")
 const CoinCodeProduct = require("../../models/CoinCodeProduct")
+const SavedProduct = require("../../models/SavedProduct")
 const { generateServerError } = require("../../helpers/errorHelpers")
 const {
   isAdmin,
@@ -65,6 +66,40 @@ const productQueries = {
       }
 
       return requestedProducts.map((product) => requestedProductData(product))
+    } catch (err) {
+      generateServerError(err)
+    }
+  },
+  async GetSavedProducts(_, { user_id }, ctx, ___) {
+    try {
+      isAuthenticated(ctx)
+      isValidUser(ctx.user, user_id)
+      isAccountVerified(ctx.user)
+
+      const savedProducts = await SavedProduct.find({ user_id })
+      let relatedProducts = []
+
+      for (let item of savedProducts) {
+        const product = await Product.findOne({ _id: item.product_id })
+        relatedProducts.push(product)
+      }
+
+      return relatedProducts.map((product) => productData(product))
+    } catch (err) {
+      generateServerError(err)
+    }
+  },
+  async GetRequestedProducts(_, { user_id }, ctx, ___) {
+    try {
+      isAuthenticated(ctx)
+      isValidUser(ctx.user, user_id)
+      isAccountVerified(ctx.user)
+
+      const coinCodeProducts = await CoinCodeProduct.find({ user_id })
+
+      return coinCodeProducts.map((ccProduct) =>
+        requestedProductData(ccProduct)
+      )
     } catch (err) {
       generateServerError(err)
     }
