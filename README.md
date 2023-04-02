@@ -1,8 +1,8 @@
 # Wiitify API Service
 
-**GraphQL** based API Service for manipulating data in the wiitify store/database.
+This project is made with **NodeJS, expressJS, GraphQL and MongoDB**
 
-> **Wiitify** is an marketing platform with the aim of connecting people with their product, blogs and post desires which help them to earn income while using the platform in different ways **<u>for example:</u>** _Getting discount on the products after confirming their requested coin-code by the product owner where user will be prized after confirming his/her coin-code product requests for at least `numberOfProductPrizes` set in `.env` file and other many ways_
+> **Wiitify** is an marketing platform with the aim of connecting people with their product, blogs and post desires which help them to earn income while using the platform in different ways **<u>for example:</u>** _Getting discount on the products after confirming their requested coin-code by the product owner where user will be prized after confirming his/her coin-code product requests for at least `numberOfProductPrizes` set by Platform owners and other many ways_
 
 #### It is composed with **Four access layers**
 
@@ -169,14 +169,8 @@ The following are different object types used in this api which are used to gque
     nPosts
     nProducts
     nReviews
-    new_messages
-    new_notifications
-    verified
     role
     createdAt
-    blogs_upload_limit
-    posts_upload_limit
-    products_upload_limit
     followers {
         follower_id
         # ...Follower Object Data ...
@@ -201,39 +195,32 @@ The following are different object types used in this api which are used to gque
         product_id
         # ...Product Object Data ...
     }
-    messages {
-        message_id
-        # ...Message Object Data ...
-    }
-    notifications {
-        notification_id
-        # ...Notification Object Data ...
-    }
-    wallets {
-        wallet_id
-        # ...Review Object Data ...
-    }
     location {
         district
         # ...Location Object Data ...
     }
-    transactions {
-        transaction_id
-        # ...Transaction Object Data ...
-    }
-    saved_products {
-        product_id
-        # ...Product Object Data ...
-    }
-    requested_products {
-        request_id
-        # ...RequestedProduct Object Data ...
-    }
-    prizes {
-        prize_id
-        # ...Prize Object Data ...
-    }
   }
+```
+
+> #### UserStatus Object Type
+
+```graphql
+UserStatus {
+ blogs_upload_limit
+ posts_upload_limit
+ products_upload_limit
+ new_messages
+ new_notifications
+ verified
+ notifications {
+   notification_id
+   # ...Notification Object Data ...
+ }
+ messages {
+   message_id
+   # ...Message Object Data ...
+ }
+}
 ```
 
 > #### Product Object Type
@@ -718,13 +705,85 @@ These queries are accessible in all access layers (**PERSONAL, BUSINESS, PROFFES
 
 > ### Hello
 
-This is query is used to get the greetings from the server.</br>
+This query is used to get the greetings from the server.</br>
 
 **Authorization header is not required**
 
 ```graphql
 query {
   Hello
+}
+```
+
+> ### GetUserStatus
+
+This query is used to get user sensitive information about quick status of his/her account.
+
+**Authorization header is required**
+
+```graphql
+query ($user_id: ID!) {
+  GetUserStatus(user_id: $user_id) {
+    blogs_upload_limit
+    posts_upload_limit
+    products_upload_limit
+    new_messages
+    new_notifications
+    verified
+    notifications {
+      notification_id
+      # ... Notification Object Data ...
+    }
+    messages {
+      message_id
+      # ... Message Object Data ...
+    }
+  }
+}
+```
+
+> ### GetWallets
+
+This query is used to get all possible wallets the user can choose from inorder to make any paying transactions on the platform.
+
+**Authorization header is required**
+
+```graphql
+query ($user_id: ID!) {
+  GetWallets(user_id: $user_id) {
+    wallet_id
+    price
+    blogs_to_offer
+    posts_to_offer
+    products_to_offer
+    scope
+    currency
+    createdAt
+  }
+}
+```
+
+> ### GetAllTransactions
+
+This query is used to get all transactions committed by the user on the platform.
+
+**Authorization header is required**
+
+```graphql
+query ($user_id: ID!) {
+  GetAllTransactions(user_id: $user_id) {
+    transaction_id
+    provider_trans_id
+    amount_paid
+    currency_used
+    description
+    transaction_role
+    createdAt
+    done_by {
+      user_id
+      # ...User Object Data...
+    }
+  }
 }
 ```
 
@@ -752,6 +811,67 @@ query ($user_id: ID!) {
       blog_id
       # ...Blog Object Data ...
     }
+  }
+}
+```
+
+> ### GetAllPrizes
+
+This query is used to get all prizes earned by the user. Both the paid, pending and unpaid prizes.
+
+**Authorization header is required**
+
+```graphql
+query ($user_id: ID!) {
+  GetAllPrizes(user_id: $user_id) {
+    prize_id
+    owner {
+      user_id
+      # ...User Object Data ...
+    }
+    prize_event
+    prize_amount
+    prize_amount_currency
+    prized
+    prizedAt
+  }
+}
+```
+
+> ### GetSavedproducts
+
+This query is used to get all saved products of the user. Mostly there purposes are to ease the request of coin-code for that product when they purchase it.
+
+**Authorization header**
+
+```graphql
+query ($user_id: ID!) {
+  GetSavedProducts(user_id: $user_id) {
+    product_id
+    #...User Object Data ...
+  }
+}
+```
+
+> ### GetRequestedProducts
+
+This query is used to get all requested products for coin-code for the user. They help the user to earn more prizes
+
+**Authorization header is required**
+
+```graphql
+query ($user_id: ID!) {
+  GetRequestedProducts(user_id: $user_id) {
+    request_id
+    product {
+      product_id
+      # ... Product Object Data ...
+    }
+    requested_by {
+      user_id
+      # ... User Object Data ...
+    }
+    requestedAt
   }
 }
 ```
