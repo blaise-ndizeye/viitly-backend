@@ -75,7 +75,7 @@ const commentMutations = {
 
       await new Notification({
         notification_type: "COMMENT",
-        ref_object: commentDestObj._id.toString(),
+        ref_object: newComment._id.toString(),
         specified_user: commentDestObj?.role
           ? commentDestObj._id.toString()
           : commentDestObj.user_id,
@@ -172,6 +172,8 @@ const commentMutations = {
           $or: [{ to: commentExists._id }, { to: commentDestObj._id }],
         })
       }
+
+      await Notification.deleteMany({ ref_object: comment_id })
 
       if (commentDestName === "Blog") {
         await Blog.updateOne(
