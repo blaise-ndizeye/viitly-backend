@@ -6,8 +6,6 @@ const Review = require("../models/Reviews")
 const User = require("../models/User")
 const Comment = require("../models/Comment")
 const Following = require("../models/Following")
-const UploadScope = require("../models/UploadScope")
-const Message = require("../models/Message")
 const Notification = require("../models/Notification")
 const Location = require("../models/Location")
 const Transaction = require("../models/Transaction")
@@ -17,8 +15,7 @@ const { reviewData } = require("../helpers/reviewHelpers")
 const { blogData } = require("../helpers/blogHelpers")
 const { postData } = require("../helpers/postHelpers")
 const { productData } = require("../helpers/productHelpers")
-const { messageData } = require("../helpers/messageHelpers")
-const { notificationData } = require("../helpers/notificationHelpers")
+
 const {
   commentData,
   getCommentDestination,
