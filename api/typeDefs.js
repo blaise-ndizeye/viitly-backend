@@ -46,13 +46,18 @@ const typeDefs = gql`
   }
 
   enum Currency {
-    FRW
+    RWF
     USD
   }
 
   enum SetStatus {
     BLOCK
     UNBLOCK
+  }
+
+  enum PaymentMethod {
+    AIRTEL
+    MTN
   }
 
   scalar Upload
@@ -588,6 +593,13 @@ const typeDefs = gql`
     filters: [SearchFilter]!
   }
 
+  input BoostResourcesInput {
+    user_id: ID!
+    wallet_id: ID!
+    paymentMethod: PaymentMethod!
+    msisdn: String!
+  }
+
   type Query {
     Hello: String!
     GetUserData(user_id: ID!, receptient_id: ID): User!
@@ -678,7 +690,7 @@ const typeDefs = gql`
     SwitchToProAccount(inputs: SwitchToProInputs!): LogUserResponse!
     SwitchToBusinessAccount(inputs: SwitchToBusinessInputs!): LogUserResponse!
     UpdateUserLocation(inputs: UpdateLocationInput): LogUserResponse!
-    BoostResources(user_id: ID!, wallet_id: ID!): LogUserResponse!
+    BoostResources(inputs: BoostResourcesInput!): LogUserResponse!
     SaveProduct(user_id: ID!, product_id: ID!): DeleteDataResponse! # This response is being reused for many objects for decreasing duplication
     DeleteSavedProduct(user_id: ID!, product_id: ID!): DeleteDataResponse!
     RequestCoinCode(user_id: ID!, product_id: ID!): DeleteDataResponse!

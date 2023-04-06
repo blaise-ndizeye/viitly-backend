@@ -288,6 +288,12 @@ const productMutations = {
       if (productExists.user_id === user_id)
         throw new ApolloError("This is your own product", 400)
 
+      const savedProductExists = await SavedProduct.findOne({
+        $and: [{ user_id }, { product_id }],
+      })
+      if (savedProductExists)
+        throw new ApolloError("This product is already saved")
+
       await new SavedProduct({
         user_id,
         product_id: productExists._id.toString(),
@@ -438,6 +444,18 @@ const productMutations = {
         transaction_role: "SELL",
       }).save()
 
+      // Delete notification of the receptient which contains a Coin-Code.
+      await Notification.deleteMany({
+        $and: [
+          {
+            body: `Request is sent to the product owner with coin-code: ${coinCode}`,
+          },
+          {
+            specified_user: receptient_id,
+          },
+        ],
+      })
+
       return {
         code: 200,
         success: true,
@@ -484,6 +502,18 @@ const productMutations = {
       }).save()
 
       await CoinCodeProduct.deleteOne({ _id: coinCodeProductExists._id })
+
+      // Delete notification of the receptient which contains a Coin-Code.
+      await Notification.deleteMany({
+        $and: [
+          {
+            body: `Request is sent to the product owner with coin-code: ${coinCodeProductExists.coin_code}`,
+          },
+          {
+            specified_user: receptient_id,
+          },
+        ],
+      })
 
       return {
         code: 200,

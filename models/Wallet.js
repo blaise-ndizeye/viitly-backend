@@ -20,7 +20,7 @@ const walletSchema = new Schema({
   },
   currency: {
     type: "String",
-    default: "FRW",
+    default: "RWF",
   },
   scope: {
     type: String,

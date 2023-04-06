@@ -25,6 +25,7 @@ module.exports = async function (context) {
       error: "",
     }
   } catch (err) {
+    console.error(err)
     throw new ApolloError(err.message, 500)
   }
 }
