@@ -9,7 +9,7 @@ const connectDB = async () => {
   mongoose.set("strictQuery", false)
 
   mongoose
-    .connect(URL)
+    .connect(URL, { useUnifiedTopology: true })
     .then(() => {
       console.log("Database connection established successfully...")
     })

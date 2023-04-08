@@ -40,6 +40,10 @@ DEV_DB_URL = mongodb://127.0.0.1:27017/wiitify # Development Database URL
 
 PROD_DB_URL = mongodb://*******/wiitify # Production Database URL and not required in development
 
+MONGO_ROOT_USER=manager # Username for mongodb user
+
+MONGO_ROOT_PASSWORD=ab1234 # Password for mongodb user
+
 NODE_ENV = development or production
 
 ACCESS_SECRET = ***random string***

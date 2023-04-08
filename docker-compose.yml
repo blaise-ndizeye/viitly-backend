@@ -1,11 +1,12 @@
 version: "2"
 services:
-  mongo:
+  wiitifydb:
     image: mongo:latest
-    container_name: mongo
+    container_name: wiitifydb
+    restart: always
     environment:
-      MONGO_INITDB_ROOT_USERNAME: admin
-      MONGO_INITDB_ROOT_PASSWORD: ab1234
+      MONGO_INITDB_ROOT_USERNAME: ${MONGO_ROOT_USER}
+      MONGO_INITDB_ROOT_PASSWORD: ${MONGO_ROOT_PASSWORD}
     ports:
       - "27017:27017"
     networks:
@@ -17,13 +18,13 @@ services:
     build: .
     container_name: api
     depends_on:
-      - mongo
+      - wiitifydb
     env_file:
       - .env
     environment:
       - PORT=5000
       - NODE_ENV=development
-      - DEV_DB_URL=mongodb://admin:ab1234@mongo:27017
+      - DEV_DB_URL=mongodb://${MONGO_ROOT_USER}:${MONGO_ROOT_PASSWORD}@wiitifydb:27017
       - PROD_DB_URL=""
     ports:
       - "5000:5000"
