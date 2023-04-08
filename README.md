@@ -76,32 +76,12 @@ SWITCH_TO_PRO_MUST_CCPRODUCTS = 40 # Number of confirmed coin-code products the 
 
 ```
 
-## Install dependencies and start development server
+## Start development server
 
-To install dependencies navigate in the terminal of the root folder and type:
-
-_Recommended way_
+To start the development server, all you need is to have docker with docker-compose installed on your machine and then first create `.env` file in root project folder to enter all that configuration variables and then go in the with the same folder path and type:
 
 ```terminal
-yarn
-```
-
-_If you prefer npm first delete `yarn.lock` file in the root folder and then type:_
-
-```terminal
-npm install
-```
-
-After all above steps you're ready to start development server, type:
-
-```terminal
-yarn dev
-```
-
-_For npm users_
-
-```terminal
-npm run dev
+docker-compose up
 ```
 
 > The graphql requests will be served at `https://domain-host.com/api` route with **POST** HTTP method.
