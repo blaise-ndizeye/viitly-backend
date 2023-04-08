@@ -17,7 +17,6 @@
     "bcryptjs": "^2.4.3",
     "dotenv": "^16.0.1",
     "express": "^4.18.1",
-    "express-sharp": "^4.2.41",
     "graphql": "^16.5.0",
     "graphql-upload": "13.0.0",
     "jsonwebtoken": "^8.5.1",

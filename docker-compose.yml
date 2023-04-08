@@ -1,0 +1,39 @@
+version: "2"
+services:
+  mongo:
+    image: mongo:latest
+    container_name: mongo
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: admin
+      MONGO_INITDB_ROOT_PASSWORD: ab1234
+    ports:
+      - "27017:27017"
+    networks:
+      - wiitify-network
+    volumes:
+      - mongo_data:/data/db
+
+  api:
+    build: .
+    container_name: api
+    depends_on:
+      - mongo
+    env_file:
+      - .env
+    environment:
+      - PORT=5000
+      - NODE_ENV=development
+      - DEV_DB_URL=mongodb://admin:ab1234@mongo:27017
+      - PROD_DB_URL=""
+    ports:
+      - "5000:5000"
+    networks:
+      - wiitify-network
+    volumes:
+      - ./:/app
+
+networks:
+  wiitify-network:
+
+volumes:
+  mongo_data:

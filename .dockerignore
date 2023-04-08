@@ -1,0 +1,7 @@
+/dev
+**/node_modules
+*.env
+public/uploads/**
+.vscode/
+*.sw*
+.idea/

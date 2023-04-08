@@ -1,14 +1,25 @@
 const path = require("path")
 const fs = require("fs")
 const router = require("express").Router()
-const { expressSharp, FsAdapter } = require("express-sharp")
 
-router.use(
-  "/",
-  expressSharp({
-    imageAdapter: new FsAdapter(path.join(__dirname, "../public/uploads")),
-  })
-)
+router.get("/:filename", (req, res) => {
+  const filename = req.params.filename
+  const imagePath = path.join(__dirname, "../public/uploads", filename)
+
+  // Get the file extension
+  const ext = path.extname(imagePath).toLowerCase()
+
+  // Check if the file exists
+  if (!fs.existsSync(imagePath)) {
+    res.status(404).send("Image not found")
+    return
+  }
+
+  // Read the file and send it to the client
+  const file = fs.readFileSync(imagePath)
+  res.contentType(ext)
+  res.send(file)
+})
 
 router.get("/watch", (req, res) => {
   try {
@@ -19,12 +30,10 @@ router.get("/watch", (req, res) => {
         .json({ success: false, message: "Range Header is required" })
 
     if (!req.query?.videoId)
-      return res
-        .status(400)
-        .json({
-          success: false,
-          message: "videoId query parameter is required",
-        })
+      return res.status(400).json({
+        success: false,
+        message: "videoId query parameter is required",
+      })
 
     const exactVideoPath = path.join(
       __dirname,
