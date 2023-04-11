@@ -37,4 +37,4 @@ networks:
   wiitify-network:
 
 volumes:
-  mongo_data:
+  mongo-data:
