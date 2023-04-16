@@ -1,7 +1,7 @@
 version: "2"
 services:
   wiitifydb:
-    image: mongo:latest
+    image: mongo:6.0
     container_name: wiitifydb
     restart: always
     environment:
@@ -10,9 +10,9 @@ services:
     ports:
       - "27017:27017"
     networks:
-      - wiitify-network
+      - api-network
     volumes:
-      - mongo_data:/data/db
+      - mongo-data:/data/db
 
   api:
     build: .
@@ -24,17 +24,20 @@ services:
     environment:
       - PORT=5000
       - NODE_ENV=development
-      - DEV_DB_URL=mongodb://${MONGO_ROOT_USER}:${MONGO_ROOT_PASSWORD}@wiitifydb:27017
-      - PROD_DB_URL=""
+      - MONGODB_URL=mongodb://${MONGO_ROOT_USER}:${MONGO_ROOT_PASSWORD}@wiitifydb:27017
     ports:
       - "5000:5000"
     networks:
-      - wiitify-network
+      - api-network
     volumes:
       - ./:/app
+      - node-modules:/app/node_modules
+      - file-uploads:/app/public/uploads
 
 networks:
-  wiitify-network:
+  api-network:
 
 volumes:
   mongo-data:
+  node-modules:
+  file-uploads:
