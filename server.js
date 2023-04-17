@@ -9,7 +9,7 @@ const {
 } = require("apollo-server-core")
 const { graphqlUploadExpress } = require("graphql-upload")
 
-const typeDefs = require("./api/typeDefs")
+const typeDefs = require("./api/typeDefs") 
 const resolvers = require("./api/resolvers")
 const connectDB = require("./utils/db")
 const contextHandler = require("./api/context")
