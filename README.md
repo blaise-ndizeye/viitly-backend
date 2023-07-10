@@ -1,4 +1,4 @@
-# Wiitify API Service
+# Viitly API Service
 
 This project is made with **NodeJS, expressJS, GraphQL and MongoDB**
 
