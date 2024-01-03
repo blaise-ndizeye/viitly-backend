@@ -2,7 +2,7 @@
 
 This project is made with **NodeJS, expressJS, GraphQL and MongoDB**
 
-> **Wiitify** is an marketing platform with the aim of connecting people with their product, blogs and post desires which help them to earn income while using the platform in different ways **<u>for example:</u>** _Getting discount on the products after confirming their requested coin-code by the product owner where user will be prized after confirming his/her coin-code product requests for at least `numberOfProductPrizes` set by Platform owners and other many ways_
+> **Viitly** is an marketing platform with the aim of connecting people with their product, blogs and post desires which help them to earn income while using the platform in different ways **<u>for example:</u>** _Getting discount on the products after confirming their requested coin-code by the product owner where user will be prized after confirming his/her coin-code product requests for at least `numberOfProductPrizes` set by Platform owners and other many ways_
 
 #### It is composed with **Four access layers**
 
